@@ -1,0 +1,21 @@
+.container {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 28px;
+  color: #0b0b0b;
+}
+.heading { font-size: 1.4rem; margin-bottom: 12px; }
+.card { display: flex; gap: 20px; align-items: flex-start; background: #fff; padding: 18px; border-radius: 12px; box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
+.image { width: 360px; height: 360px; object-fit: cover; border-radius: 12px; }
+.info { flex: 1; }
+.price { font-size: 1.6rem; color: #2f7a3e; font-weight: 700; margin-bottom: 10px; }
+.form { display: flex; flex-direction: column; gap: 12px; }
+.input, .select, .textarea { padding: 10px 12px; border-radius: 10px; border: 1px solid #e6efe7; }
+.actions { display: flex; gap: 12px; margin-top: 12px; }
+.primaryBtn { background: #2f7a3e; color: white; border: none; padding: 12px 18px; border-radius: 10px; cursor: pointer; }
+.secondaryBtn { background: #f3f3f3; border: none; padding: 12px 18px; border-radius: 10px; cursor: pointer; }
+
+@media (max-width: 900px) {
+  .card { flex-direction: column; }
+  .image { width: 100%; height: auto; max-height: 400px; }
+}

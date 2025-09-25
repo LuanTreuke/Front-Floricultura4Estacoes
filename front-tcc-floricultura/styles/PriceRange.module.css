@@ -1,0 +1,24 @@
+.rangeGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  color: black;
+}
+.sliderWithValues {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.range {
+  width: 120px;
+}
+.values {
+  font-size: 0.95rem;
+  color: #4b7350;
+  margin-left: 8px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
+}
