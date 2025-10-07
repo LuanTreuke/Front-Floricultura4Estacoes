@@ -73,7 +73,7 @@ export default function HomePage() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, [showPopup]);
 
-
+// carregando produtos
   useEffect(() => {
     fetchProducts()
       .then(data => {
@@ -135,8 +135,11 @@ export default function HomePage() {
           <div className={styles.logo}>
             <img src="/Logo floricultura.jpg" alt="Logo Floricultura Quatro Estações" style={{ height: 96, width: 'auto', display: 'block' }} />
           </div>
-          <div style={{ position: 'relative', display: 'inline-block' }}>
-            <button
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', position: 'relative' }}>
+            <button className={styles.shoppingCart} onClick={() => router.push('/carrinho')}>
+              <span className="material-icons" style={{ verticalAlign: 'middle', fontSize: 22}}>shopping_cart</span>
+            </button>
+            <button 
               className={styles.loginBtn}
               onClick={() => {
                 if (isLoggedIn) setShowPopup((v) => !v);
@@ -160,7 +163,7 @@ export default function HomePage() {
                   className={styles.loginPopupBtn}
                   onClick={() => {
                     setShowPopup(false);
-                    router.push('/admin');
+                    router.push('/admin/pedidos');
                   }}
                 >
                   Painel administrativo
@@ -219,7 +222,7 @@ export default function HomePage() {
           className={styles.orderBtn}
           ref={orderBtnRef}
           style={{ bottom: orderBtnBottom, position: 'fixed', left: '50%', transform: 'translateX(-50%)' }}
-          onClick={() => router.push('/product')}
+          onClick={() => router.push('/carrinho')}
         >
           <span role="img" aria-label="whatsapp"></span> Faça seu pedido!
         </button>

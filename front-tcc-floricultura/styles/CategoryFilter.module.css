@@ -5,10 +5,10 @@
 }
 .button {
   background: #f3f7f4;
+  color: #4b7350;
   border: none;
   border-radius: 8px;
   padding: 6px 16px;
-  color: #4b7350;
   font-weight: 500;
   font-size: 1rem;
   cursor: pointer;

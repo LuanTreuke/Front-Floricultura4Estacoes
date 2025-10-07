@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { fetchProductById, Product } from '../../../services/productService';
 import styles from '../../../styles/ProductDetail.module.css';
+import { addToCart } from '../../../services/cartService';
 
 export default function ProductPage() {
   const params = useParams();
@@ -10,6 +11,7 @@ export default function ProductPage() {
   const router = useRouter();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
+  const [addedMsg, setAddedMsg] = useState<string | null>(null);
   
   useEffect(() => {
     fetchProductById(id).then(p => { setProduct(p); setLoading(false); });
@@ -30,6 +32,18 @@ export default function ProductPage() {
           <div className={styles.actions}>
             <button className={styles.orderBtn} onClick={() => router.push(`/product/${id}/pedido`)}>Fazer pedido</button>
           </div>
+
+          <div className={styles.actions}>
+            <button className={styles.shoppingCart} onClick={() => {
+              addToCart({ id: product.id, nome: product.nome, preco: product.preco, imagem_url: product.imagem_url });
+              setAddedMsg('Adicionado');
+              setTimeout(() => setAddedMsg(null), 1500);
+            }}>
+              <span className={`material-icons ${styles.icon}`}>shopping_cart</span>
+              {addedMsg || 'Adicionar ao carrinho'}
+            </button>
+          </div>
+
         </div>
       </div>
     </div>

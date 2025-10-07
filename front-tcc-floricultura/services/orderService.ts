@@ -20,8 +20,21 @@ export interface CreateOrderDto {
 }
 
 export async function createOrder(dto: CreateOrderDto) {
-  const res = await axios.post(`${API_URL}/pedidos`, dto);
-  return res.data;
+  try {
+    const res = await axios.post(`${API_URL}/pedidos`, dto);
+    return res.data;
+  } catch (err: any) {
+    const resp = err && err.response ? err.response : null;
+    const respData = resp && resp.data ? resp.data : null;
+    let msg: string;
+    if (respData) {
+      try { msg = typeof respData === 'string' ? respData : JSON.stringify(respData); } catch (e) { msg = String(respData); }
+    } else {
+      msg = (err && err.message) || String(err);
+    }
+    if (resp && resp.status) msg = `[${resp.status}] ${msg}`;
+    throw new Error(msg);
+  }
 }
 
 export async function fetchOrders() {

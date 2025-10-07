@@ -16,6 +16,10 @@ export default function ProductOrderPage() {
   const [selectedAddress, setSelectedAddress] = useState<number | null>(null);
   const [nomeCliente, setNomeCliente] = useState('');
   const [telefone, setTelefone] = useState('');
+  const [nomeDestinatario, setNomeDestinatario] = useState('');
+  const [dataEntrega, setDataEntrega] = useState('');
+  const [horaEntrega, setHoraEntrega] = useState('');
+  const [cobrarNoEndereco, setCobrarNoEndereco] = useState(false);
   const [observacao, setObservacao] = useState('');
   const [newAddressText, setNewAddressText] = useState('');
   const [addMessage, setAddMessage] = useState<string | null>(null);
@@ -28,6 +32,9 @@ export default function ProductOrderPage() {
       const all = await fetchAddresses();
       if (usuario && usuario.id) {
         setAddresses((all || []).filter((a: any) => a.Usuario_id === usuario.id));
+        // prefills com os dados do usuário logado quando disponíveis
+        if (usuario.nome) setNomeCliente(usuario.nome);
+        if (usuario.telefone) setTelefone(usuario.telefone);
       } else {
         setAddresses([]);
       }
@@ -46,10 +53,29 @@ export default function ProductOrderPage() {
       alert('Selecione um endereço ou cadastre um');
       return;
     }
+    // quando o pedido é feito diretamente da página do produto, vamos
+    // serializar as informações do produto dentro do campo `observacao`
+    // no formato esperado pelo painel admin: { cart: [ { id, nome, preco, quantidade, imagem_url }, ... ], nota }
+    const prodItem = product ? {
+      id: product.id,
+      nome: product.nome,
+      preco: product.preco,
+      quantidade: 1,
+      imagem_url: product.imagem_url || null,
+    } : null;
+
+    const observacaoPayload: any = prodItem ? { cart: [prodItem] } : {};
+    if (observacao && typeof observacao === 'string' && observacao.trim().length > 0) observacaoPayload.nota = observacao;
+
     const dto = {
+      nome_destinatario: nomeDestinatario,
+      data_entrega: dataEntrega || undefined,
+      hora_entrega: horaEntrega || undefined,
       nome_cliente: nomeCliente || usuario.nome || '',
       telefone_cliente: telefone || usuario.telefone || '',
-      observacao,
+      // armazenamos a payload como string para manter compatibilidade com o backend
+      observacao: Object.keys(observacaoPayload).length ? JSON.stringify(observacaoPayload) : undefined,
+      cobrar_no_endereco: cobrarNoEndereco,
       Endereco_id: selectedAddress,
       Usuario_id: (typeof usuario?.id === 'number' && usuario.id > 0) ? usuario.id : null,
     };
@@ -87,10 +113,24 @@ export default function ProductOrderPage() {
               ))}
             </select>
 
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <div style={{ marginTop: 8 }}>
               <button type="button" className={styles.primaryBtn} onClick={() => router.push('/cadastro/endereco')}>
                 + Adicionar endereço
               </button>
+            </div>
+
+            <label>Nome do destinatário</label>
+            <input className={styles.input} value={nomeDestinatario} onChange={e => setNomeDestinatario(e.target.value)} placeholder="Nome do destinatário (se diferente)" />
+
+            <label>Data e hora de entrega</label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <input type="date" className={styles.input} value={dataEntrega} onChange={e => setDataEntrega(e.target.value)} />
+              <input type="time" className={styles.input} value={horaEntrega} onChange={e => setHoraEntrega(e.target.value)} />
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <input id="cobrarNoEndereco" type="checkbox" checked={cobrarNoEndereco} onChange={e => setCobrarNoEndereco(e.target.checked)} />
+              <label htmlFor="cobrarNoEndereco">Cobrar no endereço</label>
             </div>
 
             <label>Observação</label>
