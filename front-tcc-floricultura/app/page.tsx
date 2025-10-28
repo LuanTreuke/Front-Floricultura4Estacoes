@@ -1,5 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react';
+import { getCurrentUser, logout } from '../services/authService';
 import { useRouter } from 'next/navigation';
 import styles from '../styles/HomePage.module.css';
 import SearchBar from '../components/SearchBar';
@@ -34,7 +35,6 @@ export default function HomePage() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const { getCurrentUser } = require('../services/authService');
       const usuario = getCurrentUser();
       setIsLoggedIn(!!usuario);
       setIsAdmin(!!(usuario && (usuario.role === 'Admin' || usuario.cargo === 'Admin')));
@@ -175,8 +175,6 @@ export default function HomePage() {
                   className={styles.loginPopupBtn}
                   onClick={() => {
                     // desloga: remove o usuário armazenado e atualiza a interface
-                    // eslint-disable-next-line @typescript-eslint/no-var-requires
-                    const { logout } = require('../services/authService');
                     logout();
                     setIsLoggedIn(false);
                     setShowPopup(false);

@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
+import { getCurrentUser } from '../../services/authService';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Offcanvas, Button } from 'react-bootstrap';
@@ -12,9 +13,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     try {
       // runtime check: only allow users with role 'Admin' (or legacy 'cargo') to view admin pages
-      // getCurrentUser is a client-only helper that reads localStorage
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { getCurrentUser } = require('../../services/authService');
       const u = getCurrentUser();
       if (!u || !(u.role === 'Admin' || u.cargo === 'Admin')) {
         router.push('/');
