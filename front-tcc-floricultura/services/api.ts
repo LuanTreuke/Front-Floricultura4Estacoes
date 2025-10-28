@@ -1,4 +1,5 @@
 import axios from 'axios';
+import type { AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.0.122:3001';
 
@@ -8,7 +9,7 @@ const api = axios.create({
   timeout: 10000,
 });
 // attach current user id to requests when available so backend can perform simple role checks
-api.interceptors.request.use((config) => {
+api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   try {
     if (typeof window !== 'undefined') {
       const raw = localStorage.getItem('usuario');
@@ -16,15 +17,18 @@ api.interceptors.request.use((config) => {
         const parsed = JSON.parse(raw);
         const u = parsed && (parsed.usuario || parsed.user) ? (parsed.usuario || parsed.user) : parsed;
         if (u && (u.id || u.id === 0)) {
-          // assign a new headers object to avoid typing issues
-          config.headers = {
-            ...(config.headers || {}),
-            ['x-user-id']: String(u.id),
-          } as typeof config.headers;
+          // merge headers while preserving types; cast via unknown to satisfy axios internal header type
+          const prev = config.headers as Record<string, unknown> | undefined;
+          const newHeaders = ({ ...(prev || {}), ['x-user-id']: String(u.id) } as unknown) as InternalAxiosRequestConfig['headers'];
+          config.headers = newHeaders;
         }
       }
     }
-  } catch (e) {}
+  } catch (e: unknown) {
+    // ignore failures reading localStorage
+    // but keep a lightweight guard for debugging if needed
+    // console.warn('api interceptor read user failed', e);
+  }
   return config;
 });
 

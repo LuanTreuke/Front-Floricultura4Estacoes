@@ -29,15 +29,20 @@ export async function createOrder(dto: CreateOrderDto) {
     if (dto.telefone_cliente) {
       try {
         await api.post('/whatsapp/send-confirm', { phone: dto.telefone_cliente });
-      } catch (whErr) {
+      } catch (whErr: unknown) {
         // don't block the user if whatsapp fails; just log for debugging
-        // whErr may be an Axios error; safely stringify relevant info
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        console.warn('Failed to send whatsapp confirmation', (whErr?.response?.data) ?? whErr?.message ?? String(whErr));
+        try {
+          // try to extract axios-like response info if present
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          const candidate = (whErr as any)?.response?.data ?? (whErr as any)?.message ?? undefined;
+          console.warn('Failed to send whatsapp confirmation', candidate ?? String(whErr));
+        } catch (logErr) {
+          console.warn('Failed to send whatsapp confirmation', String(whErr));
+        }
       }
     }
     return created;
-  } catch (err) {
+  } catch (err: unknown) {
     // Avoid using `any` in lint-restricted environments; return a readable message
     const msg = err instanceof Error ? err.message : String(err);
     throw new Error(msg);

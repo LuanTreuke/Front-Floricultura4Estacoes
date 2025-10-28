@@ -30,11 +30,13 @@ export default function CartPopup({ onClose, inline = false }: Props) {
       if (usuario && usuario.id) {
         // logged-in: prefer the server-backed cart
         try {
-          const server = (await (await import('../services/cartService')).getCartFromServer()) as CartItem[];
+          const module = await import('../services/cartService');
+          const server = (await module.getCartFromServer()) as CartItem[];
           setItems(server);
           setTotal(server.reduce((s: number, i: CartItem) => s + (i.preco || 0) * (i.quantidade || 1), 0));
-        } catch {
+        } catch (err: unknown) {
           // fallback to local cache
+          console.warn('failed to load server cart, using local cache', err);
           const c = getCart() as CartItem[];
           setItems(c);
           setTotal(cartTotal());
@@ -51,8 +53,8 @@ export default function CartPopup({ onClose, inline = false }: Props) {
       const initial: Record<number, string> = {};
       (c || []).forEach((it: CartItem) => { initial[it.id] = String(it.quantidade || ''); });
       setQtyInputs((prev) => ({ ...initial, ...prev }));
-    } catch {
-      // ignore
+    } catch (err: unknown) {
+      console.warn('failed to initialize qtyInputs from cart', err);
     }
     // subscribe to cart changes so UI updates on login/logout/merge
     const unsub = subscribeCart((items: CartItem[]) => {
@@ -68,7 +70,7 @@ export default function CartPopup({ onClose, inline = false }: Props) {
     const usuario = getCurrentUser() as User;
     if (!usuario || !usuario.id) return;
     (async () => {
-  const all = (await fetchAddresses()) as Array<{ id?: number; Usuario_id?: number; [k: string]: unknown }>;
+  const all = (await fetchAddresses()) as unknown as Array<{ id?: number; Usuario_id?: number; [k: string]: unknown }>;
       const my = (all || []).filter((a) => a.Usuario_id === usuario.id) as Address[];
       setAddresses(my);
       if (my.length > 0) setSelectedAddress((my[0].id ?? null) as number | null);
