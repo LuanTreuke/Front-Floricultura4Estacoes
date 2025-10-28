@@ -123,7 +123,7 @@ export default function HomePage() {
       <div className={styles.container}>
         <header className={styles.header}>
           <div className={styles.logo}>
-            <Image src="/Logo floricultura.jpg" alt="Logo Floricultura Quatro Estações" width={96} height={96} style={{ height: 96, width: 'auto', display: 'block', objectFit: 'contain' }} />
+            <Image src="/Logo-floricultura.svg" alt="Logo Floricultura Quatro Estações" width={96} height={96} style={{ height: 96, width: 'auto', display: 'block', objectFit: 'contain' }} />
           </div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center', position: 'relative' }}>
             <button className={styles.shoppingCart} onClick={() => setShowCartPopup(true)}>

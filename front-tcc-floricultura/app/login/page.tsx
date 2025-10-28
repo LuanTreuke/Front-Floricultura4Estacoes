@@ -52,7 +52,7 @@ export default function LoginPage() {
     <div className={styles.container}>
       <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.logoWrap}>
-          <Image src="/Logo floricultura.jpg" alt="Logo Floricultura" className={styles.logo} width={96} height={96} style={{ objectFit: 'contain' }} />
+          <Image src="/Logo-floricultura.svg" alt="Logo Floricultura" className={styles.logo} width={96} height={96} style={{ objectFit: 'contain' }} />
         </div>
         <h2>Login</h2>
         <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
