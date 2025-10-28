@@ -16,8 +16,11 @@ api.interceptors.request.use((config) => {
         const parsed = JSON.parse(raw);
         const u = parsed && (parsed.usuario || parsed.user) ? (parsed.usuario || parsed.user) : parsed;
         if (u && (u.id || u.id === 0)) {
-          // headers typing in axios can be strict; use a safe cast
-          (config.headers as any)['x-user-id'] = String(u.id);
+          // assign a new headers object to avoid typing issues
+          config.headers = {
+            ...(config.headers || {}),
+            ['x-user-id']: String(u.id),
+          } as typeof config.headers;
         }
       }
     }

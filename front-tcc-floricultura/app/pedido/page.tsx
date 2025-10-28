@@ -2,15 +2,15 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from '../../styles/ProductOrder.module.css';
-import { getCart, clearCart, cartTotal } from '../../services/cartService';
+import { getCart, clearCart, cartTotal, CartItem } from '../../services/cartService';
 import { fetchAddresses, AddressDto } from '../../services/addressService';
 import { fetchPhones, PhoneDto } from '../../services/phoneService';
-import { getCurrentUser } from '../../services/authService';
+import { getCurrentUser, User } from '../../services/authService';
 import { createOrder } from '../../services/orderService';
 
 export default function UnifiedOrderPage() {
   const router = useRouter();
-  const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<CartItem[]>([]);
   const [total, setTotal] = useState<number>(0);
   const [addresses, setAddresses] = useState<AddressDto[]>([]);
   const [phones, setPhones] = useState<PhoneDto[]>([]);
@@ -31,18 +31,18 @@ export default function UnifiedOrderPage() {
     setItems(c);
     // compute total only on client after mount to avoid SSR/client mismatch
     try { setTotal(cartTotal()); } catch (e) { setTotal(0); }
-    const usuario: any = getCurrentUser();
+    const usuario = getCurrentUser() as User;
     if (usuario) {
       setNomeCliente(usuario.nome || '');
       setTelefone(usuario.telefone || '');
     }
     (async () => {
-      const all = await fetchAddresses();
-      const my = (all || []).filter((a: any) => a.Usuario_id === (usuario && usuario.id));
+  const all = await fetchAddresses();
+  const my = (all || []).filter((a) => a.Usuario_id === (usuario && usuario.id));
       setAddresses(my);
       // phones
-      const allPhones = await fetchPhones();
-      const myPhones = (allPhones || []).filter((p: any) => p.Usuario_id === (usuario && usuario.id));
+  const allPhones = await fetchPhones();
+  const myPhones = (allPhones || []).filter((p) => p.Usuario_id === (usuario && usuario.id));
       setPhones(myPhones);
       try {
         const prefPhone = localStorage.getItem('checkout_selected_phone');
@@ -81,7 +81,7 @@ export default function UnifiedOrderPage() {
       setErrors(prev => ({ ...prev, selectedAddress: true }));
       return alert('Selecione um endereço');
     }
-    const usuario: any = getCurrentUser();
+    const usuario = getCurrentUser() as User;
     if (!usuario || !usuario.id) {
       if (confirm('Você precisa estar logado para finalizar. Ir para login?')) router.push('/login');
       return;
@@ -131,10 +131,10 @@ export default function UnifiedOrderPage() {
     try {
       // preparar payload do carrinho e enviar para o campo `carrinho` (string JSON)
       const cartPayload = items.map(i => ({ id: i.id, nome: i.nome, preco: i.preco, quantidade: i.quantidade, imagem_url: i.imagem_url }));
-      const carrinhoObj: any = { cart: cartPayload };
+      const carrinhoObj = { cart: cartPayload } as Record<string, unknown>;
       if (observacao && typeof observacao === 'string' && observacao.trim().length > 0) carrinhoObj.nota = observacao;
 
-      const dto: any = {
+      const dto = {
         carrinho: JSON.stringify(carrinhoObj),
         observacao: observacao || undefined,
         Endereco_id: selectedAddress,
@@ -152,9 +152,10 @@ export default function UnifiedOrderPage() {
       setItems([]);
       alert('Pedido criado com sucesso');
       router.push('/');
-    } catch (e: any) {
+    } catch (e) {
       console.error(e);
-      alert('Erro ao criar pedido: ' + (e.message || String(e)));
+      const msg = e instanceof Error ? e.message : String(e);
+      alert('Erro ao criar pedido: ' + msg);
     } finally {
       setLoading(false);
     }

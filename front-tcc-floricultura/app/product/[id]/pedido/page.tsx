@@ -4,7 +4,8 @@ import { useRouter, useParams } from 'next/navigation';
 import { fetchProductById, Product } from '../../../../services/productService';
 import { fetchAddresses, AddressDto, createAddress } from '../../../../services/addressService';
 import { fetchPhones, PhoneDto } from '../../../../services/phoneService';
-import { createOrder } from '../../../../services/orderService';
+import { getCurrentUser, User } from '../../../../services/authService';
+import { createOrder, CreateOrderDto } from '../../../../services/orderService';
 import styles from '../../../../styles/ProductOrder.module.css';
 
 export default function ProductOrderPage() {
@@ -32,11 +33,10 @@ export default function ProductOrderPage() {
   useEffect(() => {
     fetchProductById(id).then(p => { setProduct(p); setLoading(false); });
     (async () => {
-      const { getCurrentUser } = require('../../../../services/authService');
-      const usuario: any = getCurrentUser();
+      const usuario = getCurrentUser() as User;
       const all = await fetchAddresses();
       if (usuario && usuario.id) {
-        setAddresses((all || []).filter((a: any) => a.Usuario_id === usuario.id));
+        setAddresses((all || []).filter((a) => a.Usuario_id === usuario.id));
         // prefills com os dados do usuário logado quando disponíveis
         if (usuario.nome) setNomeCliente(usuario.nome);
         if (usuario.telefone) setTelefone(usuario.telefone);
@@ -52,7 +52,7 @@ export default function ProductOrderPage() {
           const parsed = Number(saved);
           if (!Number.isNaN(parsed)) {
             setSelectedPhoneId(parsed);
-            const chosen = (ph || []).find((x: any) => x.id === parsed);
+            const chosen = (ph || []).find((x) => x.id === parsed);
             if (chosen && chosen.telefone) setTelefone(chosen.telefone);
           }
         }
@@ -73,7 +73,7 @@ export default function ProductOrderPage() {
   async function handlePedido(e: React.FormEvent) {
     e.preventDefault();
   const { getCurrentUser } = require('../../../../services/authService');
-  const usuario: any = getCurrentUser() || { id: 0, nome: '', telefone: '' };
+  const usuario = getCurrentUser() || ({ id: 0, nome: '', telefone: '' } as User);
   // eslint-disable-next-line no-console
   console.debug('[ProductOrderPage] getCurrentUser ->', usuario);
   // eslint-disable-next-line no-console
@@ -130,7 +130,7 @@ export default function ProductOrderPage() {
     // quando o pedido é feito diretamente da página do produto, vamos
     // serializar as informações do produto dentro do campo `carrinho` (campo novo no DB)
     // e deixar `observacao` apenas para a nota textual.
-    const carrinhoPayload: any = prodItem ? { cart: [prodItem] } : {};
+  const carrinhoPayload = prodItem ? { cart: [prodItem] } : {} as Record<string, unknown>;
     if (observacao && typeof observacao === 'string' && observacao.trim().length > 0) carrinhoPayload.nota = observacao;
 
     const dto = {
@@ -148,7 +148,7 @@ export default function ProductOrderPage() {
       Usuario_id: (typeof usuario?.id === 'number' && usuario.id > 0) ? usuario.id : null,
     };
     try {
-      await createOrder(dto as any);
+      await createOrder(dto as CreateOrderDto);
       alert('Pedido criado com sucesso');
       router.push('/');
     } catch (err) {

@@ -10,21 +10,23 @@ export async function cadastro(data: { nome: string; email: string; senha: strin
   return res.data;
 }
 
-export function getCurrentUser() {
+export type User = { id?: number; nome?: string; role?: string; cargo?: string; telefone?: string; email?: string } | null;
+
+export function getCurrentUser(): User {
   if (typeof window === 'undefined') return null;
   try {
     const raw = localStorage.getItem('usuario');
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-  // O backend pode retornar sob `usuario` ou `user`.
-  // Também tolera objetos duplamente embalados como { usuario: { ... } }.
+    // O backend pode retornar sob `usuario` ou `user`.
+    // Também tolera objetos duplamente embalados como { usuario: { ... } }.
     if (parsed == null) return null;
     if (typeof parsed === 'object') {
-      if (parsed.usuario && typeof parsed.usuario === 'object') return parsed.usuario;
-      if (parsed.user && typeof parsed.user === 'object') return parsed.user;
-      if (parsed.id) return parsed;
+      if (parsed.usuario && typeof parsed.usuario === 'object') return parsed.usuario as User;
+      if (parsed.user && typeof parsed.user === 'object') return parsed.user as User;
+      if (parsed.id) return parsed as User;
     }
-    return parsed;
+    return parsed as User;
   } catch (err) {
     console.warn('getCurrentUser: failed to parse localStorage usuario', err);
     return null;
@@ -36,7 +38,7 @@ export function logout() {
   try {
     // remove user info
     const raw = localStorage.getItem('usuario');
-    let userId: any = null;
+  let userId: number | null = null;
     try {
       if (raw) {
         const parsed = JSON.parse(raw);

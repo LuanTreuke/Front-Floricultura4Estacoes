@@ -11,15 +11,15 @@ export async function fetchPhones() {
   try {
     // Prefer asking the server for phones belonging to the current user.
     // If no user is logged in, return an empty list (no phones available).
-    const usuario: any = getCurrentUser();
+    const usuario = getCurrentUser();
     if (!usuario || !usuario.id) return [];
     const res = await api.get(`/telefones/usuario/${usuario.id}`);
     return res.data as PhoneDto[];
-  } catch (err: any) {
-    if (err.response) {
-      console.warn('fetchPhones: backend responded with status', err.response.status, err.response.data);
+  } catch (err) {
+    if (err instanceof Error) {
+      console.warn('fetchPhones: request failed', err.message);
     } else {
-      console.warn('fetchPhones: request failed', err.message || err);
+      console.warn('fetchPhones: request failed', String(err));
     }
     return [];
   }
@@ -30,16 +30,8 @@ export async function createPhone(dto: PhoneDto) {
     console.debug('[createPhone] sending dto:', dto);
     const res = await api.post(`/telefones`, dto);
     return res.data as PhoneDto;
-  } catch (err: any) {
-    const resp = err && err.response ? err.response : null;
-    const respData = resp && resp.data ? resp.data : null;
-    let msg: string;
-    if (respData) {
-      try { msg = typeof respData === 'string' ? respData : JSON.stringify(respData); } catch (e) { msg = String(respData); }
-    } else {
-      msg = (err && err.message) || String(err);
-    }
-    if (resp && resp.status) msg = `[${resp.status}] ${msg}`;
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
     console.error('createPhone failed', msg);
     throw new Error(msg);
   }
@@ -49,8 +41,8 @@ export async function updatePhone(id: number, dto: Partial<PhoneDto>) {
   try {
     const res = await api.patch(`/telefones/${id}`, dto);
     return res.data as PhoneDto;
-  } catch (err: any) {
-    console.error('updatePhone failed', err?.response?.data || err.message || err);
+  } catch (err) {
+    console.error('updatePhone failed', err instanceof Error ? err.message : String(err));
     throw err;
   }
 }
@@ -59,8 +51,8 @@ export async function deletePhone(id: number) {
   try {
     await api.delete(`/telefones/${id}`);
     return true;
-  } catch (err: any) {
-    console.error('deletePhone failed', err?.response?.data || err.message || err);
+  } catch (err) {
+    console.error('deletePhone failed', err instanceof Error ? err.message : String(err));
     throw err;
   }
 }

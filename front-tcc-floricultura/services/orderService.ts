@@ -29,22 +29,17 @@ export async function createOrder(dto: CreateOrderDto) {
     if (dto.telefone_cliente) {
       try {
         await api.post('/whatsapp/send-confirm', { phone: dto.telefone_cliente });
-      } catch (whErr: any) {
+      } catch (whErr) {
         // don't block the user if whatsapp fails; just log for debugging
+        // whErr may be an Axios error; safely stringify relevant info
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         console.warn('Failed to send whatsapp confirmation', (whErr?.response?.data) ?? whErr?.message ?? String(whErr));
       }
     }
     return created;
-  } catch (err: any) {
-    const resp = err && err.response ? err.response : null;
-    const respData = resp && resp.data ? resp.data : null;
-    let msg: string;
-    if (respData) {
-      try { msg = typeof respData === 'string' ? respData : JSON.stringify(respData); } catch (e) { msg = String(respData); }
-    } else {
-      msg = (err && err.message) || String(err);
-    }
-    if (resp && resp.status) msg = `[${resp.status}] ${msg}`;
+  } catch (err) {
+    // Avoid using `any` in lint-restricted environments; return a readable message
+    const msg = err instanceof Error ? err.message : String(err);
     throw new Error(msg);
   }
 }
@@ -52,7 +47,7 @@ export async function createOrder(dto: CreateOrderDto) {
 export async function fetchOrders() {
   // If current user is Admin, fetch all orders; otherwise fetch only the user's orders
   try {
-    const user: any = getCurrentUser();
+    const user = getCurrentUser();
     if (user && (user.role === 'Admin' || user.cargo === 'Admin')) {
       const res = await api.get('/pedidos');
       return res.data;
@@ -63,13 +58,8 @@ export async function fetchOrders() {
     }
     // not logged in: return empty
     return [];
-  } catch (err: any) {
-    // rethrow with useful message
-    const resp = err && err.response ? err.response : null;
-    const status = resp && resp.status ? resp.status : null;
-    const data = resp && resp.data ? resp.data : null;
-    let msg = (err && err.message) || String(err);
-    if (status) msg = `[${status}] ${JSON.stringify(data || msg)}`;
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
     throw new Error(msg);
   }
 }
@@ -78,8 +68,8 @@ export async function fetchOrderById(id: number) {
   try {
     const res = await api.get(`/pedidos/${id}`);
     return res.data;
-  } catch (err: any) {
-    console.warn('fetchOrderById failed', err?.response?.status || err.message || err);
+  } catch (err) {
+    console.warn('fetchOrderById failed', err instanceof Error ? err.message : String(err));
     return null;
   }
 }
@@ -88,16 +78,8 @@ export async function updateOrderStatus(id: number, status: string) {
   try {
     const res = await api.patch(`/pedidos/${id}/status`, { status });
     return res.data;
-  } catch (err: any) {
-    const resp = err && err.response ? err.response : null;
-    const respData = resp && resp.data ? resp.data : null;
-    let msg: string;
-    if (respData) {
-      try { msg = typeof respData === 'string' ? respData : JSON.stringify(respData); } catch (e) { msg = String(respData); }
-    } else {
-      msg = (err && err.message) || String(err);
-    }
-    if (resp && resp.status) msg = `[${resp.status}] ${msg}`;
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
     throw new Error(msg);
   }
 }

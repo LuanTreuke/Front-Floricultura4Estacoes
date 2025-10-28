@@ -8,8 +8,11 @@ import { getCurrentUser } from '../services/authService';
 
 type Props = {
   onClose?: () => void;
-  inline?: boolean; // when true, render without overlay (for /carrinho page)
+  inline?: boolean;
 };
+
+type User = { id?: number; role?: string; cargo?: string } | null;
+type Address = { id?: number; Usuario_id?: number; [k: string]: unknown };
 
 export default function CartPopup({ onClose, inline = false }: Props) {
   const router = useRouter();
@@ -17,56 +20,58 @@ export default function CartPopup({ onClose, inline = false }: Props) {
   const [total, setTotal] = useState(0);
   // local string inputs for quantities so we don't force immediate numeric coercion
   const [qtyInputs, setQtyInputs] = useState<Record<number, string>>({});
-  const [addresses, setAddresses] = useState<any[]>([]);
+  const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<number | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const usuario: any = getCurrentUser();
+    const usuario = getCurrentUser() as User;
     (async () => {
       if (usuario && usuario.id) {
         // logged-in: prefer the server-backed cart
         try {
-          const server = await (await import('../services/cartService')).getCartFromServer();
+          const server = (await (await import('../services/cartService')).getCartFromServer()) as CartItem[];
           setItems(server);
-          setTotal(server.reduce((s: any, i: any) => s + (i.preco || 0) * (i.quantidade || 1), 0));
-        } catch (e) {
+          setTotal(server.reduce((s: number, i: CartItem) => s + (i.preco || 0) * (i.quantidade || 1), 0));
+        } catch {
           // fallback to local cache
-          const c = getCart();
+          const c = getCart() as CartItem[];
           setItems(c);
           setTotal(cartTotal());
         }
       } else {
-        const c = getCart();
+        const c = getCart() as CartItem[];
         setItems(c);
         setTotal(cartTotal());
       }
     })();
     // initialize qtyInputs for any items not yet present
     try {
-      const c = getCart();
+      const c = getCart() as CartItem[];
       const initial: Record<number, string> = {};
-      (c || []).forEach((it: any) => { initial[it.id] = String(it.quantidade || ''); });
+      (c || []).forEach((it: CartItem) => { initial[it.id] = String(it.quantidade || ''); });
       setQtyInputs((prev) => ({ ...initial, ...prev }));
-    } catch (e) {}
+    } catch {
+      // ignore
+    }
     // subscribe to cart changes so UI updates on login/logout/merge
-    const unsub = subscribeCart((items) => {
+    const unsub = subscribeCart((items: CartItem[]) => {
       setItems(items);
       setTotal(cartTotal());
     });
     return () => unsub();
   }, []);
 
-  const usuarioAny: any = getCurrentUser();
+  const usuarioAny = getCurrentUser() as User;
 
   useEffect(() => {
-    const usuario: any = getCurrentUser();
+    const usuario = getCurrentUser() as User;
     if (!usuario || !usuario.id) return;
     (async () => {
-      const all = await fetchAddresses();
-      const my = (all || []).filter((a: any) => a.Usuario_id === usuario.id);
+  const all = (await fetchAddresses()) as Array<{ id?: number; Usuario_id?: number; [k: string]: unknown }>;
+      const my = (all || []).filter((a) => a.Usuario_id === usuario.id) as Address[];
       setAddresses(my);
-      if (my.length > 0) setSelectedAddress(my[0].id || null);
+      if (my.length > 0) setSelectedAddress((my[0].id ?? null) as number | null);
     })();
   }, []);
 
@@ -114,7 +119,7 @@ export default function CartPopup({ onClose, inline = false }: Props) {
       alert('Carrinho vazio');
       return;
     }
-    const usuario: any = getCurrentUser();
+  const usuario = getCurrentUser() as User;
     if (!usuario || !usuario.id) {
       if (confirm('Você precisa estar logado para finalizar o pedido. Ir para login?')) {
         router.push('/login');
@@ -165,18 +170,17 @@ export default function CartPopup({ onClose, inline = false }: Props) {
     }
 
     window.addEventListener('keydown', onKey);
-    if (overlayRef.current) {
-      overlayRef.current.addEventListener('wheel', preventScroll, { passive: false });
-      overlayRef.current.addEventListener('touchmove', preventScroll, { passive: false });
+    const overlayEl = overlayRef.current;
+    if (overlayEl) {
+      overlayEl.addEventListener('wheel', preventScroll, { passive: false });
+      overlayEl.addEventListener('touchmove', preventScroll, { passive: false });
     }
 
     return () => {
       window.removeEventListener('keydown', onKey);
-      if (overlayRef.current) {
-        try {
-          overlayRef.current.removeEventListener('wheel', preventScroll);
-          overlayRef.current.removeEventListener('touchmove', preventScroll);
-        } catch (e) {}
+      if (overlayEl) {
+        overlayEl.removeEventListener('wheel', preventScroll);
+        overlayEl.removeEventListener('touchmove', preventScroll);
       }
       document.body.style.overflow = prev.overflow;
       document.body.style.position = prev.position;
@@ -197,7 +201,7 @@ export default function CartPopup({ onClose, inline = false }: Props) {
           <div className={cartStyles.list}>
             {items.map((it) => (
               <div key={it.id} className={cartStyles.item}>
-                <img src={it.imagem_url || ''} className={cartStyles.itemImage} />
+                <img src={it.imagem_url || ''} className={cartStyles.itemImage} alt={it.nome || ''} />
                 <div className={cartStyles.itemInfo}>
                   <div className={cartStyles.itemName}>{it.nome}</div>
                   <div className={cartStyles.itemPrice}>R$ {Number(it.preco).toFixed(2)}</div>

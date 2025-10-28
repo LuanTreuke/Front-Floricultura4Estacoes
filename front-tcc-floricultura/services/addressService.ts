@@ -17,11 +17,11 @@ export async function fetchAddresses() {
   try {
     const res = await axios.get(`${API_URL}/enderecos`);
     return res.data as AddressDto[];
-  } catch (err: any) {
-    if (err.response) {
-      console.warn('fetchAddresses: backend responded with status', err.response.status, err.response.data);
+  } catch (err) {
+    if (err instanceof Error) {
+      console.warn('fetchAddresses: request failed', err.message);
     } else {
-      console.warn('fetchAddresses: request failed', err.message || err);
+      console.warn('fetchAddresses: request failed', String(err));
     }
     return [];
   }
@@ -34,21 +34,9 @@ export async function createAddress(dto: AddressDto) {
   console.debug('[createAddress] sending dto:', dto);
     const res = await axios.post(`${API_URL}/enderecos`, dto);
     return res.data as AddressDto;
-  } catch (err: any) {
-  // Monta uma mensagem legível a partir do erro do axios (status + corpo quando presente)
-    const resp = err && err.response ? err.response : null;
-    const respData = resp && resp.data ? resp.data : null;
-    let msg: string;
-    if (respData) {
-      try {
-        msg = typeof respData === 'string' ? respData : JSON.stringify(respData);
-      } catch (e) {
-        msg = String(respData);
-      }
-    } else {
-      msg = (err && err.message) || String(err);
-    }
-    if (resp && resp.status) msg = `[${resp.status}] ${msg}`;
+  } catch (err) {
+  // Monta uma mensagem legível a partir do erro
+    const msg = err instanceof Error ? err.message : String(err);
     console.error('createAddress failed', msg);
   // Lança Error com a mensagem para que o componente possa exibir
   throw new Error(msg);
@@ -59,8 +47,8 @@ export async function updateAddress(id: number, dto: Partial<AddressDto>) {
   try {
     const res = await axios.patch(`${API_URL}/enderecos/${id}`, dto);
     return res.data as AddressDto;
-  } catch (err: any) {
-    console.error('updateAddress failed', err?.response?.data || err.message || err);
+  } catch (err) {
+    console.error('updateAddress failed', err instanceof Error ? err.message : String(err));
     throw err;
   }
 }
@@ -69,8 +57,8 @@ export async function deleteAddress(id: number) {
   try {
     await axios.delete(`${API_URL}/enderecos/${id}`);
     return true;
-  } catch (err: any) {
-    console.error('deleteAddress failed', err?.response?.data || err.message || err);
+  } catch (err) {
+    console.error('deleteAddress failed', err instanceof Error ? err.message : String(err));
     throw err;
   }
 }
