@@ -63,31 +63,52 @@
 .shoppingCart {
   background: #f3f7f4;
   border: none;
-  border-radius: 8px;
-  padding: 8px 24px;
+  border-radius: 10px;
+  padding: 6px 10px;
   color: #222;
   font-weight: 600;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 0.9rem;
   transition: background 0.2s;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  position: relative;
+}
+
+.cartBadge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #d32f2f;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
 
 .loginBtn {
   background: #f3f7f4;
   border: none;
-  border-radius: 8px;
-  padding: 8px 24px;
+  border-radius: 10px;
+  padding: 6px 10px;
   color: #222;
   font-weight: 600;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 0.9rem;
   transition: background 0.2s;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
 }
 
 .loginBtn:hover {
@@ -246,6 +267,13 @@
     font-size: 1.5rem; 
   }
 
+  /* center the logo horizontally on small screens */
+  .logo {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
   .loginBtn {
     font-size: 1rem;
     padding: 8px 16px;
@@ -307,6 +335,21 @@
   .footerAddress {
     font-size: 1rem;
     margin-top: 12px;
+  }
+
+  /* center profile and cart icons on mobile (they live in the second header child) */
+  .header > div:last-child {
+    width: 100%;
+    display: flex; /* ensures it's flex in case inline styles change */
+    justify-content: center;
+    margin-top: 8px;
+  }
+
+  /* keep the login popup horizontally centered but keep its vertical offset */
+  .loginPopup {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
   }
 }
 

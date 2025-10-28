@@ -76,6 +76,33 @@
   min-width: 263px;
 }
 
+/* notice when user must login */
+.loginNotice {
+  margin-top: 24px;
+  padding: 18px;
+  background: #fff6e6;
+  border: 1px solid #ffecb5;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+  max-width: 480px;
+}
+.loginNotice p {
+  margin: 0;
+  color: #6b4b1a;
+  font-weight: 600;
+}
+.loginNoticeBtn {
+  background: #2f7a3e;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
 @media (max-width: 900px) {
   .layout { 
     flex-direction: 

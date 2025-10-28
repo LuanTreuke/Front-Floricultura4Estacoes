@@ -1,7 +1,35 @@
-.container { padding: 24px; color: #0b0b0b; }
-.card { border: 1px solid #eee; padding: 12px; border-radius: 8px; color: #0b0b0b; }
-.grid { display: grid; gap: 12px; }
-.row { display: flex; justify-content: space-between; }
-.meta { display: flex; flex-direction: column; gap: 6px; color: #0b0b0b; }
-.statusActions { display: flex; gap: 8px; margin-top: 8px; }
-.btn { padding: 6px 10px; border-radius: 6px; cursor: pointer; color: #0b0b0b; }
+.container { 
+    padding: 24px; 
+    color: #0b0b0b; 
+}
+.card { 
+    border: 1px solid #eee; 
+    padding: 12px; 
+    border-radius: 8px; 
+    color: #0b0b0b; 
+}
+.grid { 
+    display: grid; 
+    gap: 12px; 
+}
+.row { 
+    display: flex; 
+    justify-content: space-between; 
+}
+.meta { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 6px; 
+    color: #0b0b0b; 
+}
+.statusActions { 
+    display: flex; 
+    gap: 8px; 
+    margin-top: 8px; 
+}
+.btn { 
+    padding: 6px 10px; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    color: #0b0b0b; 
+}

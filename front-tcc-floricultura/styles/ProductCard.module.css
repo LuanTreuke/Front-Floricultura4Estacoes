@@ -17,7 +17,11 @@
   transform: translateY(-4px); 
 }
 
-.link { text-decoration: none; color: inherit; display: inline-block; }
+.link { 
+  text-decoration: none; 
+  color: inherit; 
+  display: inline-block; 
+}
 
 .image { 
   width: 100%; 

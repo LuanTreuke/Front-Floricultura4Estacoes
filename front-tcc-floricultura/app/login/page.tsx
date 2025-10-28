@@ -3,6 +3,10 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from '../../styles/Login.module.css';
 import { login } from '../../services/authService';
+import { getCart, getCartFromServer } from '../../services/cartService';
+// using shared api via services/api.ts (login uses authService)
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -28,6 +32,16 @@ export default function LoginPage() {
     } catch (err) {
       console.warn('Não foi possível salvar usuário no localStorage', err);
     }
+    // Refresh server-backed cart into local cache and remove any guest key
+    // so the visible cart is the server cart tied to the authenticated user.
+    try {
+      try {
+        await getCartFromServer();
+      } catch (e) { console.warn('refresh server cart failed', e); }
+      try { localStorage.removeItem('floricultura_cart_v1'); } catch (e) {}
+      try { window.dispatchEvent(new Event('cart-updated')); } catch (e) {}
+    } catch (e) { console.warn('post-login cart refresh failed', e); }
+
     // Redirecionar para a home ou dashboard
     router.push('/');
   }
@@ -35,6 +49,9 @@ export default function LoginPage() {
   return (
     <div className={styles.container}>
       <form className={styles.form} onSubmit={handleSubmit}>
+        <div className={styles.logoWrap}>
+          <img src="/Logo floricultura.jpg" alt="Logo Floricultura" className={styles.logo} />
+        </div>
         <h2>Login</h2>
         <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
         <input type="password" placeholder="Senha" value={senha} onChange={e => setSenha(e.target.value)} required />

@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from '../styles/HomePage.module.css';
 import SearchBar from '../components/SearchBar';
@@ -7,7 +7,9 @@ import CategoryFilter from '../components/CategoryFilter';
 import PriceRange from '../components/PriceRange';
 import SortButtons from '../components/SortButtons';
 import ProductCard from '../components/ProductCard';
-
+import CartPopup from '../components/CartPopup';
+import { getCart, subscribeCart } from '../services/cartService';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 import { fetchProducts, Product } from '../services/productService';
@@ -24,41 +26,28 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);
     const [showPopup, setShowPopup] = useState(false);
-  const [orderBtnBottom, setOrderBtnBottom] = useState(32);
-  const orderBtnRef = useRef<HTMLButtonElement>(null);
-  const footerRef = useRef<HTMLElement>(null);
+  
+  const [showCartPopup, setShowCartPopup] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const { getCurrentUser } = require('../services/authService');
       const usuario = getCurrentUser();
       setIsLoggedIn(!!usuario);
+      setIsAdmin(!!(usuario && (usuario.role === 'Admin' || usuario.cargo === 'Admin')));
     }
+    // initialize cart count and subscribe
+    try {
+      setCartCount(getCart().reduce((s, i) => s + (i.quantidade || 0), 0));
+      const unsub = subscribeCart((items) => setCartCount(items.reduce((s, i) => s + (i.quantidade || 0), 0)));
+      return () => unsub();
+    } catch (e) {}
   }, []);
 
-  // Ajusta o bottom do botão para não sobrepor o footer
-  useEffect(() => {
-    function handleScroll() {
-      if (!orderBtnRef.current || !footerRef.current) return;
-      const footerRect = footerRef.current.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-      // Se o footer está visível na tela
-      if (footerRect.top < windowHeight - 15) {
-        const overlap = windowHeight - footerRect.top + 15;
-        setOrderBtnBottom(overlap > 32 ? overlap : 32);
-      } else {
-        setOrderBtnBottom(32);
-      }
-    }
-    window.addEventListener('scroll', handleScroll);
-    window.addEventListener('resize', handleScroll);
-    handleScroll();
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleScroll);
-    };
-  }, []);
+  
 
   // Fecha o popup ao clicar fora
   useEffect(() => {
@@ -136,8 +125,11 @@ export default function HomePage() {
             <img src="/Logo floricultura.jpg" alt="Logo Floricultura Quatro Estações" style={{ height: 96, width: 'auto', display: 'block' }} />
           </div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center', position: 'relative' }}>
-            <button className={styles.shoppingCart} onClick={() => router.push('/carrinho')}>
+            <button className={styles.shoppingCart} onClick={() => setShowCartPopup(true)}>
               <span className="material-icons" style={{ verticalAlign: 'middle', fontSize: 22}}>shopping_cart</span>
+              {cartCount > 0 && (
+                <span className={styles.cartBadge}>{cartCount}</span>
+              )}
             </button>
             <button 
               className={styles.loginBtn}
@@ -155,7 +147,7 @@ export default function HomePage() {
               <div id="login-popup" className={styles.loginPopup}>
                 <button
                   className={styles.loginPopupBtn}
-                  onClick={() => setShowPopup(false)}
+                  onClick={() => { setShowPopup(false); router.push('/minha-conta'); }}
                 >
                   Minha conta
                 </button>
@@ -163,11 +155,22 @@ export default function HomePage() {
                   className={styles.loginPopupBtn}
                   onClick={() => {
                     setShowPopup(false);
-                    router.push('/admin/pedidos');
+                    router.push('/meus-pedidos');
                   }}
                 >
-                  Painel administrativo
+                  Meus pedidos
                 </button>
+                {isAdmin && (
+                  <button
+                    className={styles.loginPopupBtn}
+                    onClick={() => {
+                      setShowPopup(false);
+                      router.push('/admin/pedidos');
+                    }}
+                  >
+                    Painel administrativo
+                  </button>
+                )}
                 <button
                   className={styles.loginPopupBtn}
                   onClick={() => {
@@ -183,6 +186,9 @@ export default function HomePage() {
                   Sair
                 </button>
               </div>
+            )}
+            {showCartPopup && (
+              <CartPopup onClose={() => setShowCartPopup(false)} />
             )}
           </div>
         </header>
@@ -218,17 +224,10 @@ export default function HomePage() {
           ))}
         </div>
 
-        <button
-          className={styles.orderBtn}
-          ref={orderBtnRef}
-          style={{ bottom: orderBtnBottom, position: 'fixed', left: '50%', transform: 'translateX(-50%)' }}
-          onClick={() => router.push('/carrinho')}
-        >
-          <span role="img" aria-label="whatsapp"></span> Faça seu pedido!
-        </button>
+        
       </div>
 
-      <footer className={styles.footerSection} ref={footerRef}>
+  <footer className={styles.footerSection}>
         <div className={styles.footerContent}>
           <div className={styles.footerCol}>
             <span className={styles.footerTitle}>Email</span>

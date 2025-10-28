@@ -7,6 +7,10 @@ import styles from '../../../styles/AdminPedidos.module.css';
 export default function AdminPedidosPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [dateFilter, setDateFilter] = useState<string | null>(null); // YYYY-MM-DD
+  const [sortBy, setSortBy] = useState<'hora_pedido' | 'hora_entrega' | null>(null);
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
   // Extrai lista de produtos do campo observacao, segura contra JSON inválido
   function extractCart(obs: any) {
@@ -40,7 +44,8 @@ export default function AdminPedidosPage() {
         }
         // Enriquecer pedidos com imagens dos produtos (quando presentes em observacao)
         const enriched = await Promise.all(arr.map(async (p: any) => {
-          const cart = extractCart(p.observacao) || [];
+          // aceitar o novo campo `carrinho` (string JSON) ou cair para `observacao` para compatibilidade
+          const cart = extractCart(p.carrinho || p.observacao) || [];
           // primeiro, tente extrair imagens e nomes diretamente do item (quando o pedido foi feito direto no produto)
           const imgsFromItems = (cart || []).map((it: any) => it && it.imagem_url).filter(Boolean);
           const namesFromItems = (cart || []).map((it: any) => it && it.nome).filter(Boolean);
@@ -97,13 +102,56 @@ export default function AdminPedidosPage() {
     }));
   }
 
+  // aplica filtros e ordenação sem modificar o estado original
+  const visibleOrders = React.useMemo(() => {
+    let arr = (orders || []).slice();
+    if (statusFilter) arr = arr.filter(o => (o.status || '').toLowerCase() === statusFilter.toLowerCase());
+    if (dateFilter) {
+      arr = arr.filter(o => (o.data_pedido === dateFilter) || (o.data_entrega === dateFilter));
+    }
+    if (sortBy) {
+      arr.sort((a: any, b: any) => {
+        const ta = a[sortBy] ? (a[sortBy].length === 5 ? a[sortBy] + ':00' : a[sortBy]) : '00:00:00';
+        const tb = b[sortBy] ? (b[sortBy].length === 5 ? b[sortBy] + ':00' : b[sortBy]) : '00:00:00';
+        const da = (a.data_pedido || a.data_entrega) || '';
+        const db = (b.data_pedido || b.data_entrega) || '';
+        const dta = new Date(da + 'T' + ta).getTime() || 0;
+        const dtb = new Date(db + 'T' + tb).getTime() || 0;
+        return sortDir === 'asc' ? dta - dtb : dtb - dta;
+      });
+    }
+    return arr;
+  }, [orders, statusFilter, dateFilter, sortBy, sortDir]);
+
   if (loading) return <div>Carregando pedidos...</div>;
 
   return (
     <div className={styles.container}>
       <h1>Gerenciar Pedidos</h1>
+      <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 12 }}>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <strong>Filtrar por status:</strong>
+          {[...new Set(orders.map(o => o.status))].map(s => (
+            <button key={s} className={styles.btn} onClick={() => setStatusFilter(statusFilter === s ? null : s)} style={{ background: statusFilter === s ? '#ddd' : undefined }}>{s}</button>
+          ))}
+        </div>
+
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <strong>Ordenar por:</strong>
+          <button className={styles.btn} onClick={() => { setSortBy('hora_pedido'); setSortDir(sortBy === 'hora_pedido' && sortDir === 'desc' ? 'asc' : 'desc'); }}>Hora Pedido {sortBy === 'hora_pedido' ? (sortDir === 'desc' ? '↓' : '↑') : ''}</button>
+          <button className={styles.btn} onClick={() => { setSortBy('hora_entrega'); setSortDir(sortBy === 'hora_entrega' && sortDir === 'desc' ? 'asc' : 'desc'); }}>Hora Entrega {sortBy === 'hora_entrega' ? (sortDir === 'desc' ? '↓' : '↑') : ''}</button>
+        </div>
+
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <strong>Filtrar por dia:</strong>
+          <input type="date" value={dateFilter || ''} onChange={e => setDateFilter(e.target.value || null)} />
+          {dateFilter && <button className={styles.secondaryBtn} onClick={() => setDateFilter(null)}>Limpar</button>}
+          <button className={styles.secondaryBtn} onClick={() => { setStatusFilter(null); setDateFilter(null); setSortBy(null); setSortDir('desc'); }}>Limpar filtros</button>
+        </div>
+      </div>
+
       <div className={styles.grid}>
-        {orders.map(o => (
+        {visibleOrders.map(o => (
           <div key={o.id} className={styles.card}>
             <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
               <div style={{ width: 160, textAlign: 'center' }}>
@@ -126,15 +174,7 @@ export default function AdminPedidosPage() {
                   <div className={styles.meta}>
                     <div><strong>Cliente:</strong> {o.nome_cliente || o.usuario?.nome}</div>
                     <div><strong>Telefone:</strong> {o.telefone_cliente}</div>
-                    {/* Mostrar produto principal (quando disponível) */}
-                    {(() => {
-                      const cart = extractCart(o.observacao) || [];
-                      const firstFromCart = (cart && cart.length && (cart[0].nome || cart[0].id)) ? (cart[0].nome || `#${cart[0].id}`) : null;
-                      const firstFromEnriched = (o._productNames && o._productNames.length) ? o._productNames[0] : null;
-                      const prodName = firstFromCart || firstFromEnriched;
-                      if (prodName) return <div><strong>Produto:</strong> {prodName}</div>;
-                      return null;
-                    })()}
+                    {/* produto principal removido daqui para evitar duplicação; produtos listados abaixo */}
                     <div>
                       <strong>Endereço:</strong>{' '}
                       {o.endereco ? (
@@ -154,7 +194,7 @@ export default function AdminPedidosPage() {
                 </div>
                 {/* Exibe produtos extraídos de observacao (quando presentes) */}
                 {(() => {
-                  const cart = extractCart(o.observacao) || [];
+                  const cart = extractCart(o.carrinho || o.observacao) || [];
                   if (cart && cart.length) {
                     // se o observacao continha nomes/imagens nos items, use-os
                     return (
@@ -184,6 +224,10 @@ export default function AdminPedidosPage() {
                   return null;
                 })()}
               </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 12 }}>
+              <button className={styles.secondaryBtn} onClick={() => { window.location.href = `/pedido/${o.id}`; }}>Ver detalhes</button>
             </div>
           </div>
         ))}

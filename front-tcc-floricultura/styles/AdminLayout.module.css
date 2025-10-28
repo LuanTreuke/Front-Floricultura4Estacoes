@@ -52,8 +52,13 @@
   transition: background 0.15s;
   text-decoration: none !important;
 }
-.adminNavBtn:hover { background: #f0f2f5; }
-.adminNavBtn:focus { outline: 3px solid rgba(75,115,80,0.12); outline-offset: 2px; }
+.adminNavBtn:hover { 
+  background: #f0f2f5; 
+}
+.adminNavBtn:focus { 
+  outline: 3px solid rgba(75,115,80,0.12); 
+  outline-offset: 2px; 
+}
 .adminNavItem a,
 .adminNavBtn:link,
 .adminNavBtn:visited,

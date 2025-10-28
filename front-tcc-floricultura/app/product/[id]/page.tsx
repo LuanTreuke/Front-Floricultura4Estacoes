@@ -1,5 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
+import { getCurrentUser } from '../../../services/authService';
+import stylesModule from '../../../styles/ProductDetail.module.css';
 import { useRouter, useParams } from 'next/navigation';
 import { fetchProductById, Product } from '../../../services/productService';
 import styles from '../../../styles/ProductDetail.module.css';
@@ -12,9 +14,14 @@ export default function ProductPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [addedMsg, setAddedMsg] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   
   useEffect(() => {
     fetchProductById(id).then(p => { setProduct(p); setLoading(false); });
+    try {
+      const u: any = getCurrentUser();
+      setIsLoggedIn(!!u);
+    } catch (e) {}
   }, [id]);
 
   if (loading) return <div>Carregando...</div>;
@@ -29,20 +36,29 @@ export default function ProductPage() {
           <p className={styles.price}>R${Number(product.preco).toFixed(2)}</p>
           <p className={styles.description}>{product.descricao}</p>
 
-          <div className={styles.actions}>
-            <button className={styles.orderBtn} onClick={() => router.push(`/product/${id}/pedido`)}>Fazer pedido</button>
-          </div>
+          {isLoggedIn ? (
+            <>
+              <div className={styles.actions}>
+                <button className={styles.orderBtn} onClick={() => router.push(`/product/${id}/pedido`)}>Fazer pedido</button>
+              </div>
 
-          <div className={styles.actions}>
-            <button className={styles.shoppingCart} onClick={() => {
-              addToCart({ id: product.id, nome: product.nome, preco: product.preco, imagem_url: product.imagem_url });
-              setAddedMsg('Adicionado');
-              setTimeout(() => setAddedMsg(null), 1500);
-            }}>
-              <span className={`material-icons ${styles.icon}`}>shopping_cart</span>
-              {addedMsg || 'Adicionar ao carrinho'}
-            </button>
-          </div>
+              <div className={styles.actions}>
+                <button className={styles.shoppingCart} onClick={() => {
+                  addToCart({ id: product.id, nome: product.nome, preco: product.preco, imagem_url: product.imagem_url });
+                  setAddedMsg('Adicionado');
+                  setTimeout(() => setAddedMsg(null), 1500);
+                }}>
+                  <span className={`material-icons ${styles.icon}`}>shopping_cart</span>
+                  {addedMsg || 'Adicionar ao carrinho'}
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className={stylesModule.loginNotice}>
+              <p>Faça login para realizar o pedido ou adicionar ao carrinho.</p>
+              <button className={stylesModule.loginNoticeBtn} onClick={() => router.push('/login')}>Ir para login</button>
+            </div>
+          )}
 
         </div>
       </div>

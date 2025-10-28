@@ -36,23 +36,22 @@ html, body {
 }
 
 :root {
+  /* Light mode defaults: white background, dark text */
   --background: #ffffff;
-  --foreground: #ffffff;
-}
-
-:root {
-  --background: #ffffff;
-  --foreground: #ffffff;
+  --foreground: #111111; /* texto escuro por padrão */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   :root {
-    --background: #ffffff;
-    --foreground: #ededed;
+    /* Dark mode: dark background, light text */
+    --background: #f0f0f0;
+    --foreground: #ffffff;
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
   }
 }
 

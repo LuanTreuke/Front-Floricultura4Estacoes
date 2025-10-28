@@ -54,3 +54,23 @@ export async function createAddress(dto: AddressDto) {
   throw new Error(msg);
   }
 }
+
+export async function updateAddress(id: number, dto: Partial<AddressDto>) {
+  try {
+    const res = await axios.patch(`${API_URL}/enderecos/${id}`, dto);
+    return res.data as AddressDto;
+  } catch (err: any) {
+    console.error('updateAddress failed', err?.response?.data || err.message || err);
+    throw err;
+  }
+}
+
+export async function deleteAddress(id: number) {
+  try {
+    await axios.delete(`${API_URL}/enderecos/${id}`);
+    return true;
+  } catch (err: any) {
+    console.error('deleteAddress failed', err?.response?.data || err.message || err);
+    throw err;
+  }
+}

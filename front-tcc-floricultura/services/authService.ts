@@ -1,14 +1,12 @@
-import axios from 'axios';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+import api from './api';
 
 export async function login(email: string, senha: string) {
-  const res = await axios.post(`${API_URL}/usuario/login`, { email, senha });
+  const res = await api.post(`/usuario/login`, { email, senha });
   return res.data;
 }
 
 export async function cadastro(data: { nome: string; email: string; senha: string; telefone?: string }) {
-  const res = await axios.post(`${API_URL}/usuario/cadastro`, data);
+  const res = await api.post(`/usuario/cadastro`, data);
   return res.data;
 }
 
@@ -36,7 +34,30 @@ export function getCurrentUser() {
 export function logout() {
   if (typeof window === 'undefined') return;
   try {
+    // remove user info
+    const raw = localStorage.getItem('usuario');
+    let userId: any = null;
+    try {
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const u = parsed && (parsed.usuario || parsed.user) ? (parsed.usuario || parsed.user) : parsed;
+        if (u && (u.id || u.id === 0)) userId = u.id;
+      }
+    } catch (e) {}
+    // Ensure that after logout the visible cart is not contaminated by
+    // the previous authenticated user's local cache. Remove the guest
+    // key so a not-logged-in visitor starts with an empty cart. We do
+    // NOT copy the user's cart into the guest session.
+    try {
+      try { localStorage.removeItem('floricultura_cart_v1'); } catch (e) {}
+    } catch (e) {}
     localStorage.removeItem('usuario');
+    try {
+      // notify other listeners (same tab) that cart changed/cleared
+      if (typeof window !== 'undefined' && window.dispatchEvent) {
+        window.dispatchEvent(new Event('cart-updated'));
+      }
+    } catch (e) {}
   } catch (err) {
     console.warn('logout: failed to remove usuario from localStorage', err);
   }

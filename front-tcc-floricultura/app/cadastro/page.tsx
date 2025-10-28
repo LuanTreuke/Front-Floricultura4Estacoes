@@ -34,6 +34,9 @@ export default function CadastroPage() {
   return (
     <div className={styles.container}>
       <form className={styles.form} onSubmit={handleSubmit}>
+        <div className={styles.logoWrap}>
+          <img src="/Logo floricultura.jpg" alt="Logo Floricultura" className={styles.logo} />
+        </div>
         <h2>Cadastro</h2>
         <input type="text" placeholder="Nome" value={nome} onChange={e => setNome(e.target.value)} required />
         <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />

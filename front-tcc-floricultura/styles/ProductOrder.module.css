@@ -42,6 +42,11 @@
   border: 1px solid #e6efe7;
   border-radius: 10px;
 }
+
+.invalid {
+  border-color: #e53e3e !important;
+  box-shadow: 0 0 0 3px rgba(229,62,62,0.08);
+}
 .textarea {
   resize: vertical;
   overflow: auto;
