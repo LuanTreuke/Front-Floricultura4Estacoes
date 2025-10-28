@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import styles from '../../styles/ProductOrder.module.css';
 import { getCart, clearCart, cartTotal, CartItem } from '../../services/cartService';
@@ -22,7 +23,7 @@ export default function UnifiedOrderPage() {
   const [dataEntrega, setDataEntrega] = useState('');
   const [horaEntrega, setHoraEntrega] = useState('');
   const [observacao, setObservacao] = useState('');
-  const [cobrarNoEndereco, setCobrarNoEndereco] = useState(false);
+  const cobrarNoEndereco = false;
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, boolean>>({});
 
@@ -30,7 +31,7 @@ export default function UnifiedOrderPage() {
     const c = getCart();
     setItems(c);
     // compute total only on client after mount to avoid SSR/client mismatch
-    try { setTotal(cartTotal()); } catch (e) { setTotal(0); }
+  try { setTotal(cartTotal()); } catch { setTotal(0); }
     const usuario = getCurrentUser() as User;
     if (usuario) {
       setNomeCliente(usuario.nome || '');
@@ -48,12 +49,12 @@ export default function UnifiedOrderPage() {
         const prefPhone = localStorage.getItem('checkout_selected_phone');
         if (prefPhone) setSelectedPhoneId(Number(prefPhone));
         else if (myPhones.length > 0) setSelectedPhoneId(myPhones[0].id || null);
-      } catch (err) { if (myPhones.length > 0) setSelectedPhoneId(myPhones[0].id || null); }
+      } catch { if (myPhones.length > 0) setSelectedPhoneId(myPhones[0].id || null); }
       try {
         const pref = localStorage.getItem('checkout_selected_address');
         if (pref) setSelectedAddress(Number(pref));
         else if (my.length > 0) setSelectedAddress(my[0].id || null);
-      } catch (err) { if (my.length > 0) setSelectedAddress(my[0].id || null); }
+      } catch { if (my.length > 0) setSelectedAddress(my[0].id || null); }
     })();
   }, []);
 
@@ -65,7 +66,7 @@ export default function UnifiedOrderPage() {
       } else {
         localStorage.setItem('checkout_selected_phone', String(selectedPhoneId));
       }
-    } catch (e) {
+    } catch {
       // ignore storage errors
     }
     const chosen = phones.find(p => p.id === selectedPhoneId);
@@ -103,7 +104,7 @@ export default function UnifiedOrderPage() {
           alert('A data e hora de entrega não podem ser anteriores à data/hora atual');
           return;
         }
-      } catch (e) {
+      } catch {
         alert('Erro ao validar data/hora de entrega');
         return;
       }
@@ -166,7 +167,7 @@ export default function UnifiedOrderPage() {
       <h1 className={styles.heading}>Finalizar pedido</h1>
       <form onSubmit={handleSubmit} className={styles.form}>
         <label>Endereço</label>
-        <select className={`${styles.select} ${errors.selectedAddress ? styles.invalid : ''}`} value={selectedAddress || ''} onChange={e => { setSelectedAddress(Number(e.target.value)); setErrors(prev => ({ ...prev, selectedAddress: false })); try { localStorage.setItem('checkout_selected_address', String(Number(e.target.value))); } catch (e) {} }}>
+          <select className={`${styles.select} ${errors.selectedAddress ? styles.invalid : ''}`} value={selectedAddress || ''} onChange={e => { setSelectedAddress(Number(e.target.value)); setErrors(prev => ({ ...prev, selectedAddress: false })); try { localStorage.setItem('checkout_selected_address', String(Number(e.target.value))); } catch {} }}>
           <option value="">Selecione</option>
           {addresses.map(a => <option key={a.id} value={a.id}>{`${a.rua}, ${a.numero} - ${a.bairro}`}</option>)}
         </select>
@@ -180,7 +181,7 @@ export default function UnifiedOrderPage() {
             const id = e.target.value ? Number(e.target.value) : null; setSelectedPhoneId(id);
             const phone = phones.find(p => p.id === id);
             if (phone && phone.telefone) setTelefone(phone.telefone);
-            try { localStorage.setItem('checkout_selected_phone', String(id)); } catch (err) {}
+            try { localStorage.setItem('checkout_selected_phone', String(id)); } catch {}
             setErrors(prev => ({ ...prev, telefone: false }));
           }}>
             <option value="">Selecione</option>
@@ -210,7 +211,11 @@ export default function UnifiedOrderPage() {
         <h3>Itens no pedido</h3>
         {items.map(it => (
           <div key={it.id} style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 8 }}>
-            <img src={it.imagem_url || ''} style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 8 }} />
+            {it.imagem_url ? (
+              <Image src={it.imagem_url} alt={it.nome || ''} width={64} height={64} style={{ objectFit: 'cover', borderRadius: 8 }} />
+            ) : (
+              <div style={{ width: 64, height: 64, background: '#f3f3f3', borderRadius: 8 }} />
+            )}
             <div style={{ flex: 1 }}>
               <div style={{ fontWeight: 600 }}>{it.nome}</div>
               <div>R$ {Number(it.preco).toFixed(2)} x {it.quantidade}</div>

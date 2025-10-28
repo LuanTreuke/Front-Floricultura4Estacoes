@@ -30,7 +30,6 @@ export async function fetchAddresses() {
 export async function createAddress(dto: AddressDto) {
   try {
   // mostrar payload enviado para depuração
-  // eslint-disable-next-line no-console
   console.debug('[createAddress] sending dto:', dto);
     const res = await axios.post(`${API_URL}/enderecos`, dto);
     return res.data as AddressDto;

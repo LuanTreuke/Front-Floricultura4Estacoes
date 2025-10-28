@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import styles from '../../styles/MyAccount.module.css';
-import { getCurrentUser } from '../../services/authService';
+import { getCurrentUser, User } from '../../services/authService';
 import { fetchPhones, PhoneDto, createPhone, updatePhone, deletePhone } from '../../services/phoneService';
 import { fetchAddresses, AddressDto, createAddress, updateAddress, deleteAddress } from '../../services/addressService';
 import { useRouter } from 'next/navigation';
@@ -18,8 +18,8 @@ export default function MyAccountPage() {
   const [newAddressRua, setNewAddressRua] = useState('');
 
   useEffect(() => {
-    const usuario: any = getCurrentUser();
-    if (!usuario || !usuario.id) {
+    const usuario = getCurrentUser();
+    if (!usuario || typeof usuario.id !== 'number') {
       router.push('/login');
       return;
     }
@@ -29,7 +29,7 @@ export default function MyAccountPage() {
       const ad = await fetchAddresses();
       setAddresses((ad || []).filter(a => a.Usuario_id === usuario.id));
     })();
-  }, []);
+  }, [router]);
 
   async function handleSavePhone(id: number) {
     await updatePhone(id, { telefone: phoneValue });
@@ -44,8 +44,8 @@ export default function MyAccountPage() {
   }
 
   async function handleAddPhone() {
-    const usuario: any = getCurrentUser();
-    if (!newPhone || !usuario) return;
+    const usuario = getCurrentUser();
+    if (!newPhone || !usuario || typeof usuario.id !== 'number') return;
     const created = await createPhone({ telefone: newPhone, Usuario_id: usuario.id });
     setPhones([...(phones || []), created]);
     setNewPhone('');
@@ -64,14 +64,14 @@ export default function MyAccountPage() {
   }
 
   async function handleAddAddress() {
-    const usuario: any = getCurrentUser();
-    if (!newAddressRua || !usuario) return;
+    const usuario = getCurrentUser();
+    if (!newAddressRua || !usuario || typeof usuario.id !== 'number') return;
     const created = await createAddress({ rua: newAddressRua, numero: '', bairro: '', cep: '', cidade: '', Usuario_id: usuario.id });
     setAddresses([...(addresses || []), created]);
     setNewAddressRua('');
   }
 
-  const usuario: any = getCurrentUser();
+  const usuario: User = getCurrentUser();
 
   return (
     <div className={styles.container}>

@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from '../../../styles/ProductOrder.module.css';
-import { createPhone } from '../../../services/phoneService';
+import { createPhone, PhoneDto } from '../../../services/phoneService';
+import { getCurrentUser, User } from '../../../services/authService';
 
 export default function CadastroTelefonePage() {
   const router = useRouter();
@@ -11,20 +12,19 @@ export default function CadastroTelefonePage() {
   const [message, setMessage] = useState<string | null>(null);
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const { getCurrentUser } = require('../../../services/authService');
-    const usuario: any = getCurrentUser() || { id: 0 };
-    const dto = {
+    const usuario = getCurrentUser() as User | null;
+    const dto: PhoneDto = {
       telefone,
       Usuario_id: (typeof usuario?.id === 'number' && usuario.id > 0) ? usuario.id : null,
     };
     setLoading(true);
     try {
-      await createPhone(dto as any);
+  await createPhone(dto);
       setMessage('Telefone cadastrado com sucesso');
       setTimeout(() => router.push('/'), 1200);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('createPhone error', err);
-      const msg = (err as any)?.message || String(err);
+      const msg = (err instanceof Error) ? err.message : String(err);
       setMessage(msg || 'Erro ao cadastrar telefone');
     } finally { setLoading(false); }
   }

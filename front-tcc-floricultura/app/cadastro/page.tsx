@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from '../../styles/Login.module.css';
+import Image from 'next/image';
 import { cadastro } from '../../services/authService';
 
 export default function CadastroPage() {
@@ -35,7 +36,7 @@ export default function CadastroPage() {
     <div className={styles.container}>
       <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.logoWrap}>
-          <img src="/Logo floricultura.jpg" alt="Logo Floricultura" className={styles.logo} />
+          <Image src="/Logo floricultura.jpg" alt="Logo Floricultura" className={styles.logo} width={96} height={96} style={{ objectFit: 'contain' }} />
         </div>
         <h2>Cadastro</h2>
         <input type="text" placeholder="Nome" value={nome} onChange={e => setNome(e.target.value)} required />

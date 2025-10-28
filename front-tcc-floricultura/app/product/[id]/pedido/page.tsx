@@ -1,8 +1,9 @@
 "use client";
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { useRouter, useParams } from 'next/navigation';
 import { fetchProductById, Product } from '../../../../services/productService';
-import { fetchAddresses, AddressDto, createAddress } from '../../../../services/addressService';
+import { fetchAddresses, AddressDto } from '../../../../services/addressService';
 import { fetchPhones, PhoneDto } from '../../../../services/phoneService';
 import { getCurrentUser, User } from '../../../../services/authService';
 import { createOrder, CreateOrderDto } from '../../../../services/orderService';
@@ -24,10 +25,8 @@ export default function ProductOrderPage() {
   const [dataEntrega, setDataEntrega] = useState('');
   const [horaEntrega, setHoraEntrega] = useState('');
   const [errors, setErrors] = useState<Record<string, boolean>>({});
-  const [cobrarNoEndereco, setCobrarNoEndereco] = useState(false);
+  const [cobrarNoEndereco, _setCobrarNoEndereco] = useState(false);
   const [observacao, setObservacao] = useState('');
-  const [newAddressText, setNewAddressText] = useState('');
-  const [addMessage, setAddMessage] = useState<string | null>(null);
   const [orderQuantity, setOrderQuantity] = useState<number>(1);
 
   useEffect(() => {
@@ -56,7 +55,7 @@ export default function ProductOrderPage() {
             if (chosen && chosen.telefone) setTelefone(chosen.telefone);
           }
         }
-      } catch (e) {
+      } catch {
         // ignore
       }
     })();
@@ -72,12 +71,9 @@ export default function ProductOrderPage() {
 
   async function handlePedido(e: React.FormEvent) {
     e.preventDefault();
-  const { getCurrentUser } = require('../../../../services/authService');
   const usuario = getCurrentUser() || ({ id: 0, nome: '', telefone: '' } as User);
-  // eslint-disable-next-line no-console
   console.debug('[ProductOrderPage] getCurrentUser ->', usuario);
-  // eslint-disable-next-line no-console
-  console.debug('[ProductOrderPage] localStorage.usuario raw ->', localStorage.getItem('usuario'));
+  console.debug('[ProductOrderPage] localStorage.usuario raw ->', typeof window !== 'undefined' ? localStorage.getItem('usuario') : null);
     // prepare product item early so validation can check it
     const prodItem = product ? {
       id: product.id,
@@ -122,7 +118,7 @@ export default function ProductOrderPage() {
           alert('A data e hora de entrega não podem ser anteriores à data/hora atual');
           return;
         }
-      } catch (e) {
+      } catch {
         alert('Erro ao validar data/hora de entrega');
         return;
       }
@@ -164,7 +160,11 @@ export default function ProductOrderPage() {
     <div className={styles.container}>
       <h1 className={styles.heading}>Fazer pedido — {product.nome}</h1>
       <div className={styles.card}>
-        <img src={product.imagem_url || ''} alt={product.nome} className={styles.image} />
+        {product.imagem_url ? (
+          <Image src={product.imagem_url} alt={product.nome} className={styles.image} width={400} height={400} style={{ objectFit: 'cover' }} />
+        ) : (
+          <div className={styles.image}>Img</div>
+        )}
         <div className={styles.info}>
           <p className={styles.price}>R${Number(product.preco).toFixed(2)}</p>
           <form onSubmit={handlePedido} className={styles.form}>
@@ -218,7 +218,7 @@ export default function ProductOrderPage() {
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <input id="cobrarNoEndereco" type="checkbox" checked={cobrarNoEndereco} onChange={e => setCobrarNoEndereco(e.target.checked)} />
+              <input id="cobrarNoEndereco" type="checkbox" checked={cobrarNoEndereco} onChange={e => _setCobrarNoEndereco(e.target.checked)} />
               <label htmlFor="cobrarNoEndereco">Cobrar no endereço</label>
             </div>
 

@@ -1,5 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { getCurrentUser, logout } from '../services/authService';
 import { useRouter } from 'next/navigation';
 import styles from '../styles/HomePage.module.css';
@@ -44,7 +45,7 @@ export default function HomePage() {
       setCartCount(getCart().reduce((s, i) => s + (i.quantidade || 0), 0));
       const unsub = subscribeCart((items) => setCartCount(items.reduce((s, i) => s + (i.quantidade || 0), 0)));
       return () => unsub();
-    } catch (e) {}
+    } catch {}
   }, []);
 
   
@@ -85,7 +86,7 @@ export default function HomePage() {
         const map: Record<string, number> = {};
         cats.forEach(c => (map[c.nome] = c.id));
         setCategoryMap(map);
-      } catch (e) {
+      } catch {
         // fallback estático
         const fallback = ['Buquês', 'Arranjos', 'Flores', 'Cestas'];
         setCategories(['Todas', ...fallback]);
@@ -122,7 +123,7 @@ export default function HomePage() {
       <div className={styles.container}>
         <header className={styles.header}>
           <div className={styles.logo}>
-            <img src="/Logo floricultura.jpg" alt="Logo Floricultura Quatro Estações" style={{ height: 96, width: 'auto', display: 'block' }} />
+            <Image src="/Logo floricultura.jpg" alt="Logo Floricultura Quatro Estações" width={96} height={96} style={{ height: 96, width: 'auto', display: 'block', objectFit: 'contain' }} />
           </div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center', position: 'relative' }}>
             <button className={styles.shoppingCart} onClick={() => setShowCartPopup(true)}>

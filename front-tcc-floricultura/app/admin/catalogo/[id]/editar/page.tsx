@@ -9,13 +9,13 @@ export default function EditarProdutoPage() {
   const router = useRouter();
   const params = useParams();
   const id = Number(params?.id);
-  const [produto, setProduto] = useState<any>(null);
+  const [produto, setProduto] = useState<Product | null>(null);
   const [nome, setNome] = useState('');
   const [descricao, setDescricao] = useState('');
   const [preco, setPreco] = useState('');
   const [categoria, setCategoria] = useState('');
   const [categories, setCategories] = useState<Array<{ id: number; nome: string }>>([]);
-  const [imagem, setImagem] = useState<File | null>(null);
+  const [, setImagem] = useState<File | null>(null);
 
   useEffect(() => {
     fetchProductById(id).then((prod: Product | null) => {
@@ -35,7 +35,7 @@ export default function EditarProdutoPage() {
         const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
         const res = await axios.get(`${API_URL}/categorias`);
         setCategories(res.data || []);
-      } catch (e) {
+      } catch {
         setCategories([]);
       }
     })();
@@ -51,7 +51,7 @@ export default function EditarProdutoPage() {
     e.preventDefault();
     (async () => {
       try {
-        const payload: any = {
+        const payload: Partial<Product> = {
           nome,
           descricao,
           preco: Number(preco),

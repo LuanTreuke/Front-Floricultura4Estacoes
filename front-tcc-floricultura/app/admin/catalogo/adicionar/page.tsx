@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { addProduct } from '@/services/productService';
+import { addProduct, Product } from '@/services/productService';
 
 export default function AdicionarProdutoPage() {
   const [nome, setNome] = useState('');
@@ -21,16 +21,17 @@ export default function AdicionarProdutoPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     try {
-      await addProduct({
+      const dto = {
         nome,
         descricao,
         preco: Number(preco),
         imagem_url: imagem ? '' : '',
         Categoria_id: Number(categoria),
-      });
+      };
+      await addProduct(dto as Omit<Product, 'id'>);
       alert('Produto adicionado com sucesso!');
       router.push('/admin/catalogo');
-    } catch (err) {
+    } catch {
       alert('Erro ao adicionar produto!');
     }
   }

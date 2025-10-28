@@ -1,8 +1,6 @@
 import api from './api';
 import { getCurrentUser } from './authService';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-
 export interface CreateOrderDto {
   imagem_entrega?: string;
   hora_entrega?: string;
@@ -32,11 +30,11 @@ export async function createOrder(dto: CreateOrderDto) {
       } catch (whErr: unknown) {
         // don't block the user if whatsapp fails; just log for debugging
         try {
-          // try to extract axios-like response info if present
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          const candidate = (whErr as any)?.response?.data ?? (whErr as any)?.message ?? undefined;
+          // narrow to expected shapes instead of using `any`
+          const maybe = whErr as { response?: { data?: unknown }; message?: string } | undefined;
+          const candidate = maybe?.response?.data ?? maybe?.message ?? undefined;
           console.warn('Failed to send whatsapp confirmation', candidate ?? String(whErr));
-        } catch (logErr) {
+        } catch {
           console.warn('Failed to send whatsapp confirmation', String(whErr));
         }
       }
@@ -63,7 +61,7 @@ export async function fetchOrders() {
     }
     // not logged in: return empty
     return [];
-  } catch (err) {
+  } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     throw new Error(msg);
   }
@@ -73,7 +71,7 @@ export async function fetchOrderById(id: number) {
   try {
     const res = await api.get(`/pedidos/${id}`);
     return res.data;
-  } catch (err) {
+  } catch (err: unknown) {
     console.warn('fetchOrderById failed', err instanceof Error ? err.message : String(err));
     return null;
   }
@@ -83,7 +81,7 @@ export async function updateOrderStatus(id: number, status: string) {
   try {
     const res = await api.patch(`/pedidos/${id}/status`, { status });
     return res.data;
-  } catch (err) {
+  } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     throw new Error(msg);
   }

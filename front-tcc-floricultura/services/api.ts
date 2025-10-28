@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
+import type { InternalAxiosRequestConfig } from 'axios';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.0.122:3001';
 
@@ -24,7 +24,7 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
         }
       }
     }
-  } catch (e: unknown) {
+  } catch {
     // ignore failures reading localStorage
     // but keep a lightweight guard for debugging if needed
     // console.warn('api interceptor read user failed', e);

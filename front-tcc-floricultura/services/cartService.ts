@@ -1,4 +1,4 @@
-import { getCurrentUser } from './authService';
+import { getCurrentUser, User } from './authService';
 import api from './api';
 
 export interface CartItem {
@@ -14,11 +14,13 @@ export interface CartItem {
 
 const STORAGE_KEY = 'floricultura_cart_v1';
 
+type AnyObj = Record<string, unknown>;
+
 function userStorageKey() {
   try {
-    const u: any = getCurrentUser();
+    const u = getCurrentUser() as User | null;
     if (u && (u.id || u.id === 0)) return `${STORAGE_KEY}_user_${u.id}`;
-  } catch (e) {}
+  } catch {}
   return STORAGE_KEY; // fallback to global key for guests
 }
 
@@ -38,25 +40,28 @@ export function getCart(): CartItem[] {
 
 export async function getCartFromServer(): Promise<CartItem[]> {
   try {
-    const u: any = getCurrentUser();
+    const u = getCurrentUser() as User | null;
     if (!u || !u.id) return getCart();
-  const res = await api.get(`/cart`, { params: { Usuario_id: u.id } });
-  const cart = res.data;
+    const res = await api.get(`/cart`, { params: { Usuario_id: u.id } });
+    const cart = res.data;
     // normalize items to frontend shape
-    const items = (cart && cart.items ? cart.items : []).map((it: any) => ({
-      // use produto.id as local id so UI components remain unchanged
-      id: (it.produto && it.produto.id) || (it.meta && it.meta.produtoId) || 0,
-      nome: it.meta?.nome || (it.produto && it.produto.nome) || '',
-      preco: Number(it.preco_unitario || it.preco || it.precoUnitario || 0),
-      quantidade: it.quantidade || 1,
-      imagem_url: it.meta?.imagem_url || (it.produto && it.produto.imagem_url) || undefined,
-      serverId: it.id,
-    }));
+    const rawItems = (cart && (cart as AnyObj).items ? (cart as AnyObj).items as AnyObj[] : []) as AnyObj[];
+    const items = rawItems.map((it: AnyObj) => {
+      const produto = it['produto'] as AnyObj | undefined;
+      const meta = it['meta'] as AnyObj | undefined;
+      const prodId = (produto && (produto['id'] as number)) || (meta && (meta['produtoId'] as number)) || 0;
+      const nome = (meta && (meta['nome'] as string)) || (produto && (produto['nome'] as string)) || '';
+      const preco = Number(it['preco_unitario' as string] ?? it['preco'] ?? it['precoUnitario'] ?? 0);
+      const quantidade = (it['quantidade'] as number) ?? 1;
+      const imagem_url = (meta && (meta['imagem_url'] as string)) || (produto && (produto['imagem_url'] as string)) || undefined;
+      const serverId = it['id'] as number | undefined;
+      return { id: prodId, nome, preco, quantidade, imagem_url, serverId } as CartItem;
+    });
     // keep local cache for quick UI; write to user-scoped key
-    try { localStorage.setItem(userStorageKey(), JSON.stringify(items)); } catch(e){}
+  try { localStorage.setItem(userStorageKey(), JSON.stringify(items)); } catch {}
     return items;
   } catch (e) {
-    console.warn('getCartFromServer failed', e);
+    console.warn('getCartFromServer failed', (e as Error)?.message ?? String(e));
     return getCart();
   }
 }
@@ -78,11 +83,11 @@ export function subscribeCart(fn: CartListener) {
 }
 function notify() {
   const c = getCart();
-  listeners.slice().forEach((l) => { try { l(c); } catch (e) {} });
+  listeners.slice().forEach((l) => { try { l(c); } catch {} });
 }
 
 export function addToCart(item: Omit<CartItem, 'quantidade'>, qtd = 1) {
-  const u: any = getCurrentUser();
+  const u = getCurrentUser() as User | null;
   if (u && u.id) {
     // server-side add
     try {
@@ -94,7 +99,7 @@ export function addToCart(item: Omit<CartItem, 'quantidade'>, qtd = 1) {
         return res.data;
       })();
     } catch (e) {
-      console.warn('addToCart server failed', e);
+      console.warn('addToCart server failed', (e as Error)?.message ?? String(e));
     }
     // optimistic local update
     const cart = getCart();
@@ -118,19 +123,19 @@ export function addToCart(item: Omit<CartItem, 'quantidade'>, qtd = 1) {
 }
 
 export function updateQty(productId: number, quantidade: number) {
-  const u: any = getCurrentUser();
+  const u = getCurrentUser() as User | null;
   if (u && u.id) {
     (async () => {
       try {
         // find server-side item id from cached local items (best effort)
         const cached = getCart();
         const found = cached.find(i => i.id === productId);
-        if (found && (found as any).serverId) {
-          await api.put(`/cart/items/${(found as any).serverId}`, { quantidade });
+        if (found && typeof found.serverId === 'number') {
+          await api.put(`/cart/items/${found.serverId}`, { quantidade });
         }
         await getCartFromServer();
         notify();
-      } catch (e) { console.warn('updateQty server failed', e); }
+      } catch (e) { console.warn('updateQty server failed', (e as Error)?.message ?? String(e)); }
     })();
   }
   const cart = getCart();
@@ -144,16 +149,16 @@ export function updateQty(productId: number, quantidade: number) {
 }
 
 export function removeFromCart(productId: number) {
-  const u: any = getCurrentUser();
+  const u = getCurrentUser() as User | null;
   if (u && u.id) {
     (async () => {
       try {
         const cached = getCart();
         const found = cached.find(i => i.id === productId);
-          if (found && (found as any).serverId) await api.delete(`/cart/items/${(found as any).serverId}`);
+          if (found && typeof found.serverId === 'number') await api.delete(`/cart/items/${found.serverId}`);
         await getCartFromServer();
         notify();
-      } catch (e) { console.warn('removeFromCart server failed', e); }
+      } catch (e) { console.warn('removeFromCart server failed', (e as Error)?.message ?? String(e)); }
     })();
   }
   const cart = getCart().filter(i => i.id !== productId);
@@ -167,14 +172,14 @@ export function clearCart() {
   try {
     const key = userStorageKey();
     localStorage.removeItem(key);
-    const u: any = getCurrentUser();
+    const u = getCurrentUser() as User | null;
     if (u && u.id) {
       // fire-and-forget server clear
       (async () => {
-  try { await api.post(`/cart/clear`, { Usuario_id: u.id }); } catch (e) { console.warn('clearCart server failed', e); }
+  try { await api.post(`/cart/clear`, { Usuario_id: u.id }); } catch (e) { console.warn('clearCart server failed', (e as Error)?.message ?? String(e)); }
       })();
     }
-  } catch (e) {}
+  } catch {}
   notify();
 }
 
@@ -183,11 +188,12 @@ export function cartTotal() {
   return cart.reduce((s, i) => s + (i.preco || 0) * (i.quantidade || 1), 0);
 }
 
-export default { getCart, saveCart, addToCart, updateQty, removeFromCart, clearCart, cartTotal };
+const cartService = { getCart, saveCart, addToCart, updateQty, removeFromCart, clearCart, cartTotal };
+export default cartService;
 
 // listen for cross-module cart-updated events (dispatched on logout) to refresh subscribers
 if (typeof window !== 'undefined') {
   window.addEventListener('cart-updated', () => {
-    try { notify(); } catch (e) { }
+    try { notify(); } catch { }
   });
 }

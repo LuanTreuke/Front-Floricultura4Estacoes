@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import styles from '../../../styles/OrderDetails.module.css';
 import { fetchOrderById } from '../../../services/orderService';
@@ -22,7 +23,24 @@ export default function PedidoDetalhePage() {
   const params = useParams();
   const id = Number(params?.id);
   const router = useRouter();
-  const [order, setOrder] = useState<any | null>(null);
+  type AnyObj = Record<string, unknown>;
+  type Order = AnyObj & {
+    id?: number;
+    nome_cliente?: string;
+    usuario?: { nome?: string; telefone?: string } | null;
+    telefone_cliente?: string | null;
+    endereco?: { rua?: string; numero?: string; complemento?: string; bairro?: string; cidade?: string; cep?: string } | null;
+    Endereco_id?: number | null;
+    data_entrega?: string;
+    hora_entrega?: string;
+    status?: string;
+    data_pedido?: string;
+    hora_pedido?: string;
+    cobrar_no_endereco?: number | string | boolean;
+    observacao?: unknown;
+    carrinho?: unknown;
+  };
+  const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -33,30 +51,39 @@ export default function PedidoDetalhePage() {
     })();
   }, [id]);
 
-  function extractCart(obs: any) {
+  function extractCart(obs: unknown): AnyObj[] {
     if (!obs) return [];
     try {
-      const parsed = typeof obs === 'string' ? JSON.parse(obs) : obs;
+      const parsed = typeof obs === 'string' ? JSON.parse(String(obs)) : obs;
       // formatos possíveis: { cart: [...] } | [...] | { items: [...] }
-      if (parsed && Array.isArray(parsed.cart)) return parsed.cart;
-      if (parsed && Array.isArray(parsed.items)) return parsed.items;
-      if (Array.isArray(parsed)) return parsed;
+      if (parsed && typeof parsed === 'object') {
+        const obj = parsed as Record<string, unknown>;
+        if (Array.isArray(obj['cart'] as unknown)) return obj['cart'] as AnyObj[];
+        if (Array.isArray(obj['items'] as unknown)) return obj['items'] as AnyObj[];
+      }
+      if (Array.isArray(parsed)) return parsed as AnyObj[];
       return [];
-    } catch (e) { return []; }
+    } catch { return []; }
   }
 
   if (loading) return <div className={styles.container}>Carregando...</div>;
   if (!order) return <div className={styles.container}>Pedido não encontrado</div>;
 
-  const cart = extractCart(order.carrinho) || [];
-  const unique = [] as any[];
+  const cart = extractCart((order && (order['carrinho'] as unknown)) ?? undefined) || [];
+  const unique: AnyObj[] = [];
   const seen = new Set<string>();
-  cart.forEach((it: any) => {
-    const key = `${it.id || ''}::${it.nome || ''}`;
+  cart.forEach((it: AnyObj) => {
+    const id = (it['id'] as number | undefined) ?? '';
+    const nome = (it['nome'] as string | undefined) ?? '';
+    const key = `${id}::${nome}`;
     if (!seen.has(key)) { seen.add(key); unique.push(it); }
     else {
-      const ex = unique.find(u => (u.id === it.id && u.nome === it.nome));
-      if (ex) ex.quantidade = (ex.quantidade || 0) + (it.quantidade || 0);
+      const ex = unique.find(u => ((u['id'] as number | undefined) === (it['id'] as number | undefined) && (u['nome'] as string | undefined) === (it['nome'] as string | undefined)));
+      if (ex) {
+        const prev = (ex['quantidade'] as number | undefined) ?? 0;
+        const add = (it['quantidade'] as number | undefined) ?? 0;
+        ex['quantidade'] = prev + add;
+      }
     }
   });
 
@@ -83,20 +110,20 @@ export default function PedidoDetalhePage() {
         <div className={styles.productList}>
           <strong>Produtos:</strong>
           <ul>
-            {unique.map((it: any, idx: number) => (
+            {unique.map((it: AnyObj, idx: number) => (
               <li key={idx} className={styles.productItem}>
-                { (it.imagem_url || it.imagem || it.imagemUrl) ? (
-                  <img className={styles.productImg} src={it.imagem_url || it.imagem || it.imagemUrl} alt={it.nome} />
+                {((it['imagem_url'] as string | undefined) || (it['imagem'] as string | undefined) || (it['imagemUrl'] as string | undefined)) ? (
+                  <Image src={String((it['imagem_url'] as string | undefined) || (it['imagem'] as string | undefined) || (it['imagemUrl'] as string | undefined))} alt={(it['nome'] as string | undefined) ?? ''} width={80} height={80} className={styles.productImg} style={{ objectFit: 'cover' }} />
                 ) : (
                   <div className={styles.productImg}>Img</div>
                 )}
                 <div className={styles.productInfo}>
-                  <div className={styles.productTitle}>{it.nome}</div>
-                  <div className={styles.productDesc}>{it.descricao || it.categoria ? `${it.descricao || ''}` : ''}</div>
+                  <div className={styles.productTitle}>{(it['nome'] as string | undefined) ?? ''}</div>
+                  <div className={styles.productDesc}>{((it['descricao'] as string | undefined) || (it['categoria'] as string | undefined)) ? `${(it['descricao'] as string | undefined) || ''}` : ''}</div>
                 </div>
                 <div className={styles.productQuantityPrice}>
-                  <div>{it.quantidade ? `x ${it.quantidade}` : ''}</div>
-                  <div style={{ fontWeight: 600 }}>{it.preco ? `R$ ${Number(it.preco).toFixed(2)}` : ''}</div>
+                  <div>{(it['quantidade'] as number | undefined) ? `x ${(it['quantidade'] as number).toString()}` : ''}</div>
+                  <div style={{ fontWeight: 600 }}>{(it['preco'] as number | undefined) ? `R$ ${Number(it['preco']).toFixed(2)}` : ''}</div>
                 </div>
               </li>
             ))}
@@ -110,7 +137,7 @@ export default function PedidoDetalhePage() {
               try {
                 const parsed = typeof order.observacao === 'string' ? JSON.parse(order.observacao) : order.observacao;
                 return <pre className={styles.obsPre}>{JSON.stringify(parsed, null, 2)}</pre>;
-              } catch (e) {
+              } catch {
                 return <div style={{ whiteSpace: 'pre-wrap' }}>{String(order.observacao)}</div>;
               }
             })() : <div>—</div>}

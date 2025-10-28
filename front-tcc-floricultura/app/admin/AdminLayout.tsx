@@ -17,7 +17,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       if (!u || !(u.role === 'Admin' || u.cargo === 'Admin')) {
         router.push('/');
       }
-    } catch (e) {
+    } catch {
       router.push('/');
     }
   }, [router]);

@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import { getCurrentUser } from '../../../services/authService';
+import Image from 'next/image';
+import { getCurrentUser, User } from '../../../services/authService';
 import stylesModule from '../../../styles/ProductDetail.module.css';
 import { useRouter, useParams } from 'next/navigation';
 import { fetchProductById, Product } from '../../../services/productService';
@@ -19,9 +20,11 @@ export default function ProductPage() {
   useEffect(() => {
     fetchProductById(id).then(p => { setProduct(p); setLoading(false); });
     try {
-      const u: any = getCurrentUser();
-      setIsLoggedIn(!!u);
-    } catch (e) {}
+      const u: User = getCurrentUser();
+      setIsLoggedIn(!!u && typeof u.id === 'number');
+    } catch {
+      // ignore
+    }
   }, [id]);
 
   if (loading) return <div>Carregando...</div>;
@@ -30,7 +33,11 @@ export default function ProductPage() {
   return (
     <div className={styles.container}>
       <div className={styles.layout}>
-        <img src={product.imagem_url || ''} alt={product.nome} className={styles.image} />
+        {product.imagem_url ? (
+          <Image src={product.imagem_url} alt={product.nome} className={styles.image} width={400} height={400} style={{ objectFit: 'cover' }} />
+        ) : (
+          <div className={styles.image}>Img</div>
+        )}
         <div className={styles.info}>
           <h1 className={styles.title}>{product.nome}</h1>
           <p className={styles.price}>R${Number(product.preco).toFixed(2)}</p>

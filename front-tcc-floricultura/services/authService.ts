@@ -37,29 +37,18 @@ export function logout() {
   if (typeof window === 'undefined') return;
   try {
     // remove user info
-    const raw = localStorage.getItem('usuario');
-  let userId: number | null = null;
-    try {
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        const u = parsed && (parsed.usuario || parsed.user) ? (parsed.usuario || parsed.user) : parsed;
-        if (u && (u.id || u.id === 0)) userId = u.id;
-      }
-    } catch (e) {}
     // Ensure that after logout the visible cart is not contaminated by
     // the previous authenticated user's local cache. Remove the guest
     // key so a not-logged-in visitor starts with an empty cart. We do
     // NOT copy the user's cart into the guest session.
-    try {
-      try { localStorage.removeItem('floricultura_cart_v1'); } catch (e) {}
-    } catch (e) {}
+    try { localStorage.removeItem('floricultura_cart_v1'); } catch {}
     localStorage.removeItem('usuario');
     try {
       // notify other listeners (same tab) that cart changed/cleared
       if (typeof window !== 'undefined' && window.dispatchEvent) {
         window.dispatchEvent(new Event('cart-updated'));
       }
-    } catch (e) {}
+    } catch {}
   } catch (err) {
     console.warn('logout: failed to remove usuario from localStorage', err);
   }

@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from '../../../styles/ProductOrder.module.css';
-import { createAddress } from '../../../services/addressService';
+import { createAddress, AddressDto } from '../../../services/addressService';
+import { getCurrentUser, User } from '../../../services/authService';
 
 export default function CadastroEnderecoPage() {
   const router = useRouter();
@@ -17,27 +18,23 @@ export default function CadastroEnderecoPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-  // obter usuário atual a partir do helper centralizado
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { getCurrentUser } = require('../../../services/authService');
-    const usuario: any = getCurrentUser() || { id: 0 };
-    const dto = {
+    // obter usuário atual a partir do helper centralizado
+    const usuario = getCurrentUser() as User | null;
+    const dto: AddressDto = {
       rua, numero, bairro, cep, cidade, complemento,
       Usuario_id: (typeof usuario?.id === 'number' && usuario.id > 0) ? usuario.id : null,
     };
-  // eslint-disable-next-line no-console
-  console.debug('[CadastroEnderecoPage] getCurrentUser ->', (require('../../../services/authService')).getCurrentUser());
-  // eslint-disable-next-line no-console
-  console.debug('[CadastroEnderecoPage] localStorage.usuario raw ->', localStorage.getItem('usuario'));
+  console.debug('[CadastroEnderecoPage] getCurrentUser ->', usuario);
+  console.debug('[CadastroEnderecoPage] localStorage.usuario raw ->', typeof window !== 'undefined' ? localStorage.getItem('usuario') : null);
     setLoading(true);
     try {
-      await createAddress(dto as any);
+      await createAddress(dto);
         setMessage('Endereço criado com sucesso');
       setTimeout(() => router.push('/'), 1200);
-    } catch (err) {
-    console.error('createAddress error', err);
-    const msg = (err as any)?.message || String(err);
-    setMessage(msg || 'Erro ao criar endereço');
+  } catch (err: unknown) {
+  console.error('createAddress error', err);
+  const msg = (err instanceof Error) ? err.message : String(err);
+  setMessage(msg || 'Erro ao criar endereço');
     } finally { setLoading(false); }
   }
 

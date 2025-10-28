@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState, useRef } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import cartStyles from '../styles/ShoppingCart.module.css';
 import { getCart, CartItem, updateQty, removeFromCart, cartTotal, subscribeCart } from '../services/cartService';
@@ -30,8 +31,8 @@ export default function CartPopup({ onClose, inline = false }: Props) {
       if (usuario && usuario.id) {
         // logged-in: prefer the server-backed cart
         try {
-          const module = await import('../services/cartService');
-          const server = (await module.getCartFromServer()) as CartItem[];
+          const cartModule = await import('../services/cartService');
+          const server = (await cartModule.getCartFromServer()) as CartItem[];
           setItems(server);
           setTotal(server.reduce((s: number, i: CartItem) => s + (i.preco || 0) * (i.quantidade || 1), 0));
         } catch (err: unknown) {
@@ -164,7 +165,9 @@ export default function CartPopup({ onClose, inline = false }: Props) {
     document.body.style.right = '0';
 
     function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose && onClose();
+      if (e.key === 'Escape') {
+        if (onClose) onClose();
+      }
     }
 
     function preventScroll(e: Event) {
@@ -203,7 +206,11 @@ export default function CartPopup({ onClose, inline = false }: Props) {
           <div className={cartStyles.list}>
             {items.map((it) => (
               <div key={it.id} className={cartStyles.item}>
-                <img src={it.imagem_url || ''} className={cartStyles.itemImage} alt={it.nome || ''} />
+                {it.imagem_url ? (
+                  <Image src={it.imagem_url} className={cartStyles.itemImage} alt={it.nome || ''} width={64} height={64} style={{ objectFit: 'cover', borderRadius: 8 }} />
+                ) : (
+                  <div className={cartStyles.itemImage} />
+                )}
                 <div className={cartStyles.itemInfo}>
                   <div className={cartStyles.itemName}>{it.nome}</div>
                   <div className={cartStyles.itemPrice}>R$ {Number(it.preco).toFixed(2)}</div>
@@ -244,6 +251,29 @@ export default function CartPopup({ onClose, inline = false }: Props) {
             ))}
           </div>
           
+          {/* Address selector for checkout (uses addresses state so it's not unused) */}
+          {usuarioAny && usuarioAny.id ? (
+            <div style={{ margin: '12px 0' }}>
+              {addresses.length > 0 ? (
+                <label style={{ display: 'block', marginBottom: 6 }}>
+                  Endereço de entrega
+                  <select
+                    value={selectedAddress ?? ''}
+                    onChange={(e) => setSelectedAddress(e.target.value ? Number(e.target.value) : null)}
+                    style={{ display: 'block', marginTop: 6 }}
+                  >
+                    {addresses.map((a) => (
+                      <option key={a.id} value={a.id}>{String(a['logradouro'] ?? `Endereço ${a.id}`)}</option>
+                    ))}
+                  </select>
+                </label>
+              ) : (
+                <div style={{ marginTop: 6 }}>
+                  <small>Nenhum endereço cadastrado. Adicione em Minha Conta &gt; Endereços.</small>
+                </div>
+              )}
+            </div>
+          ) : null}
           <div className={cartStyles.footerRow}>
             <button
               className={cartStyles.backBtn}
@@ -282,7 +312,7 @@ export default function CartPopup({ onClose, inline = false }: Props) {
       <div
         ref={overlayRef}
         style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 30000 }}
-        onClick={() => onClose && onClose()}
+        onClick={() => { if (onClose) onClose(); }}
       />
       <div
         className={cartStyles.panel}

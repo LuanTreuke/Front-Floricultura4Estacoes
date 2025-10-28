@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import styles from '../styles/ProductCard.module.css';
 
@@ -13,7 +14,11 @@ export default function ProductCard({ id, name, price, image }: ProductCardProps
   const imgSrc = isExternal ? image : image.startsWith('/') ? image : `/${image}`;
   const content = (
     <div className={styles.card}>
-      <img src={imgSrc} alt={name} className={styles.image} />
+      {imgSrc ? (
+        <Image src={imgSrc} alt={name} className={styles.image} width={300} height={300} style={{ objectFit: 'cover' }} />
+      ) : (
+        <div className={styles.image}>Img</div>
+      )}
       <div className={styles.info}>
         <span className={styles.name}>{name}</span>
         <span className={styles.price}>{price}</span>
