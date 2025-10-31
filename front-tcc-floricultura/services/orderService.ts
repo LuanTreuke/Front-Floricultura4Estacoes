@@ -41,7 +41,17 @@ export async function createOrder(dto: CreateOrderDto) {
     }
     return created;
   } catch (err: unknown) {
-    // Avoid using `any` in lint-restricted environments; return a readable message
+    // If server returned structured error info (axios), surface it to the caller
+    try {
+      const anyErr = err as any;
+      if (anyErr && anyErr.response && anyErr.response.data) {
+        const data = anyErr.response.data;
+        const serverMsg = typeof data === 'string' ? data : (data.message || JSON.stringify(data));
+        throw new Error(serverMsg);
+      }
+    } catch (_) {
+      // fallthrough
+    }
     const msg = err instanceof Error ? err.message : String(err);
     throw new Error(msg);
   }
@@ -80,6 +90,16 @@ export async function fetchOrderById(id: number) {
 export async function updateOrderStatus(id: number, status: string) {
   try {
     const res = await api.patch(`/pedidos/${id}/status`, { status });
+    return res.data;
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    throw new Error(msg);
+  }
+}
+
+export async function setOrderNotifications(id: number, enabled: boolean) {
+  try {
+    const res = await api.patch(`/pedidos/${id}/notifications`, { enabled });
     return res.data;
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);

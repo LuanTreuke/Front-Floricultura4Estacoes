@@ -1,15 +1,18 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { addProduct, Product } from '@/services/productService';
+import { fetchCategories, Categoria } from '@/services/categoryService';
 
 export default function AdicionarProdutoPage() {
   const [nome, setNome] = useState('');
   const [descricao, setDescricao] = useState('');
   const [preco, setPreco] = useState('');
   const [categoria, setCategoria] = useState('');
+  const [categories, setCategories] = useState<Categoria[]>([]);
   const [imagem, setImagem] = useState<File | null>(null);
+  const [enabled, setEnabled] = useState(true);
   const router = useRouter();
 
   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -26,7 +29,8 @@ export default function AdicionarProdutoPage() {
         descricao,
         preco: Number(preco),
         imagem_url: imagem ? '' : '',
-        Categoria_id: Number(categoria),
+        Categoria_id: Number(categoria || 0),
+          enabled,
       };
       await addProduct(dto as Omit<Product, 'id'>);
       alert('Produto adicionado com sucesso!');
@@ -35,6 +39,21 @@ export default function AdicionarProdutoPage() {
       alert('Erro ao adicionar produto!');
     }
   }
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const cats = await fetchCategories();
+        if (!mounted) return;
+        setCategories(cats);
+      } catch (e) {
+        // keep empty categories on error
+        console.warn('Failed to load categories', e);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
 
   return (
   <div style={{maxWidth: 800, margin: '0 auto', color: '#222'}}>
@@ -60,11 +79,21 @@ export default function AdicionarProdutoPage() {
           <label>Categoria</label>
           <select value={categoria} onChange={e => setCategoria(e.target.value)} required style={{padding: 10, borderRadius: 8, border: '1px solid #cbead6'}}>
             <option value="">Selecione a categoria</option>
-            <option value="Buquês">Buquês</option>
-            <option value="Arranjos">Arranjos</option>
-            <option value="Flores">Flores</option>
-            <option value="Cestas">Cestas</option>
+            {categories.length > 0 ? categories.map(c => (
+              <option key={c.id} value={String(c.id)}>{c.nome}</option>
+            )) : (
+              <>
+                <option value="1">Buquês</option>
+                <option value="2">Arranjos</option>
+                <option value="3">Flores</option>
+                <option value="4">Cestas</option>
+              </>
+            )}
           </select>
+        </div>
+        <div style={{display: 'flex', gap: 8, alignItems: 'center'}}>
+          <input id="enabled" type="checkbox" checked={enabled} onChange={e => setEnabled(e.target.checked)} />
+          <label htmlFor="enabled"> Exibir produto na loja (Ativo)</label>
         </div>
         <div style={{display: 'flex', gap: 16, justifyContent: 'flex-end'}}>
           <button type="button" onClick={() => router.push('/admin/catalogo')} style={{background: '#f3f7f4', color: '#222', border: 'none', borderRadius: 8, padding: '12px 24px', fontWeight: 500, fontSize: '1rem', cursor: 'pointer'}}>Cancelar</button>

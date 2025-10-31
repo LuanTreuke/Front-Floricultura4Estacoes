@@ -48,8 +48,6 @@ export default function HomePage() {
     } catch {}
   }, []);
 
-  
-
   // Fecha o popup ao clicar fora
   useEffect(() => {
     if (!showPopup) return;
@@ -95,8 +93,6 @@ export default function HomePage() {
     })();
   }, []);
 
-
-
   const [categories, setCategories] = useState<string[]>([]);
   const [categoryMap, setCategoryMap] = useState<Record<string, number>>({});
 
@@ -105,9 +101,12 @@ export default function HomePage() {
   }
 
   let filtered = products.filter((p: Product) => {
+    // only show products with enabled true; if enabled is missing (legacy), treat as visible
+    const isVisible = p.enabled === undefined ? true : !!p.enabled;
     const nomeNormalized = removeAccents(p.nome.toLowerCase());
     const searchNormalized = removeAccents(search.toLowerCase());
     return (
+      isVisible &&
       nomeNormalized.includes(searchNormalized) &&
   ((category === '' || category === 'Todas') ? true : (p.categoria ? p.categoria.id === categoryMap[category] : p.Categoria_id === categoryMap[category])) &&
       p.preco >= price[0] && p.preco <= price[1]
@@ -229,16 +228,14 @@ export default function HomePage() {
   <footer className={styles.footerSection}>
         <div className={styles.footerContent}>
           <div className={styles.footerCol}>
-            <span className={styles.footerTitle}>Email</span>
-            <span>email</span>
+            
           </div>
           <div className={styles.footerCol}>
             <span className={styles.footerTitle}>Redes Sociais</span>
-            <span>redes sociais</span>
+            <a href="https://www.instagram.com/floricultura4estacoes_/" target="_blank" rel="noopener noreferrer">Instagram</a>
           </div>
           <div className={styles.footerCol}>
-            <span className={styles.footerTitle}>Termos</span>
-            <span>termos</span>
+            
           </div>
         </div>
         <div className={styles.footerAddress}>

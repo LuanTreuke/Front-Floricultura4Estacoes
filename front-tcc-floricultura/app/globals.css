@@ -1,5 +1,7 @@
 
 @import url('https://fonts.googleapis.com/css?family=Material+Icons');
+/* Bootstrap Icons CDN (used in various pages) */
+@import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css');
 
 html, body {
   width: 100%;

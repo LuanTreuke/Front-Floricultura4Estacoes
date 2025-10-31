@@ -5,12 +5,13 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   width: 100%;
   height: 230px;
-  max-width: 220px;
+  max-width: none;
   cursor: pointer;
   transition: transform .12s ease, box-shadow .12s ease;
   box-sizing: border-box;
-  flex: 0 1 220px;
-  margin: 8px;
+  flex: 1 1 0;
+  margin: 0;
+  position: relative;
 }
 
 .card:hover { 
@@ -20,7 +21,8 @@
 .link { 
   text-decoration: none; 
   color: inherit; 
-  display: inline-block; 
+  display: block; 
+  width: 100%;
 }
 
 .image { 
@@ -44,6 +46,37 @@
   margin-top: 4px;
   display: block;
   color: #111; 
+}
+
+.cardWrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.topRight {
+  position: absolute;
+  top: 10px; /* sits within image area */
+  right: 10px;
+  z-index: 50;
+  background: rgba(255,255,255,0.95);
+  border-radius: 999px;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  pointer-events: auto; /* ensure inputs are clickable */
+}
+
+.topRight input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
 }
 
 @media (max-width: 800px) {

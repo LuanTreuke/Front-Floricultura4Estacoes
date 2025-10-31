@@ -8,6 +8,17 @@
   font-size: 1.4rem;
   margin-bottom: 12px;
 }
+/* logo above headings for standalone pages */
+.logoContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.logo {
+  width: 160px;
+  height: auto;
+}
 .card {
   display: flex;
   gap: 20px;
@@ -50,6 +61,7 @@
 .textarea {
   resize: vertical;
   overflow: auto;
+  width: 60%;
 }
 .actions {
   display: flex;
@@ -81,5 +93,20 @@
     width: 100%; 
     height: auto; 
     max-height: 400px; 
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 16px;
+  }
+  .heading {
+    font-size: 1.25rem;
+  }
+  .logo {
+    width: 120px;
+  }
+  .primaryBtn, .secondaryBtn, .addBtn {
+    padding: 10px 14px;
   }
 }

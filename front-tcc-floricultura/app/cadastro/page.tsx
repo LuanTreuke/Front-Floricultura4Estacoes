@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from '../../styles/Login.module.css';
 import Image from 'next/image';
-import { cadastro } from '../../services/authService';
+import { cadastro, login } from '../../services/authService';
+import { getCartFromServer } from '../../services/cartService';
 
 export default function CadastroPage() {
   const [nome, setNome] = useState('');
@@ -28,8 +29,32 @@ export default function CadastroPage() {
       setError(res.message || 'Erro ao cadastrar');
       return;
     }
+    // Após cadastrar, efetuar login automático para persistir sessão/usuario
+    try {
+      // Persistir usuário em localStorage e atualizar carrinho (mesma lógica do login)
+      try {
+        const resLogin = await login(email, senha);
+        const data = (resLogin && typeof resLogin === 'object') ? resLogin as Record<string, unknown> : null;
+        const uCandidate = data ? (data['usuario'] ?? data['user'] ?? data) : null;
+        const uObj = (uCandidate && typeof uCandidate === 'object') ? uCandidate as Record<string, unknown> : null;
+        if (uObj && typeof window !== 'undefined') {
+          localStorage.setItem('usuario', JSON.stringify(uObj));
+        }
+      } catch (err) {
+        console.warn('post-cadastro login/localStorage failed', err);
+      }
+      try {
+        await getCartFromServer();
+      } catch (e) { console.warn('refresh server cart failed', e); }
+      try { localStorage.removeItem('floricultura_cart_v1'); } catch {}
+      try { window.dispatchEvent(new Event('cart-updated')); } catch {}
+    } catch (err) {
+      // se o login automático falhar, apenas prosseguir para a tela de telefone
+      console.warn('login automático após cadastro falhou', err);
+    }
     setSuccess('Cadastro realizado com sucesso!');
-    setTimeout(() => router.push('/login'), 1500);
+    // Ir para a página de telefone para completar verificação (mantém delay UX)
+    setTimeout(() => router.push('/cadastro/telefone'), 1500);
   }
 
   return (
@@ -41,12 +66,11 @@ export default function CadastroPage() {
         <h2>Cadastro</h2>
         <input type="text" placeholder="Nome" value={nome} onChange={e => setNome(e.target.value)} required />
         <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
-        <input type="text" placeholder="Telefone" value={telefone} onChange={e => setTelefone(e.target.value)} />
         <input type="password" placeholder="Senha" value={senha} onChange={e => setSenha(e.target.value)} required />
         <input type="password" placeholder="Confirmar senha" value={senha2} onChange={e => setSenha2(e.target.value)} required />
         {error && <span className={styles.error}>{error}</span>}
         {success && <span className={styles.success}>{success}</span>}
-        <button type="submit">Cadastrar</button>
+        <button type="submit">Avançar</button>
       </form>
     </div>
   );

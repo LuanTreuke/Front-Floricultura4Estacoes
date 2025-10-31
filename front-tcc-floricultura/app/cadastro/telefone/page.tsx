@@ -1,45 +1,113 @@
 "use client";
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import styles from '../../../styles/ProductOrder.module.css';
-import { createPhone, PhoneDto } from '../../../services/phoneService';
-import { getCurrentUser, User } from '../../../services/authService';
+import React, { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import styles from '../../../styles/Login.module.css';
+import Image from 'next/image';
+import { fetchPhones, PhoneDto } from '../../../services/phoneService';
 
-export default function CadastroTelefonePage() {
+export default function CadastroPage() {
   const router = useRouter();
-  const [telefone, setTelefone] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const usuario = getCurrentUser() as User | null;
-    const dto: PhoneDto = {
-      telefone,
-      Usuario_id: (typeof usuario?.id === 'number' && usuario.id > 0) ? usuario.id : null,
+  const search = useSearchParams();
+  const from = search?.get('from') || null;
+
+  const [checking, setChecking] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [phones, setPhones] = useState<PhoneDto[]>([]);
+
+  useEffect(() => {
+    let mounted = true;
+    async function checkNow() {
+      setChecking(true);
+      try {
+        const ph = await fetchPhones();
+        if (!mounted) return;
+        setPhones(ph || []);
+        if (ph && ph.length > 0) {
+          setSuccessMessage('Número cadastrado com sucesso!');
+          try { localStorage.removeItem('check_phone_after_whatsapp'); } catch {}
+        }
+      } catch (err) {
+        console.warn('check phones failed', err);
+      } finally {
+        if (mounted) setChecking(false);
+      }
+    }
+
+    // helper to start a short polling loop
+    function startPollingIfFlag() {
+      try {
+        const flag = typeof window !== 'undefined' ? localStorage.getItem('check_phone_after_whatsapp') : null;
+        if (flag) {
+          // poll up to 12 times (every 1s) for phone to appear
+          let attempts = 0;
+          const iv = setInterval(async () => {
+            attempts += 1;
+            await checkNow();
+            if ((typeof window !== 'undefined' && !localStorage.getItem('check_phone_after_whatsapp')) || attempts >= 12) {
+              clearInterval(iv);
+            }
+          }, 1000);
+        } else {
+          // normal one-time fetch to show current phone if present
+          checkNow();
+        }
+      } catch (err) {
+        // fail silently
+        checkNow();
+      }
+    }
+
+    // initial run
+    startPollingIfFlag();
+
+    // when the user focuses the tab (returns from WhatsApp), try checking immediately
+    const onFocus = () => { checkNow().catch(() => {}); };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('focus', onFocus);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') onFocus();
+      });
+    }
+
+    return () => {
+      mounted = false;
+      try {
+        if (typeof window !== 'undefined') {
+          window.removeEventListener('focus', onFocus);
+        }
+      } catch {}
     };
-    setLoading(true);
-    try {
-  await createPhone(dto);
-      setMessage('Telefone cadastrado com sucesso');
-      setTimeout(() => router.push('/'), 1200);
-    } catch (err: unknown) {
-      console.error('createPhone error', err);
-      const msg = (err instanceof Error) ? err.message : String(err);
-      setMessage(msg || 'Erro ao cadastrar telefone');
-    } finally { setLoading(false); }
-  }
+  }, []);
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.heading}>Cadastrar telefone</h1>
-      <form onSubmit={handleSubmit} className={styles.form}>
-        <label>Telefone (somente números, sem o 9 antes do telefone)</label>
-        <input className={styles.input} value={telefone} onChange={e => setTelefone(e.target.value)} placeholder="5542xxxxxxxx" required />
-        <div className={styles.actions}>
-          <button type="submit" className={styles.primaryBtn} disabled={loading}>{loading ? 'Salvando...' : 'Salvar'}</button>
-          <button type="button" className={styles.secondaryBtn} onClick={() => router.back()}>Cancelar</button>
+      <form className={styles.form}>
+        <div className={styles.logoWrap}>
+          <Image src="/Logo-floricultura.svg" alt="Logo Floricultura" className={styles.logo} width={96} height={96} style={{ objectFit: 'contain' }} />
         </div>
-        {message && <div style={{ marginTop: 8 }}>{message}</div>}
+        <h2>Cadastrar whatsapp</h2>
+        <div style={{justifyContent:'center', textAlign: 'center'}}>
+          <p>Para continuar, adicione seu número de whatsapp.</p>
+        </div>
+        {successMessage && <div style={{ color: 'green', marginBottom: 12 }}>{successMessage}</div>}
+
+        {/* If no phone: show only the Add button and helper text. */}
+        {(!phones || phones.length === 0) ? (
+          <>
+            <button type="button" onClick={() => router.push('/cadastro/telefone/novo' + (from ? `?returnTo=${encodeURIComponent(from)}` : ''))}>Adicionar telefone</button>
+            <div style={{ color: '#666', fontSize: 12, marginTop: 8 }}>Aguardando confirmação do número antes de concluir o cadastro.</div>
+          </>
+        ) : (
+          /* If phone exists: show only the Concluir button */
+          <button
+            type="button"
+            style={{ background: '#b2e0c2' }}
+            onClick={() => router.push('/')}
+            title="Concluir cadastro"
+          >
+            Concluir cadastro
+          </button>
+        )}
       </form>
     </div>
   );

@@ -1,15 +1,13 @@
-import axios from 'axios';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+import api from './api';
 
 export async function addProduct(produto: Omit<Product, 'id'>): Promise<Product> {
-  const res = await axios.post(`${API_URL}/produtos`, produto);
+  const res = await api.post(`/produtos`, produto);
   return res.data as Product;
 }
 
 export async function fetchProductById(id: number): Promise<Product | null> {
   try {
-    const res = await axios.get(`${API_URL}/produtos/${id}`);
+    const res = await api.get(`/produtos/${id}`);
     return res.data as Product;
   } catch (err: unknown) {
     const maybeErr = err as { response?: { status?: number } } | undefined;
@@ -30,11 +28,12 @@ export interface Product {
   imagem_url?: string;
   Categoria_id?: number;
   categoria?: { id: number; nome?: string } | null;
+  enabled?: boolean;
 }
 
 export async function fetchProducts(): Promise<Product[]> {
   try {
-    const res = await axios.get(`${API_URL}/produtos`);
+    const res = await api.get(`/produtos`);
     return res.data as Product[];
   } catch (err: unknown) {
     const maybeErr = err as { response?: { status?: number } } | undefined;
@@ -46,7 +45,7 @@ export async function fetchProducts(): Promise<Product[]> {
 
 export async function deleteProduct(id: number): Promise<boolean> {
   try {
-    const res = await axios.delete(`${API_URL}/produtos/${id}`);
+    const res = await api.delete(`/produtos/${id}`);
     return res.status === 200 || res.status === 204 || (res.data && res.data.deleted === true);
   } catch (err: unknown) {
     const maybeErr = err as { response?: { status?: number } } | undefined;
@@ -58,7 +57,7 @@ export async function deleteProduct(id: number): Promise<boolean> {
 
 export async function updateProduct(id: number, payload: Partial<Product>): Promise<Product | null> {
   try {
-    const res = await axios.patch(`${API_URL}/produtos/${id}`, payload);
+    const res = await api.patch(`/produtos/${id}`, payload);
     return res.data as Product;
   } catch (err: unknown) {
     const maybeErr = err as { response?: { status?: number } } | undefined;

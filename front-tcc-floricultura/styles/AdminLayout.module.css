@@ -77,3 +77,86 @@
   background: #fafbfc;
   min-width: 0;
 }
+
+/* small utility buttons used in admin lists (Editar / Excluir) */
+.adminActionBtn {
+  background: #cbead6;
+  color: #222;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 500;
+  font-size: 0.98rem;
+  cursor: pointer;
+}
+.adminActionBtnDanger {
+  background: #f7d6d6;
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 500;
+  font-size: 0.98rem;
+  cursor: pointer;
+}
+
+@media (max-width: 390px) {
+  /* reduce visual size of action buttons on very narrow screens */
+  .adminActionBtn,
+  .adminActionBtnDanger {
+    /* reduce padding to make button ~10px narrower horizontally */
+    padding: 6px 8px;
+    /* slightly smaller text */
+    font-size: 0.88rem;
+  }
+}
+
+/* header control buttons (Habilitar / Desabilitar / Adicionar) */
+.headerControlBtn {
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: none;
+  cursor: pointer;
+}
+
+@media (max-width: 550px) {
+  /* reduce header control buttons by ~10px horizontally (less padding) */
+  .headerControlBtn {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+  }
+}
+
+/* Hamburger toggle button shown on top-left to open the admin offcanvas */
+.hamburgerBtn {
+  background: rgba(10, 128, 10, 0.5); /* bootstrap primary */
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(13,110,253,0.15);
+}
+.hamburgerBtn:focus { outline: 3px solid rgba(13,110,253,0.18); outline-offset: 2px; }
+.hamburgerBtn svg { color: #fff; }
+
+@media (max-width: 800px) {
+  .adminNav {
+    width: 72px;
+    padding-top: 12px;
+  }
+  .adminNavTitle { display: none; }
+  .adminNavBtn { padding: 12px 16px; border-radius: 6px; }
+  .adminMain { padding: 12px; }
+}
+
+@media (max-width: 480px) {
+  .adminNav { width: 56px; }
+  .adminMain { padding: 10px; }
+}

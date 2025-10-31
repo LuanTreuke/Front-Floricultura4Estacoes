@@ -13,8 +13,11 @@ export async function fetchPhones() {
     // If no user is logged in, return an empty list (no phones available).
     const usuario = getCurrentUser();
     if (!usuario || !usuario.id) return [];
-    const res = await api.get(`/telefones/usuario/${usuario.id}`);
-    return res.data as PhoneDto[];
+    // The backend now stores a single telefone on the usuario record.
+    const res = await api.get(`/usuario/${usuario.id}`);
+    // normalize to array for compatibility with places that expected an array
+    const phone = res.data?.usuario?.telefone ? [{ telefone: res.data.usuario.telefone }] : [];
+    return phone as PhoneDto[];
   } catch (err) {
     if (err instanceof Error) {
       console.warn('fetchPhones: request failed', err.message);
@@ -28,8 +31,11 @@ export async function fetchPhones() {
 export async function createPhone(dto: PhoneDto) {
   try {
     console.debug('[createPhone] sending dto:', dto);
-    const res = await api.post(`/telefones`, dto);
-    return res.data as PhoneDto;
+    // Create a phone by updating the current user's telefone field
+    const usuario = getCurrentUser();
+    if (!usuario || !usuario.id) throw new Error('Usuário não autenticado');
+    const res = await api.patch(`/usuario/telefone`, { id: usuario.id, telefone: dto.telefone });
+    return { telefone: res.data.usuario.telefone } as PhoneDto;
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error('createPhone failed', msg);
@@ -39,8 +45,11 @@ export async function createPhone(dto: PhoneDto) {
 
 export async function updatePhone(id: number, dto: Partial<PhoneDto>) {
   try {
-    const res = await api.patch(`/telefones/${id}`, dto);
-    return res.data as PhoneDto;
+    // Update (replace) telefone on the usuario record. id parameter is ignored in the single-phone model.
+    const usuario = getCurrentUser();
+    if (!usuario || !usuario.id) throw new Error('Usuário não autenticado');
+    const res = await api.patch(`/usuario/telefone`, { id: usuario.id, telefone: dto.telefone });
+    return { telefone: res.data.usuario.telefone } as PhoneDto;
   } catch (err) {
     console.error('updatePhone failed', err instanceof Error ? err.message : String(err));
     throw err;
@@ -49,8 +58,10 @@ export async function updatePhone(id: number, dto: Partial<PhoneDto>) {
 
 export async function deletePhone(id: number) {
   try {
-    await api.delete(`/telefones/${id}`);
-    return true;
+    const usuario = getCurrentUser();
+    if (!usuario || !usuario.id) throw new Error('Usuário não autenticado');
+    const res = await api.patch(`/usuario/telefone`, { id: usuario.id, telefone: null });
+    return !!res.data.usuario;
   } catch (err) {
     console.error('deletePhone failed', err instanceof Error ? err.message : String(err));
     throw err;

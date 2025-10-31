@@ -16,6 +16,7 @@ export default function EditarProdutoPage() {
   const [categoria, setCategoria] = useState('');
   const [categories, setCategories] = useState<Array<{ id: number; nome: string }>>([]);
   const [, setImagem] = useState<File | null>(null);
+  const [enabled, setEnabled] = useState(true);
 
   useEffect(() => {
     fetchProductById(id).then((prod: Product | null) => {
@@ -27,6 +28,7 @@ export default function EditarProdutoPage() {
         // produto pode trazer relation 'categoria' ou só Categoria_id
         const catId = prod.categoria ? prod.categoria.id : prod.Categoria_id;
         setCategoria(catId ? String(catId) : '');
+        setEnabled(prod.enabled === undefined ? true : !!prod.enabled);
       }
     });
     // buscar categorias do backend
@@ -56,6 +58,7 @@ export default function EditarProdutoPage() {
           descricao,
           preco: Number(preco),
           Categoria_id: categoria ? Number(categoria) : undefined,
+          enabled,
         };
         // TODO: upload imagem se houver
         const { updateProduct } = await import('@/services/productService');
@@ -105,6 +108,10 @@ export default function EditarProdutoPage() {
           </select>
         </div>
         <div style={{display: 'flex', gap: 16, justifyContent: 'flex-end'}}>
+        <div style={{display: 'flex', gap: 8, alignItems: 'center'}}>
+          <input id="enabled" type="checkbox" checked={enabled} onChange={e => setEnabled(e.target.checked)} />
+          <label htmlFor="enabled"> Exibir produto na loja (Ativo)</label>
+        </div>
           <button type="button" onClick={() => router.push('/admin/catalogo')} style={{background: '#f3f7f4', color: '#222', border: 'none', borderRadius: 8, padding: '12px 24px', fontWeight: 500, fontSize: '1rem', cursor: 'pointer'}}>Cancelar</button>
           <button type="submit" style={{background: '#cbead6', color: '#222', border: 'none', borderRadius: 8, padding: '12px 24px', fontWeight: 600, fontSize: '1rem', cursor: 'pointer'}}>Salvar</button>
         </div>

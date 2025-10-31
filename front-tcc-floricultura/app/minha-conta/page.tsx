@@ -2,54 +2,54 @@
 import React, { useEffect, useState } from 'react';
 import styles from '../../styles/MyAccount.module.css';
 import { getCurrentUser, User } from '../../services/authService';
-import { fetchPhones, PhoneDto, createPhone, updatePhone, deletePhone } from '../../services/phoneService';
-import { fetchAddresses, AddressDto, createAddress, updateAddress, deleteAddress } from '../../services/addressService';
+import { fetchPhones, PhoneDto, deletePhone } from '../../services/phoneService';
+import { fetchAddresses, AddressDto, updateAddress, deleteAddress } from '../../services/addressService';
 import { useRouter } from 'next/navigation';
 
 export default function MyAccountPage() {
   const router = useRouter();
+  const [usuario, setUsuario] = useState<User | null>(null);
   const [phones, setPhones] = useState<PhoneDto[]>([]);
   const [addresses, setAddresses] = useState<AddressDto[]>([]);
-  const [editingPhone, setEditingPhone] = useState<number | null>(null);
   const [editingAddress, setEditingAddress] = useState<number | null>(null);
-  const [phoneValue, setPhoneValue] = useState('');
+  
   const [addressValue, setAddressValue] = useState('');
-  const [newPhone, setNewPhone] = useState('');
-  const [newAddressRua, setNewAddressRua] = useState('');
+  // removed newPhone input per single-phone UX
+  // navigation to add-address page now used instead of inline input
 
   useEffect(() => {
-    const usuario = getCurrentUser();
-    if (!usuario || typeof usuario.id !== 'number') {
+    const usuarioLocal = getCurrentUser();
+    if (!usuarioLocal || typeof usuarioLocal.id !== 'number') {
       router.push('/login');
       return;
     }
+    setUsuario(usuarioLocal);
     (async () => {
       const ph = await fetchPhones();
-      setPhones((ph || []).filter(p => p.Usuario_id === usuario.id));
-      const ad = await fetchAddresses();
-      setAddresses((ad || []).filter(a => a.Usuario_id === usuario.id));
+      setPhones(ph || []);
+  const ad = await fetchAddresses();
+  setAddresses((ad || []).filter(a => a.Usuario_id === usuarioLocal.id));
     })();
   }, [router]);
 
-  async function handleSavePhone(id: number) {
-    await updatePhone(id, { telefone: phoneValue });
-    setPhones(phones.map(p => p.id === id ? { ...p, telefone: phoneValue } : p));
-    setEditingPhone(null);
-  }
-
-  async function handleDeletePhone(id: number) {
+  async function handleDeletePhone() {
     if (!confirm('Remover telefone?')) return;
-    await deletePhone(id);
-    setPhones(phones.filter(p => p.id !== id));
+    await deletePhone(0);
+    setPhones([]);
+    try {
+      if (typeof window !== 'undefined') {
+        const cur = getCurrentUser();
+        if (cur) {
+          (cur as any).telefone = null;
+          localStorage.setItem('usuario', JSON.stringify(cur));
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to update localStorage usuario telefone', err);
+    }
   }
 
-  async function handleAddPhone() {
-    const usuario = getCurrentUser();
-    if (!newPhone || !usuario || typeof usuario.id !== 'number') return;
-    const created = await createPhone({ telefone: newPhone, Usuario_id: usuario.id });
-    setPhones([...(phones || []), created]);
-    setNewPhone('');
-  }
+  // add-phone removed: use Edit to change telefone
 
   async function handleSaveAddress(id: number) {
     await updateAddress(id, { rua: addressValue });
@@ -63,15 +63,9 @@ export default function MyAccountPage() {
     setAddresses(addresses.filter(a => a.id !== id));
   }
 
-  async function handleAddAddress() {
-    const usuario = getCurrentUser();
-    if (!newAddressRua || !usuario || typeof usuario.id !== 'number') return;
-    const created = await createAddress({ rua: newAddressRua, numero: '', bairro: '', cep: '', cidade: '', Usuario_id: usuario.id });
-    setAddresses([...(addresses || []), created]);
-    setNewAddressRua('');
-  }
+  // handleAddAddress removed; use dedicated cadastro/endereco page which can redirect back using ?returnTo=
 
-  const usuario: User = getCurrentUser();
+  // usuario is client-loaded via useEffect to avoid SSR/CSR hydration mismatch
 
   return (
     <div className={styles.container}>
@@ -85,36 +79,28 @@ export default function MyAccountPage() {
       </section>
 
       <section className={styles.section}>
-        <h2>Telefones</h2>
+        <h2>Telefone</h2>
         <div className={styles.list}>
-          {phones.map(p => (
-            <div key={p.id} className={styles.item}>
-              {editingPhone === p.id ? (
-                <input className={styles.input} value={phoneValue} onChange={e => setPhoneValue(e.target.value)} />
-              ) : (
-                <div className={styles.value}>{p.telefone}</div>
-              )}
-              <div className={styles.actions}>
-                {editingPhone === p.id ? (
-                  <>
-                    <button className={styles.saveBtn} onClick={() => handleSavePhone(p.id!)}>Salvar</button>
-                    <button className={styles.cancelBtn} onClick={() => setEditingPhone(null)}>Cancelar</button>
-                  </>
-                ) : (
-                  <>
-                    <button className={styles.editBtn} onClick={() => { setEditingPhone(p.id!); setPhoneValue(p.telefone); }} aria-label="Editar telefone">✎</button>
-                    <button className={styles.deleteBtn} onClick={() => handleDeletePhone(p.id!)} aria-label="Excluir telefone">✖</button>
-                  </>
-                )}
-              </div>
+          <div className={styles.item}>
+            <div className={styles.value}>{phones[0]?.telefone || '—'}</div>
+
+            <div className={styles.actions}>
+              {phones[0]?.telefone ? (
+                <>
+                  <button className={styles.deleteBtn} onClick={() => handleDeletePhone()} aria-label="Excluir telefone">X</button>
+                </>
+              ) : null}
             </div>
-          ))}
+          </div>
         </div>
 
-        <div className={styles.addRow}>
-          <input className={styles.input} placeholder="Novo telefone" value={newPhone} onChange={e => setNewPhone(e.target.value)} />
-          <button className={styles.addBtn} onClick={handleAddPhone}>Adicionar</button>
-        </div>
+        {/* when there is no phone, show the add button below the info like addresses */}
+        {!phones[0]?.telefone && (
+          <div className={styles.addRow}>
+            <button className={styles.addBtn} onClick={() => router.push('/cadastro/telefone/novo?returnTo=/minha-conta')}>Adicionar telefone</button>
+          </div>
+        )}
+        {/* removed add-row: only edit/delete allowed for telefone */}
       </section>
 
       <section className={styles.section}>
@@ -136,7 +122,7 @@ export default function MyAccountPage() {
                 ) : (
                   <>
                     <button className={styles.editBtn} onClick={() => { setEditingAddress(a.id!); setAddressValue(a.rua); }} aria-label="Editar endereço">✎</button>
-                    <button className={styles.deleteBtn} onClick={() => handleDeleteAddress(a.id!)} aria-label="Excluir endereço">✖</button>
+                    <button className={styles.deleteBtn} onClick={() => handleDeleteAddress(a.id!)} aria-label="Excluir endereço">X</button>
                   </>
                 )}
               </div>
@@ -145,8 +131,7 @@ export default function MyAccountPage() {
         </div>
 
         <div className={styles.addRow}>
-          <input className={styles.input} placeholder="Rua do novo endereço" value={newAddressRua} onChange={e => setNewAddressRua(e.target.value)} />
-          <button className={styles.addBtn} onClick={handleAddAddress}>Adicionar endereço</button>
+          <button className={styles.addBtn} onClick={() => router.push('/cadastro/endereco?returnTo=/minha-conta')}>Adicionar endereço</button>
         </div>
       </section>
     </div>

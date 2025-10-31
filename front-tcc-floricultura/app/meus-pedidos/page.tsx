@@ -109,6 +109,7 @@ export default function MeusPedidosPage() {
     })();
   }, [router, extractCart, parseOrderDateTime]);
 
+
   async function handleCancel(id: number) {
     if (!confirm('Deseja cancelar este pedido?')) return;
     try {
@@ -145,6 +146,8 @@ export default function MeusPedidosPage() {
 
   if (loading) return <div className={styles.container}>Carregando seus pedidos...</div>;
 
+  
+
   return (
     <div className={styles.container}>
       <h1>Meus Pedidos</h1>
@@ -154,6 +157,8 @@ export default function MeusPedidosPage() {
         <div className={styles.grid}>
           {orders.map((o: Order) => (
             <div key={o.id as number} className={styles.card}>
+              
+
               <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
                 <div style={{ width: 160, textAlign: 'center' }}>
                       {(o._images && (o._images as string[]).length > 0) ? (
@@ -175,29 +180,29 @@ export default function MeusPedidosPage() {
                   )}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  {/* Stack all meta info vertically: Pedido, Status, Data, Produtos */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <div><strong>Pedido #{o.id}</strong></div>
+                    <div><strong>Status:</strong> {o.status}</div>
                     <div>
-                      <div><strong>Pedido #{o.id}</strong></div>
-                      <div>
-                        <strong>Data:</strong>{' '}
-                        {o.data_pedido || o.data_entrega || '—'}
-                        { (o.hora_pedido || o.hora_entrega) ? (
-                          <span>{' '}—{' '}{o.hora_pedido || o.hora_entrega}</span>
-                        ) : null }
-                      </div>
+                      <strong>Data:</strong>{' '}
+                      { (o.data_pedido || o.data_entrega) ? (o.data_pedido || o.data_entrega) : '—' }
+                      {(o.hora_pedido || o.hora_entrega) ? (
+                        <span>{' '}—{' '}{(o.hora_pedido && o.hora_pedido.length === 5) ? `${o.hora_pedido}:00` : (o.hora_pedido || o.hora_entrega)}</span>
+                      ) : null }
                     </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <div><strong>Status:</strong> {o.status}</div>
-                    </div>
-                  </div>
 
-                  <div style={{ marginTop: 8 }}>
-                    <strong>Produtos:</strong>
+                    <div style={{ marginTop: 4 }}>
+                      <strong>Produtos:</strong>
                       <ul style={{ margin: '8px 0 0 16px' }}>
-                      {((o._cart && (o._cart as AnyObj[]).length) ? (o._cart as AnyObj[]) : (extractCart(o['carrinho'] ?? o['observacao']) || [])).map((it: AnyObj, idx: number) => (
-                        <li key={idx}>{((it['nome'] as string) || (o._productNames && (o._productNames as string[])[idx]) || `#${(it['id'] as number | undefined) ?? idx}`)} {(it['quantidade'] !== undefined ? `x ${(it['quantidade'] as number)}` : '')} {(it['preco'] !== undefined ? `— R$ ${Number(it['preco']).toFixed(2)}` : '')}</li>
-                      ))}
-                    </ul>
+                        {((o._cart && (o._cart as AnyObj[]).length) ? (o._cart as AnyObj[]) : (extractCart(o['carrinho'] ?? o['observacao']) || [])).map((it: AnyObj, idx: number) => {
+                          const name = ((it['nome'] as string) || (o._productNames && (o._productNames as string[])[idx]) || `#${(it['id'] as number | undefined) ?? idx}`);
+                          const qty = (it['quantidade'] !== undefined ? `${it['quantidade']}` : '1');
+                          const price = (it['preco'] !== undefined ? ` — R$ ${Number(it['preco']).toFixed(2)}` : '');
+                          return <li key={idx}>{`${name} x ${qty}${price}`}</li>;
+                        })}
+                      </ul>
+                    </div>
                   </div>
 
                   <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>

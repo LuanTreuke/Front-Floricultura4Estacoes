@@ -8,17 +8,24 @@ interface ProductCardProps {
   name: string;
   price: string;
   image: string;
+  topRight?: React.ReactNode;
 }
-export default function ProductCard({ id, name, price, image }: ProductCardProps) {
+
+export default function ProductCard({ id, name, price, image, topRight }: ProductCardProps) {
   const isExternal = image.startsWith('http://') || image.startsWith('https://');
   const imgSrc = isExternal ? image : image.startsWith('/') ? image : `/${image}`;
-  const content = (
+
+  const inner = (
     <div className={styles.card}>
       {imgSrc ? (
         <Image src={imgSrc} alt={name} className={styles.image} width={300} height={300} style={{ objectFit: 'cover' }} />
       ) : (
         <div className={styles.image}>Img</div>
       )}
+
+      {/* render topRight inside the card so it overlays the image area */}
+      {topRight && <div className={styles.topRight}>{topRight}</div>}
+
       <div className={styles.info}>
         <span className={styles.name}>{name}</span>
         <span className={styles.price}>{price}</span>
@@ -26,12 +33,15 @@ export default function ProductCard({ id, name, price, image }: ProductCardProps
     </div>
   );
 
-  if (id) {
-    return (
-      <Link href={`/product/${id}`} aria-label={`Ver ${name}`} className={styles.link}>
-        {content}
-      </Link>
-    );
-  }
-  return content;
+  return (
+    <div className={styles.cardWrapper}>
+      {id ? (
+        <Link href={`/product/${id}`} aria-label={`Ver ${name}`} className={styles.link}>
+          {inner}
+        </Link>
+      ) : (
+        inner
+      )}
+    </div>
+  );
 }

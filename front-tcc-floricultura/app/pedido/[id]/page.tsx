@@ -19,6 +19,12 @@ function formatDateTime(dateStr?: string, timeStr?: string) {
   return `${dd}/${mm}/${yyyy} ${hh}:${min}`;
 }
 
+function displayStatus(status?: string | null) {
+  if (!status) return '—';
+  if (status === 'Em_Rota') return 'Saiu para entrega';
+  return String(status).replace(/_/g, ' ');
+}
+
 export default function PedidoDetalhePage() {
   const params = useParams();
   const id = Number(params?.id);
@@ -101,7 +107,7 @@ export default function PedidoDetalhePage() {
             </div>
           </div>
           <div className={styles.rightColumn}>
-            <div className={styles.status}><span className={styles.label}>Status:</span> {order.status}</div>
+            <div className={styles.status}><span className={styles.label}>Status:</span> {displayStatus(order.status as string | null)}</div>
             <div><span className={styles.label}>Pedido em:</span> <span className={styles.muted}>{formatDateTime(order.data_pedido, order.hora_pedido)}</span></div>
             <div><span className={styles.label}>Cobrar no endereço:</span> <span className={styles.muted}>{((order.cobrar_no_endereco === 1) || (order.cobrar_no_endereco === '1') || (order.cobrar_no_endereco === true)) ? 'Sim' : 'Não'}</span></div>
           </div>

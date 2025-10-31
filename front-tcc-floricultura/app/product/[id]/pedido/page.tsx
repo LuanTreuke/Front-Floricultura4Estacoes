@@ -4,7 +4,6 @@ import Image from 'next/image';
 import { useRouter, useParams } from 'next/navigation';
 import { fetchProductById, Product } from '../../../../services/productService';
 import { fetchAddresses, AddressDto } from '../../../../services/addressService';
-import { fetchPhones, PhoneDto } from '../../../../services/phoneService';
 import { getCurrentUser, User } from '../../../../services/authService';
 import { createOrder, CreateOrderDto } from '../../../../services/orderService';
 import styles from '../../../../styles/ProductOrder.module.css';
@@ -17,10 +16,7 @@ export default function ProductOrderPage() {
   const [loading, setLoading] = useState(true);
   const [addresses, setAddresses] = useState<AddressDto[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<number | null>(null);
-  const [phones, setPhones] = useState<PhoneDto[]>([]);
-  const [selectedPhoneId, setSelectedPhoneId] = useState<number | null>(null);
   const [nomeCliente, setNomeCliente] = useState('');
-  const [telefone, setTelefone] = useState('');
   const [nomeDestinatario, setNomeDestinatario] = useState('');
   const [dataEntrega, setDataEntrega] = useState('');
   const [horaEntrega, setHoraEntrega] = useState('');
@@ -37,37 +33,15 @@ export default function ProductOrderPage() {
       if (usuario && usuario.id) {
         setAddresses((all || []).filter((a) => a.Usuario_id === usuario.id));
         // prefills com os dados do usuário logado quando disponíveis
-        if (usuario.nome) setNomeCliente(usuario.nome);
-        if (usuario.telefone) setTelefone(usuario.telefone);
+  if (usuario.nome) setNomeCliente(usuario.nome);
       } else {
         setAddresses([]);
       }
-      // fetch phones for select
-      try {
-        const ph = await fetchPhones();
-        setPhones(ph || []);
-        const saved = localStorage.getItem('checkout_selected_phone');
-        if (saved) {
-          const parsed = Number(saved);
-          if (!Number.isNaN(parsed)) {
-            setSelectedPhoneId(parsed);
-            const chosen = (ph || []).find((x) => x.id === parsed);
-            if (chosen && chosen.telefone) setTelefone(chosen.telefone);
-          }
-        }
-      } catch {
-        // ignore
-      }
+      // no phone select anymore; telefone comes from usuario.telefone when needed
     })();
   }, [id]);
 
-  useEffect(() => {
-    if (selectedPhoneId === null) {
-      localStorage.removeItem('checkout_selected_phone');
-    } else {
-      localStorage.setItem('checkout_selected_phone', String(selectedPhoneId));
-    }
-  }, [selectedPhoneId]);
+  // phone selection removed
 
   async function handlePedido(e: React.FormEvent) {
     e.preventDefault();
@@ -90,7 +64,7 @@ export default function ProductOrderPage() {
       return;
     }
     if (!nomeCliente || !nomeCliente.trim()) missing.push('nomeCliente');
-    if (!telefone || !telefone.trim()) missing.push('telefone');
+  // telefone field removed from order form
     if (!nomeDestinatario || !nomeDestinatario.trim()) missing.push('nomeDestinatario');
     if (!dataEntrega) missing.push('dataEntrega');
     if (!horaEntrega) missing.push('horaEntrega');
@@ -134,8 +108,9 @@ export default function ProductOrderPage() {
       data_entrega: dataEntrega || undefined,
       hora_entrega: horaEntrega || undefined,
       nome_cliente: nomeCliente || usuario.nome || '',
+      telefone_cliente: (usuario as any)?.telefone || undefined,
       // não enviar telefone do usuário automaticamente quando o campo do pedido for deixado em branco
-      telefone_cliente: telefone && telefone.trim().length ? telefone : undefined,
+  // telefone_cliente removed: we will not send telefone in the order payload
   // armazenamos o carrinho como string no novo campo `carrinho`; observacao permanece apenas texto
   carrinho: Object.keys(carrinhoPayload).length ? JSON.stringify(carrinhoPayload) : undefined,
   observacao: observacao && observacao.trim().length ? observacao : undefined,
@@ -144,12 +119,14 @@ export default function ProductOrderPage() {
       Usuario_id: (typeof usuario?.id === 'number' && usuario.id > 0) ? usuario.id : null,
     };
     try {
+      console.debug('[ProductOrderPage] createOrder DTO ->', dto);
       await createOrder(dto as CreateOrderDto);
       alert('Pedido criado com sucesso');
       router.push('/');
-    } catch (err) {
+    } catch (err: unknown) {
       console.error(err);
-      alert('Erro ao criar pedido');
+      const msg = err instanceof Error ? err.message : String(err);
+      alert('Erro ao criar pedido: ' + msg);
     }
   }
 
@@ -170,29 +147,7 @@ export default function ProductOrderPage() {
           <form onSubmit={handlePedido} className={styles.form}>
             <label>Nome</label>
             <input className={`${styles.input} ${errors.nomeCliente ? styles.invalid : ''}`} value={nomeCliente} onChange={e => { setNomeCliente(e.target.value); setErrors(prev => ({ ...prev, nomeCliente: false })); }} placeholder="Seu nome" />
-            <label>Telefone</label>
-            <select className={`${styles.select} ${errors.telefone ? styles.invalid : ''}`} value={selectedPhoneId || ''} onChange={e => {
-              const val = e.target.value;
-              if (!val) {
-                setSelectedPhoneId(null);
-                setTelefone('');
-                return;
-              }
-              const id = Number(val);
-              setSelectedPhoneId(id);
-              const chosen = (phones || []).find(p => p.id === id);
-              if (chosen && chosen.telefone) setTelefone(chosen.telefone);
-              setErrors(prev => ({ ...prev, telefone: false }));
-            }}>
-              <option value="">Outro / selecionar</option>
-              {phones.map(p => (
-                <option key={p.id} value={p.id}>{p.telefone}</option>
-              ))}
-            </select>
-
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-              <button type="button" className={styles.secondaryBtn} onClick={() => router.push('/cadastro/telefone')}>+ Adicionar telefone</button>
-            </div>
+            {/* telefone removed from form */}
 
             <label>Endereço</label>
             <select className={`${styles.select} ${errors.selectedAddress ? styles.invalid : ''}`} value={selectedAddress || ''} onChange={e => { setSelectedAddress(Number(e.target.value)); setErrors(prev => ({ ...prev, selectedAddress: false })); }}>

@@ -24,10 +24,29 @@ export default function AdminPedidosPage() {
   };
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [notifyDisabled, setNotifyDisabled] = useState<Record<number, boolean>>({});
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [dateFilter, setDateFilter] = useState<string | null>(null); // YYYY-MM-DD
   const [sortBy, setSortBy] = useState<'hora_pedido' | 'hora_entrega' | null>(null);
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
+  const [statusSelections, setStatusSelections] = useState<Record<string, string>>({});
+
+  function displayStatus(status?: string | null) {
+    if (!status) return '—';
+    if (status === 'Em_Rota') return 'Saiu para entrega';
+    // replace underscore with space for other statuses
+    return String(status).replace(/_/g, ' ');
+  }
+
+  function formatTime(t?: string | null) {
+    if (!t) return '—';
+    if (typeof t !== 'string') return String(t);
+    // common formats: HH:MM, HH:MM:SS, or ISO-like strings containing time
+    if (t.length === 5) return t; // HH:MM
+    if (t.length === 8) return t.slice(0, 5); // HH:MM:SS -> HH:MM
+    const m = t.match(/(\d{2}:\d{2})/);
+    return m ? m[1] : t;
+  }
 
   // Extrai lista de produtos do campo observacao, segura contra JSON inválido
   const extractCart = useCallback((obs: unknown): AnyObj[] | null => {
@@ -94,6 +113,57 @@ export default function AdminPedidosPage() {
     })();
   }, [extractCart]);
 
+  // derive per-order notification preference from backend field when orders change
+  useEffect(() => {
+    try {
+      const map: Record<number, boolean> = {};
+      (orders || []).forEach(o => {
+        const id = typeof o.id === 'number' ? o.id as number : undefined;
+        if (!id) return;
+        // notifications_enabled can be numeric (0/1) or boolean; consider missing value as enabled
+        const raw = (o as any).notifications_enabled;
+        // treat 0 or '0' or false as disabled
+        const isDisabled = raw === 0 || raw === '0' || raw === false ? true : false;
+        map[id] = isDisabled;
+      });
+      setNotifyDisabled(map);
+    } catch (e) {
+      // ignore
+    }
+  }, [orders]);
+
+  async function toggleNotify(orderId?: number) {
+    if (!orderId) return;
+    // optimistic update: flip local state first so the UI responds immediately
+    const prev = notifyDisabled[orderId] === true;
+    setNotifyDisabled(curr => ({ ...curr, [orderId]: !prev }));
+
+    try {
+  const currentlyDisabled = prev;
+  // prev == notifyDisabled (true when notifications are currently disabled)
+  // We want to set the backend `notifications_enabled` to the new value.
+  // currentNotificationsEnabled = !currentlyDisabled
+  // newNotificationsEnabled = !currentNotificationsEnabled = currentlyDisabled
+  const enabled = currentlyDisabled; // flip: if currently disabled -> enable (true); if currently enabled -> disable (false)
+      // call backend to persist
+      console.log('[admin/pedidos] toggleNotify sending', { orderId, enabled });
+      const mod = await (await import('../../../services/orderService')).setOrderNotifications(orderId, enabled);
+      // backend returns updated order; update orders list
+      if (mod) {
+        setOrders(curr => curr.map(o => o.id === orderId ? { ...o, ...(mod || {}) } : o));
+      }
+      // ensure local map reflects backend value (notifications_enabled may be 0/1)
+      const newRaw = (mod as any)?.notifications_enabled;
+      const newDisabled = newRaw === 0 || newRaw === '0' || newRaw === false ? true : false;
+      setNotifyDisabled(curr => ({ ...curr, [orderId]: newDisabled }));
+    } catch (e) {
+      console.error('Failed to toggle notifications', e);
+      // revert optimistic change
+      setNotifyDisabled(curr => ({ ...curr, [orderId]: prev }));
+      alert('Erro ao atualizar preferências de notificação');
+    }
+  }
+
   async function handleChangeStatus(id: number, status: string) {
     try {
       await updateOrderStatus(id, status);
@@ -144,115 +214,154 @@ export default function AdminPedidosPage() {
     return arr;
   }, [orders, statusFilter, dateFilter, sortBy, sortDir]);
 
-  if (loading) return <div>Carregando pedidos...</div>;
+  if (loading) return <div className={styles.container}>Carregando pedidos...</div>;
 
   return (
     <div className={styles.container}>
-      <h1>Gerenciar Pedidos</h1>
-      <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 12 }}>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <strong>Filtrar por status:</strong>
-          {[...new Set(orders.map(o => o.status))].map((s) => (
-            <button key={String(s)} className={styles.btn} onClick={() => setStatusFilter(statusFilter === s ? null : (s ?? null))} style={{ background: statusFilter === s ? '#ddd' : undefined }}>{s}</button>
-          ))}
-        </div>
+      <h1 className={styles.title}>Gerenciar Pedidos</h1>
+      <div className={styles.header}>
+        <div className={styles.toolbar}>
+          <div className={styles.filters}>
+            <label style={{ fontWeight: 600, marginRight: 8 }}>Status</label>
+            {/* mobile-only label (CSS will show this only on small screens) */}
+            <span className={styles.mobileStatusLabel}>Status</span>
+            {/* Mostrar todos os possíveis status, mesmo que não existam pedidos com eles ainda */}
+            <select
+              value={statusFilter ?? ''}
+              onChange={e => setStatusFilter(e.target.value || null)}
+              style={{ padding: '8px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.08)', minWidth: 180 }}
+            >
+              <option value="">Todos</option>
+              {['Recebido', 'Preparando', 'Em_Rota', 'Entregue', 'Cancelado'].map(s => (
+                <option key={s} value={s}>{displayStatus(s)}</option>
+              ))}
+            </select>
+          </div>
 
-        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <strong>Ordenar por:</strong>
-          <button className={styles.btn} onClick={() => { setSortBy('hora_pedido'); setSortDir(sortBy === 'hora_pedido' && sortDir === 'desc' ? 'asc' : 'desc'); }}>Hora Pedido {sortBy === 'hora_pedido' ? (sortDir === 'desc' ? '↓' : '↑') : ''}</button>
-          <button className={styles.btn} onClick={() => { setSortBy('hora_entrega'); setSortDir(sortBy === 'hora_entrega' && sortDir === 'desc' ? 'asc' : 'desc'); }}>Hora Entrega {sortBy === 'hora_entrega' ? (sortDir === 'desc' ? '↓' : '↑') : ''}</button>
-        </div>
+          <div className={styles.filters}>
+            <label style={{ fontWeight: 600, marginRight: 8 }}>Ordenar</label>
+            {/* mobile-only label for sort controls */}
+            <span className={styles.mobileSortLabel}>Ordenar</span>
+            <button className={styles.btn} onClick={() => { setSortBy('hora_pedido'); setSortDir(sortBy === 'hora_pedido' && sortDir === 'desc' ? 'asc' : 'desc'); }}>Hora Pedido {sortBy === 'hora_pedido' ? (sortDir === 'desc' ? '↓' : '↑') : ''}</button>
+            <button className={styles.btn} onClick={() => { setSortBy('hora_entrega'); setSortDir(sortBy === 'hora_entrega' && sortDir === 'desc' ? 'asc' : 'desc'); }}>Hora Entrega {sortBy === 'hora_entrega' ? (sortDir === 'desc' ? '↓' : '↑') : ''}</button>
+          </div>
 
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <strong>Filtrar por dia:</strong>
-          <input type="date" value={dateFilter || ''} onChange={e => setDateFilter(e.target.value || null)} />
-          {dateFilter && <button className={styles.secondaryBtn} onClick={() => setDateFilter(null)}>Limpar</button>}
-          <button className={styles.secondaryBtn} onClick={() => { setStatusFilter(null); setDateFilter(null); setSortBy(null); setSortDir('desc'); }}>Limpar filtros</button>
+          <div className={styles.filters}>
+            <label style={{ fontWeight: 600, marginRight: 8 }}>Data</label>
+            {/* mobile-only label (CSS will show this only on small screens) */}
+            <span className={styles.mobileDateLabel}>Data</span>
+            <input type="date" value={dateFilter || ''} onChange={e => setDateFilter(e.target.value || null)} />
+            {dateFilter && <button className={`${styles.secondaryBtn} ${styles.clearBtn}`} onClick={() => setDateFilter(null)}>Limpar</button>}
+            <button className={`${styles.secondaryBtn} ${styles.clearBtn}`} onClick={() => { setStatusFilter(null); setDateFilter(null); setSortBy(null); setSortDir('desc'); }}>Limpar</button>
+          </div>
         </div>
       </div>
 
       <div className={styles.grid}>
         {visibleOrders.map(o => (
           <div key={o.id} className={styles.card}>
-            <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-              <div style={{ width: 160, textAlign: 'center' }}>
-                {(o._images && o._images.length > 0) ? (
-                  <div style={{ position: 'relative' }}>
-                    {o._images && o._images[o._imageIndex || 0] ? (
-                      <Image src={String(o._images[o._imageIndex || 0])} alt={String(o.nome_cliente ?? o.id ?? '')} width={160} height={160} style={{ objectFit: 'cover', borderRadius: 8 }} />
-                    ) : (
-                      <div style={{ width: 160, height: 160, background: '#f3f3f3', borderRadius: 8 }} />
-                    )}
-                    {o._images.length > 1 && (
-                      <>
-                        <button onClick={() => (typeof o.id === 'number' ? prevImage(o.id) : undefined)} style={{ position: 'absolute', left: 4, top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.4)', color: '#fff', border: 'none', borderRadius: 4, padding: '6px 8px', cursor: 'pointer' }}>{'<'}</button>
-                        <button onClick={() => (typeof o.id === 'number' ? nextImage(o.id) : undefined)} style={{ position: 'absolute', right: 4, top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.4)', color: '#fff', border: 'none', borderRadius: 4, padding: '6px 8px', cursor: 'pointer' }}>{'>'}</button>
-                      </>
-                    )}
-                  </div>
-                ) : (
-                  <div style={{ width: 160, height: 160, background: '#f3f3f3', borderRadius: 8 }} />
-                )}
-              </div>
-              <div style={{ flex: 1 }}>
-                <div className={styles.row}>
-                  <div className={styles.meta}>
-                    <div><strong>Cliente:</strong> {o.nome_cliente || o.usuario?.nome}</div>
-                    <div><strong>Telefone:</strong> {o.telefone_cliente}</div>
-                    {/* produto principal removido daqui para evitar duplicação; produtos listados abaixo */}
-                    <div>
-                      <strong>Endereço:</strong>{' '}
-                      {o.endereco ? (
-                        `${o.endereco.rua}, ${o.endereco.numero}${o.endereco.complemento ? ' • ' + o.endereco.complemento : ''} — ${o.endereco.bairro}${o.endereco.cidade ? ', ' + o.endereco.cidade : ''}${o.endereco.cep ? ' • CEP: ' + o.endereco.cep : ''}`
-                      ) : (
-                        o.Endereco_id ? `ID ${o.Endereco_id}` : '—'
-                      )}
-                    </div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div><strong>Status:</strong> {o.status}</div>
-                    <div className={styles.statusActions}>
-                      <button className={styles.btn} onClick={() => (typeof o.id === 'number' ? handleChangeStatus(o.id, 'Recebido') : undefined)}>Recebido</button>
-                      <button className={styles.btn} onClick={() => (typeof o.id === 'number' ? handleChangeStatus(o.id, 'Entregue') : undefined)}>Entregue</button>
-                    </div>
-                  </div>
+            <button className={styles.bellBtn} onClick={() => toggleNotify(typeof o.id === 'number' ? o.id as number : undefined)} aria-label="Toggle notifications for this order">
+              {notifyDisabled && typeof o.id === 'number' && notifyDisabled[o.id] ? (
+                <i className="bi bi-bell-slash" aria-hidden></i>
+              ) : (
+                <i className="bi bi-bell" aria-hidden></i>
+              )}
+            </button>
+            <div className={styles.thumb}>
+              {(o._images && o._images.length > 0) ? (
+                <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                  {o._images && o._images[o._imageIndex || 0] ? (
+                    <Image src={String(o._images[o._imageIndex || 0])} alt={String(o.nome_cliente ?? o.id ?? '')} width={140} height={140} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
+                  ) : (
+                    <div style={{ width: '100%', height: '100%', background: '#f3f3f3' }} />
+                  )}
                 </div>
-                {/* Exibe produtos extraídos de observacao (quando presentes) */}
-                {(() => {
-                  const cart = extractCart(o.carrinho || o.observacao) || [];
-                  if (cart && cart.length) {
-                    // se o observacao continha nomes/imagens nos items, use-os
-                    return (
-                      <div style={{ marginTop: 8 }}>
-                        <strong>Produtos:</strong>
-                        <ul style={{ margin: '8px 0 0 16px' }}>
-                          {cart.map((it: AnyObj, idx: number) => (
-                            <li key={idx}>
-                              {((it['nome'] as string) || (o._productNames && o._productNames[idx]) || `Produto #${(it['id'] as number | undefined) ?? idx}`)} {(it['quantidade'] !== undefined ? `x ${(it['quantidade'] as number)}` : '')} {(it['preco'] !== undefined ? `— R$ ${Number(it['preco']).toFixed(2)}` : '')}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    );
-                  }
-                  // fallback: se não houver cart, mas _productNames existe (por enriquecimento), exiba-os
-                  if (o._productNames && o._productNames.length) {
-                    return (
-                      <div style={{ marginTop: 8 }}>
-                        <strong>Produtos:</strong>
-                        <ul style={{ margin: '8px 0 0 16px' }}>
-                          {o._productNames.map((n: string, i: number) => <li key={i}>{n}</li>)}
-                        </ul>
-                      </div>
-                    );
-                  }
-                  return null;
-                })()}
+              ) : (
+                <div style={{ width: '100%', height: '100%', background: '#f3f3f3' }} />
+              )}
+            </div>
+
+            <div className={styles.details}>
+              <div className={styles.meta}>
+                <div><strong>Cliente:</strong> {o.nome_cliente || o.usuario?.nome}</div>
+                <div><strong>Telefone:</strong> {o.telefone_cliente || '—'}</div>
+                <div>
+                  <strong>Endereço:</strong>{' '}
+                  {o.endereco ? (
+                    `${o.endereco.rua}, ${o.endereco.numero}${o.endereco.complemento ? ' • ' + o.endereco.complemento : ''} — ${o.endereco.bairro}${o.endereco.cidade ? ', ' + o.endereco.cidade : ''}${o.endereco.cep ? ' • CEP: ' + o.endereco.cep : ''}`
+                  ) : (
+                    o.Endereco_id ? `ID ${o.Endereco_id}` : '—'
+                  )}
+                </div>
+                {/* horários: hora de entrega e hora do pedido (empilhados abaixo do endereço) */}
+                <div className={styles.times}>
+                  <div><strong>Hora de entrega:</strong> {formatTime(o['hora_entrega'] as string | null)}</div>
+                  <div><strong>Hora do pedido:</strong> {formatTime(o['hora_pedido'] as string | null)}</div>
+                </div>
+              </div>
+
+              {/* produtos */}
+              {(() => {
+                const cart = extractCart(o.carrinho || o.observacao) || [];
+                if (cart && cart.length) {
+                  return (
+                    <div className={styles.productList}>
+                      {cart.map((it: AnyObj, idx: number) => (
+                        <span key={idx} className={styles.badge}>
+                          {((it['nome'] as string) || (o._productNames && o._productNames[idx]) || `Produto #${(it['id'] as number | undefined) ?? idx}`)} {it['quantidade'] !== undefined ? ` x ${(it['quantidade'] as number)}` : ''}
+                        </span>
+                      ))}
+                    </div>
+                  );
+                }
+                if (o._productNames && o._productNames.length) {
+                  return (
+                    <div className={styles.productList}>
+                      {o._productNames.map((n: string, i: number) => <span key={i} className={styles.badge}>{n}</span>)}
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+
+              <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: 8 }}>
+                <button className={styles.secondaryBtn} onClick={() => { window.location.href = `/pedido/${o.id}`; }}>Ver detalhes</button>
               </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 12 }}>
-              <button className={styles.secondaryBtn} onClick={() => { window.location.href = `/pedido/${o.id}`; }}>Ver detalhes</button>
+      <div className={styles.statusColumn}>
+    <div className={`${styles.statusLabel} ${styles.rightMeta}`}><strong>Status:</strong> {displayStatus(o.status as string | null)}</div>
+          <div className={styles.statusActions}>
+                  {/* Select box with allowed statuses (exclude 'Recebido') */}
+                  <select
+                    value={statusSelections[String(o.id ?? '')] || ''}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (typeof o.id === 'number') setStatusSelections(curr => ({ ...curr, [String(o.id)]: val }));
+                    }}
+                    style={{ padding: '8px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.08)', minWidth: 140 }}
+                  >
+                    <option value="">Alterar status</option>
+                    {['Preparando', 'Em_Rota', 'Entregue', 'Cancelado'].map(s => (
+                      <option key={s} value={s}>{s === 'Em_Rota' ? 'Saiu para entrega' : s.replace('_', ' ')}</option>
+                    ))}
+                  </select>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button
+                      className={styles.btn}
+                      onClick={() => {
+                        const sel = statusSelections[String(o.id ?? '')] || '';
+                        if (typeof o.id === 'number' && sel) {
+                          handleChangeStatus(o.id, sel);
+                          setStatusSelections(curr => ({ ...curr, [String(o.id)]: '' }));
+                        }
+                      }}
+                      disabled={!statusSelections[String(o.id ?? '')]}
+                    >
+                      Atualizar
+                    </button>
+                  </div>
+                </div>
             </div>
           </div>
         ))}
