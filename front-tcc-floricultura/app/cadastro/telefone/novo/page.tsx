@@ -96,7 +96,7 @@ export default function CadastroTelefoneNovoPage() {
           </div>
 
       <div style={{ marginTop: 12 }}>
-        <small>Ao clicar em "Abrir no WhatsApp" você será levado para o WhatsApp para enviar a mensagem para {companyNumber}.</small>
+        <small>Ao clicar em &quot;Abrir no WhatsApp&quot; você será levado para o WhatsApp para enviar a mensagem para {companyNumber}.</small>
         {error && <div style={{ color: 'red', marginTop: 8 }}>Erro: {error}</div>}
       </div>
     </div>

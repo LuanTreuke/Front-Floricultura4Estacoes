@@ -1,14 +1,24 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import styles from '../../../styles/Login.module.css';
 import Image from 'next/image';
 import { fetchPhones, PhoneDto } from '../../../services/phoneService';
 
 export default function CadastroPage() {
   const router = useRouter();
-  const search = useSearchParams();
-  const from = search?.get('from') || null;
+  const [from, setFrom] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const p = new URLSearchParams(window.location.search);
+        setFrom(p.get('from'));
+      }
+    } catch {
+      setFrom(null);
+    }
+  }, []);
 
   const [checking, setChecking] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);

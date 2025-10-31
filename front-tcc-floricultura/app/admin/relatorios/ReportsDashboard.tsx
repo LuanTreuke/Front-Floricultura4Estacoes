@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useEffect, useRef, useState } from 'react';
 import styles from '../../../styles/AdminRelatorios.module.css';
@@ -47,7 +48,7 @@ export default function ReportsDashboard() {
 
     // load Chart.js from CDN and create some demo charts
     const CDN = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
-    let charts: any[] = [];
+  const charts: any[] = [];
     // initial data load
     (async () => {
       try {
@@ -80,8 +81,7 @@ export default function ReportsDashboard() {
     })();
 
     loadScript(CDN).then(() => {
-      // @ts-ignore
-      const Chart = (window as any).Chart;
+  const Chart = (window as any).Chart;
       if (!Chart) return;
 
       // charts will be rendered once data is available; we still create empty placeholders here
@@ -103,12 +103,11 @@ export default function ReportsDashboard() {
   // update charts when orders/users change
   useEffect(() => {
     const CDN = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
-    let chartInstances: any[] = [];
+  const chartInstances: any[] = [];
     (async () => {
       try {
         await loadScript(CDN);
-        // @ts-ignore
-        const Chart = (window as any).Chart;
+  const Chart = (window as any).Chart;
         if (!Chart) return;
 
         // orders per month (aggregate by YYYY-MM), applying date range filter if present
