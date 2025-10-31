@@ -1,6 +1,6 @@
 "use client";
-import React, { useMemo, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useMemo, useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import styles from '../../../../styles/ProductOrder.module.css';
 import Image from 'next/image';
 import { getCurrentUser, User } from '../../../../services/authService';
@@ -8,9 +8,19 @@ import api from '../../../../services/api';
 
 export default function CadastroTelefoneNovoPage() {
   const router = useRouter();
-  const search = useSearchParams();
+  const [returnTo, setReturnTo] = useState<string | null>(null);
+
   // prefer an explicit returnTo query param; if absent, fall back to history.back()
-  const returnTo = search?.get('returnTo') || null;
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const p = new URLSearchParams(window.location.search);
+        setReturnTo(p.get('returnTo'));
+      }
+    } catch {
+      setReturnTo(null);
+    }
+  }, []);
   const usuario = getCurrentUser() as User | null;
 
   // company WhatsApp number (provided)
