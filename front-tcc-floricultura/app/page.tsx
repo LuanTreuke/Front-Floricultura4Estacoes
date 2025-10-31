@@ -102,7 +102,8 @@ export default function HomePage() {
     return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   }
 
-  let filtered = products.filter((p: Product) => {
+  const safeProducts = Array.isArray(products) ? products : [];
+  let filtered = safeProducts.filter((p: Product) => {
     // only show products with enabled true; if enabled is missing (legacy), treat as visible
     const isVisible = p.enabled === undefined ? true : !!p.enabled;
     const nomeNormalized = removeAccents(p.nome.toLowerCase());

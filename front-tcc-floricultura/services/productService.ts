@@ -34,7 +34,12 @@ export interface Product {
 export async function fetchProducts(): Promise<Product[]> {
   try {
     const res = await api.get(`/produtos`);
-    return res.data as Product[];
+    const data = res.data as unknown;
+    if (Array.isArray(data)) return data as Product[];
+    if (data && typeof data === 'object' && Array.isArray((data as any).items)) {
+      return (data as any).items as Product[];
+    }
+    return [];
   } catch (err: unknown) {
     const maybeErr = err as { response?: { status?: number } } | undefined;
     const status = maybeErr?.response?.status;
