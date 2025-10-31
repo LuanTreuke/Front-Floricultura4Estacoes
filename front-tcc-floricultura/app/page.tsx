@@ -9,13 +9,14 @@ import CategoryFilter from '../components/CategoryFilter';
 import PriceRange from '../components/PriceRange';
 import SortButtons from '../components/SortButtons';
 import ProductCard from '../components/ProductCard';
+import ProductPopup from '../components/ProductPopup';
 import CartPopup from '../components/CartPopup';
 import { getCart, subscribeCart } from '../services/cartService';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 import { fetchProducts, Product } from '../services/productService';
-import axios from 'axios';
+import api from '@/services/api';
 
 // categorias serão carregadas do backend
 
@@ -33,6 +34,8 @@ export default function HomePage() {
   
   const [showCartPopup, setShowCartPopup] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  const [showProductPopup, setShowProductPopup] = useState(false);
+  const [activeProductId, setActiveProductId] = useState<number | null>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -76,8 +79,7 @@ export default function HomePage() {
     // buscar categorias do backend
     (async () => {
       try {
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-        const res = await axios.get(`${API_URL}/categorias`);
+        const res = await api.get('/categorias');
         const cats = res.data as Array<{ id: number; nome: string }>;
         // prepend 'Todas' option
         setCategories(['Todas', ...cats.map(c => c.nome)]);
@@ -218,12 +220,20 @@ export default function HomePage() {
               name={p.nome}
               price={`R$${Number(p.preco).toFixed(2)}`}
               image={p.imagem_url || ''}
+              onClick={() => { setActiveProductId(p.id); setShowProductPopup(true); }}
             />
           ))}
         </div>
 
         
       </div>
+
+      {showProductPopup && activeProductId !== null && (
+        <ProductPopup
+          productId={activeProductId}
+          onClose={() => setShowProductPopup(false)}
+        />
+      )}
 
   <footer className={styles.footerSection}>
         <div className={styles.footerContent}>

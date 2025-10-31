@@ -5,6 +5,7 @@ import styles from '../../styles/Login.module.css';
 import Image from 'next/image';
 import { login } from '../../services/authService';
 import { getCartFromServer } from '../../services/cartService';
+import BackButton from '../../components/BackButton';
 // using shared api via services/api.ts (login uses authService)
 
 export default function LoginPage() {
@@ -51,6 +52,7 @@ export default function LoginPage() {
   return (
     <div className={styles.container}>
       <form className={styles.form} onSubmit={handleSubmit}>
+        <BackButton />
         <div className={styles.logoWrap}>
           <Image src="/Logo-floricultura.svg" alt="Logo Floricultura" className={styles.logo} width={96} height={96} style={{ objectFit: 'contain' }} />
         </div>

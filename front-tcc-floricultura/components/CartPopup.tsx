@@ -130,17 +130,18 @@ export default function CartPopup({ onClose, inline = false }: Props) {
       return;
     }
 
-    if (!selectedAddress) {
-      if (confirm('Nenhum endereço cadastrado. Deseja adicionar um agora?')) {
-        router.push('/cadastro/endereco');
+    if (inline) {
+      if (!selectedAddress) {
+        if (confirm('Nenhum endereço cadastrado. Deseja adicionar um agora?')) {
+          router.push('/cadastro/endereco');
+        }
+        return;
       }
-      return;
-    }
-
-    try {
-      localStorage.setItem('checkout_selected_address', String(selectedAddress));
-    } catch (err) {
-      console.warn('failed to save checkout_selected_address', err);
+      try {
+        localStorage.setItem('checkout_selected_address', String(selectedAddress));
+      } catch (err) {
+        console.warn('failed to save checkout_selected_address', err);
+      }
     }
 
     if (onClose) onClose();
@@ -252,7 +253,7 @@ export default function CartPopup({ onClose, inline = false }: Props) {
           </div>
           
           {/* Address selector for checkout (uses addresses state so it's not unused) */}
-          {usuarioAny && usuarioAny.id ? (
+          {inline && usuarioAny && usuarioAny.id ? (
             <div style={{ margin: '12px 0' }}>
               {addresses.length > 0 ? (
                 <label style={{ display: 'block', marginBottom: 6 }}>

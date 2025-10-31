@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import styles from '../../../styles/Login.module.css';
 import Image from 'next/image';
 import { fetchPhones, PhoneDto } from '../../../services/phoneService';
+import BackButton from '../../../components/BackButton';
 
 export default function CadastroPage() {
   const router = useRouter();
@@ -92,6 +93,7 @@ export default function CadastroPage() {
   return (
     <div className={styles.container}>
       <form className={styles.form}>
+        <BackButton />
         <div className={styles.logoWrap}>
           <Image src="/Logo-floricultura.svg" alt="Logo Floricultura" className={styles.logo} width={96} height={96} style={{ objectFit: 'contain' }} />
         </div>

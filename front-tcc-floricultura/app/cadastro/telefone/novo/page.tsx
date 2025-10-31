@@ -80,9 +80,9 @@ export default function CadastroTelefoneNovoPage() {
       <div className={styles.logoContainer}>
         <Image src="/Logo-floricultura.svg" alt="Floricultura" width={400} height={120} />
       </div>
-      <h1 className={styles.heading}>Cadastrar telefone via WhatsApp</h1>
+      <h1 className={styles.heading} style={{fontSize: 25}}>Cadastrar telefone via WhatsApp</h1>
 
-      <p>Para vincular seu número de telefone envie a mensagem pré-definida para o número da empresa usando o link abaixo:</p>
+      <p style={{fontSize: 20}}>Para vincular seu número de telefone basta enviar a mensagem pré-definida para o número da empresa usando o botão abaixo:</p>
       <div style={{justifyContent: 'flex-start', display: 'flex', flexDirection: 'column' }}>
         <div style={{ marginTop: 12, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8}}>
           <label>Mensagem:</label>
@@ -105,8 +105,8 @@ export default function CadastroTelefoneNovoPage() {
             <button type="button" className={styles.secondaryBtn} onClick={() => router.push('/')}>Voltar</button>
           </div>
 
-      <div style={{ marginTop: 12 }}>
-        <small>Ao clicar em &quot;Abrir no WhatsApp&quot; você será levado para o WhatsApp para enviar a mensagem para {companyNumber}.</small>
+      <div style={{ marginTop: 12, fontSize: 20 }}>
+        <small>Clique em &quot;Gerar Link&quot; e em seguida em &quot;Abrir no WhatsApp&quot;, depois disso você será levado para o WhatsApp, em seguida, envie a mensagem para +55 42 3524-2223, e pronto! você estará cadastrado.</small>
         {error && <div style={{ color: 'red', marginTop: 8 }}>Erro: {error}</div>}
       </div>
     </div>

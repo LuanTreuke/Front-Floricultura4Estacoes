@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
@@ -172,25 +171,7 @@ export default function AdminPedidosPage() {
     } catch (err) { console.error(err); alert('Erro ao atualizar status'); }
   }
 
-  function prevImage(orderId: number) {
-    setOrders(curr => curr.map(o => {
-      if (o.id !== orderId) return o;
-      const len = (o._images || []).length || 0;
-      if (len <= 1) return o;
-      const idx = typeof o._imageIndex === 'number' ? o._imageIndex : 0;
-      return { ...o, _imageIndex: (idx - 1 + len) % len };
-    }));
-  }
-
-  function nextImage(orderId: number) {
-    setOrders(curr => curr.map(o => {
-      if (o.id !== orderId) return o;
-      const len = (o._images || []).length || 0;
-      if (len <= 1) return o;
-      const idx = typeof o._imageIndex === 'number' ? o._imageIndex : 0;
-      return { ...o, _imageIndex: (idx + 1) % len };
-    }));
-  }
+  // image carousel controls removed from admin view (keeps UI simpler). If needed later, re-add handlers.
 
   // aplica filtros e ordenação sem modificar o estado original
   const visibleOrders = React.useMemo(() => {

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 
 import { fetchProductById, Product } from '@/services/productService';
-import axios from 'axios';
+import api from '@/services/api';
 
 export default function EditarProdutoPage() {
   const router = useRouter();
@@ -34,8 +34,7 @@ export default function EditarProdutoPage() {
     // buscar categorias do backend
     (async () => {
       try {
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-        const res = await axios.get(`${API_URL}/categorias`);
+        const res = await api.get('/categorias');
         setCategories(res.data || []);
       } catch {
         setCategories([]);

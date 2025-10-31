@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+import api from './api';
 
 export interface AddressDto {
   id?: number;
@@ -15,7 +13,7 @@ export interface AddressDto {
 
 export async function fetchAddresses() {
   try {
-    const res = await axios.get(`${API_URL}/enderecos`);
+  const res = await api.get(`/enderecos`);
     return res.data as AddressDto[];
   } catch (err) {
     if (err instanceof Error) {
@@ -31,7 +29,7 @@ export async function createAddress(dto: AddressDto) {
   try {
   // mostrar payload enviado para depuração
   console.debug('[createAddress] sending dto:', dto);
-    const res = await axios.post(`${API_URL}/enderecos`, dto);
+  const res = await api.post(`/enderecos`, dto);
     return res.data as AddressDto;
   } catch (err) {
   // Monta uma mensagem legível a partir do erro
@@ -44,7 +42,7 @@ export async function createAddress(dto: AddressDto) {
 
 export async function updateAddress(id: number, dto: Partial<AddressDto>) {
   try {
-    const res = await axios.patch(`${API_URL}/enderecos/${id}`, dto);
+  const res = await api.patch(`/enderecos/${id}`, dto);
     return res.data as AddressDto;
   } catch (err) {
     console.error('updateAddress failed', err instanceof Error ? err.message : String(err));
@@ -54,7 +52,7 @@ export async function updateAddress(id: number, dto: Partial<AddressDto>) {
 
 export async function deleteAddress(id: number) {
   try {
-    await axios.delete(`${API_URL}/enderecos/${id}`);
+  await api.delete(`/enderecos/${id}`);
     return true;
   } catch (err) {
     console.error('deleteAddress failed', err instanceof Error ? err.message : String(err));

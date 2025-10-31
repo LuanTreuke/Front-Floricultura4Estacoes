@@ -6,6 +6,7 @@ import { getCurrentUser, User } from '../../services/authService';
 import { fetchOrders, updateOrderStatus } from '../../services/orderService';
 import { fetchProductById } from '../../services/productService';
 import styles from '../../styles/AdminPedidos.module.css';
+import BackButton from '../../components/BackButton';
 
 export default function MeusPedidosPage() {
   const router = useRouter();
@@ -150,7 +151,8 @@ export default function MeusPedidosPage() {
 
   return (
     <div className={styles.container}>
-      <h1>Meus Pedidos</h1>
+      <BackButton />
+      <h1 style={{ textAlign: 'center' }}>Meus Pedidos</h1>
       {orders.length === 0 ? (
         <div>Você não possui pedidos.</div>
       ) : (

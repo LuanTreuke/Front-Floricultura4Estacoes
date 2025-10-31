@@ -5,6 +5,7 @@ import styles from '../../styles/Login.module.css';
 import Image from 'next/image';
 import { cadastro, login } from '../../services/authService';
 import { getCartFromServer } from '../../services/cartService';
+import BackButton from '../../components/BackButton';
 
 export default function CadastroPage() {
   const [nome, setNome] = useState('');
@@ -60,6 +61,7 @@ export default function CadastroPage() {
   return (
     <div className={styles.container}>
       <form className={styles.form} onSubmit={handleSubmit}>
+        <BackButton />
         <div className={styles.logoWrap}>
           <Image src="/Logo-floricultura.svg" alt="Logo Floricultura" className={styles.logo} width={96} height={96} style={{ objectFit: 'contain' }} />
         </div>

@@ -6,6 +6,7 @@ import { getCurrentUser, User } from '../../services/authService';
 import { fetchPhones, PhoneDto, deletePhone } from '../../services/phoneService';
 import { fetchAddresses, AddressDto, updateAddress, deleteAddress } from '../../services/addressService';
 import { useRouter } from 'next/navigation';
+import BackButton from '../../components/BackButton';
 
 export default function MyAccountPage() {
   const router = useRouter();
@@ -70,7 +71,8 @@ export default function MyAccountPage() {
 
   return (
     <div className={styles.container}>
-      <h1>Minha conta</h1>
+      <BackButton />
+      <h1 style={{ textAlign: 'center' }}>Minha conta</h1>
 
       <section className={styles.section}>
         <h2>Email cadastrado</h2>

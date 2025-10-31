@@ -9,9 +9,10 @@ interface ProductCardProps {
   price: string;
   image: string;
   topRight?: React.ReactNode;
+  onClick?: () => void;
 }
 
-export default function ProductCard({ id, name, price, image, topRight }: ProductCardProps) {
+export default function ProductCard({ id, name, price, image, topRight, onClick }: ProductCardProps) {
   const isExternal = image.startsWith('http://') || image.startsWith('https://');
   const imgSrc = isExternal ? image : image.startsWith('/') ? image : `/${image}`;
 
@@ -36,9 +37,15 @@ export default function ProductCard({ id, name, price, image, topRight }: Produc
   return (
     <div className={styles.cardWrapper}>
       {id ? (
-        <Link href={`/product/${id}`} aria-label={`Ver ${name}`} className={styles.link}>
-          {inner}
-        </Link>
+        onClick ? (
+          <button type="button" onClick={onClick} aria-label={`Ver ${name}`} className={styles.link} style={{ background: 'transparent', border: 'none', padding: 0 }}>
+            {inner}
+          </button>
+        ) : (
+          <Link href={`/product/${id}`} aria-label={`Ver ${name}`} className={styles.link}>
+            {inner}
+          </Link>
+        )
       ) : (
         inner
       )}

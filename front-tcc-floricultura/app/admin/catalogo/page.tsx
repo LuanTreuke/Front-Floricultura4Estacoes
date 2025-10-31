@@ -8,7 +8,7 @@ import SearchBar from '../../../components/SearchBar';
 import CategoryFilter from '../../../components/CategoryFilter';
 import PriceRange from '../../../components/PriceRange';
 import SortButtons from '../../../components/SortButtons';
-import axios from 'axios';
+import api from '@/services/api';
 import { fetchProducts, Product, deleteProduct, updateProduct } from '../../../services/productService';
 
 export default function AdminCatalogoPage() {
@@ -40,8 +40,7 @@ export default function AdminCatalogoPage() {
 
     (async () => {
       try {
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-        const res = await axios.get(`${API_URL}/categorias`);
+        const res = await api.get('/categorias');
         const cats = res.data as Array<{ id: number; nome: string }>;
         if (!mounted) return;
         setCategories(['Todas', ...cats.map(c => c.nome)]);
