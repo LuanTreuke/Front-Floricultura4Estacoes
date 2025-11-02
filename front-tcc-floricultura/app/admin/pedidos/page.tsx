@@ -14,6 +14,7 @@ export default function AdminPedidosPage() {
     _imageIndex?: number;
     _productNames?: string[];
     nome_cliente?: string;
+    nome_destinatario?: string | null;
     usuario?: { nome?: string } | null;
     telefone_cliente?: string | null;
     endereco?: { rua?: string; numero?: string; complemento?: string; bairro?: string; cidade?: string; cep?: string } | null;
@@ -26,8 +27,15 @@ export default function AdminPedidosPage() {
   const [loading, setLoading] = useState(true);
   const [notifyDisabled, setNotifyDisabled] = useState<Record<number, boolean>>({});
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
-  const [dateFilter, setDateFilter] = useState<string | null>(null); // YYYY-MM-DD
-  const [sortBy, setSortBy] = useState<'hora_pedido' | 'hora_entrega' | null>(null);
+  const [dateFilter, setDateFilter] = useState<string | null>(() => {
+    // inicializa com a data local (YYYY-MM-DD)
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }); // YYYY-MM-DD
+  const [sortBy, setSortBy] = useState<'hora_pedido' | 'hora_entrega' | null>('hora_pedido');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
   const [statusSelections, setStatusSelections] = useState<Record<string, string>>({});
 
@@ -264,8 +272,9 @@ export default function AdminPedidosPage() {
             </div>
 
             <div className={styles.details}>
-              <div className={styles.meta}>
-                <div><strong>Cliente:</strong> {o.nome_cliente || o.usuario?.nome}</div>
+                <div className={styles.meta}>
+                  <div><strong>Cliente:</strong> {o.nome_cliente || o.usuario?.nome}</div>
+                  <div><strong>Para:</strong> {o.nome_destinatario || '—'}</div>
                 <div><strong>Telefone:</strong> {o.telefone_cliente || '—'}</div>
                 <div>
                   <strong>Endereço:</strong>{' '}
@@ -277,8 +286,40 @@ export default function AdminPedidosPage() {
                 </div>
                 {/* horários: hora de entrega e hora do pedido (empilhados abaixo do endereço) */}
                 <div className={styles.times}>
-                  <div><strong>Hora de entrega:</strong> {formatTime(o['hora_entrega'] as string | null)}</div>
-                  <div><strong>Hora do pedido:</strong> {formatTime(o['hora_pedido'] as string | null)}</div>
+                  <div>
+                    <strong>Hora de entrega:</strong> {formatTime(o['hora_entrega'] as string | null)}
+                    {(() => {
+                      const d = (o['data_entrega'] as string | null);
+                      const fm = (function(d?: string | null) {
+                        if (!d) return null;
+                        const s = String(d);
+                        if (s.includes('T')) {
+                          try { const dt = new Date(s); if (!isNaN(dt.getTime())) return `${String(dt.getDate()).padStart(2,'0')}/${String(dt.getMonth()+1).padStart(2,'0')}`; } catch {}
+                        }
+                        const m = s.match(/(\d{4})-(\d{2})-(\d{2})/);
+                        if (m) return `${m[3]}/${m[2]}`;
+                        return null;
+                      })(d);
+                      return fm ? ` • ${fm}` : '';
+                    })()}
+                  </div>
+                  <div>
+                    <strong>Hora do pedido:</strong> {formatTime(o['hora_pedido'] as string | null)}
+                    {(() => {
+                      const d = (o['data_pedido'] as string | null);
+                      const fm = (function(d?: string | null) {
+                        if (!d) return null;
+                        const s = String(d);
+                        if (s.includes('T')) {
+                          try { const dt = new Date(s); if (!isNaN(dt.getTime())) return `${String(dt.getDate()).padStart(2,'0')}/${String(dt.getMonth()+1).padStart(2,'0')}`; } catch {}
+                        }
+                        const m = s.match(/(\d{4})-(\d{2})-(\d{2})/);
+                        if (m) return `${m[3]}/${m[2]}`;
+                        return null;
+                      })(d);
+                      return fm ? ` • ${fm}` : '';
+                    })()}
+                  </div>
                 </div>
               </div>
 

@@ -23,6 +23,15 @@ export async function createOrder(dto: CreateOrderDto) {
   try {
     const res = await api.post('/pedidos', dto);
     const created = res.data;
+    // marcar notificação local para o usuário atual
+    try {
+      const u = getCurrentUser();
+      const uid = (u && typeof u.id === 'number') ? u.id : null;
+      if (uid != null && typeof window !== 'undefined') {
+        localStorage.setItem(`orders_notify_user_${uid}`, '1');
+        window.dispatchEvent(new Event('orders-updated'));
+      }
+    } catch {}
     // if phone provided, request backend to send whatsapp confirmation
     if (dto.telefone_cliente) {
       try {

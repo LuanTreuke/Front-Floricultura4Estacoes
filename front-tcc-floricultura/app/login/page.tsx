@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from '../../styles/Login.module.css';
 import Image from 'next/image';
-import { login } from '../../services/authService';
+import { login, getCurrentUser } from '../../services/authService';
 import { getCartFromServer } from '../../services/cartService';
+import { fetchOrders } from '../../services/orderService';
 import BackButton from '../../components/BackButton';
 // using shared api via services/api.ts (login uses authService)
 
@@ -46,7 +47,25 @@ export default function LoginPage() {
       } catch (e) { console.warn('post-login cart refresh failed', e); }
 
     // Redirecionar para a home ou dashboard
-    router.push('/');
+    try {
+      // ligar badge simples pós-login se houver pedidos em aberto
+      const u = getCurrentUser();
+      const uid = (u && typeof u.id === 'number') ? u.id : null;
+      if (uid != null && typeof window !== 'undefined') {
+        try {
+          const orders = await fetchOrders();
+          const hasActive = Array.isArray(orders) && orders.some((o: any) => {
+            const s = String(o?.status ?? '').toLowerCase();
+            return !(s === 'entregue' || s === 'cancelado');
+          });
+          if (hasActive) localStorage.setItem(`orders_notify_user_${uid}`, '1');
+          else localStorage.removeItem(`orders_notify_user_${uid}`);
+          window.dispatchEvent(new Event('orders-updated'));
+        } catch {}
+      }
+    } finally {
+      router.push('/');
+    }
   }
 
   return (

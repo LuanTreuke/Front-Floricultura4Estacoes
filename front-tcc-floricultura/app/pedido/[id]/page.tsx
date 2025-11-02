@@ -33,6 +33,7 @@ export default function PedidoDetalhePage() {
   type Order = AnyObj & {
     id?: number;
     nome_cliente?: string;
+    nome_destinatario?: string | null;
     usuario?: { nome?: string; telefone?: string } | null;
     telefone_cliente?: string | null;
     endereco?: { rua?: string; numero?: string; complemento?: string; bairro?: string; cidade?: string; cep?: string } | null;
@@ -101,6 +102,7 @@ export default function PedidoDetalhePage() {
           <div className={styles.left}>
             <div className={styles.meta}>
               <div className={styles.metaItem}><span className={styles.label}>Cliente:</span> <span className={styles.muted}>{order.nome_cliente || order.usuario?.nome}</span></div>
+              <div className={styles.metaItem}><span className={styles.label}>Nome do destinatário:</span> <span className={styles.muted}>{order.nome_destinatario || '—'}</span></div>
               <div className={styles.metaItem}><span className={styles.label}>Telefone:</span> <span className={styles.muted}>{order.telefone_cliente || order.usuario?.telefone || '—'}</span></div>
               <div className={styles.metaItem}><span className={styles.label}>Endereço:</span> <span className={styles.muted}>{order.endereco ? `${order.endereco.rua}, ${order.endereco.numero}${order.endereco.complemento ? ' • ' + order.endereco.complemento : ''} — ${order.endereco.bairro}${order.endereco.cidade ? ', ' + order.endereco.cidade : ''}${order.endereco.cep ? ' • CEP: ' + order.endereco.cep : ''}` : (order.Endereco_id ? `ID ${order.Endereco_id}` : '—')}</span></div>
               <div className={styles.metaItem}><span className={styles.label}>Data & Hora entrega:</span> <span className={styles.muted}>{formatDateTime(order.data_entrega, order.hora_entrega)}</span></div>

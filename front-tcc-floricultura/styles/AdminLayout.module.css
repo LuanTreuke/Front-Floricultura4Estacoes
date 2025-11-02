@@ -17,6 +17,10 @@
   box-shadow: 0 1px 0 rgba(0,0,0,0.02);
 }
 
+.adminNavBtn i {
+  margin-right: 4px; /* ajuste o valor */
+}
+
 .adminNavTitle {
   font-size: 1.2rem;
   font-weight: 600;
@@ -38,6 +42,7 @@
 .adminNavItem {
   padding: 0;
   margin: 0;
+  margin-bottom: 10px;
 }
 
 .adminNavBtn {
@@ -45,12 +50,22 @@
   width: 100%;
   text-align: left;
   padding: 14px 32px;
-  font-size: 1rem;
+  font-size: 1.15rem;
   color: #222;
   cursor: pointer;
   border-radius: 6px 0 0 6px;
   transition: background 0.15s;
   text-decoration: none !important;
+}
+.adminNavBtn i { font-size: 1.35rem; }
+
+/* estado ativo do link no sidebar */
+.adminNavBtnActive {
+  background: #e8f5ec; /* verde claro */
+  font-weight: 600;
+}
+.adminNavBtnActive:hover {
+  background: #e8f5ec; /* manter o mesmo tom ao hover quando ativo */
 }
 .adminNavBtn:hover { 
   background: #f0f2f5; 

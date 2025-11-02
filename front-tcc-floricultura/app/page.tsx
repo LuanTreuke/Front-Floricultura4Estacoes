@@ -37,12 +37,21 @@ export default function HomePage() {
   const [cartCount, setCartCount] = useState(0);
   const [showProductPopup, setShowProductPopup] = useState(false);
   const [activeProductId, setActiveProductId] = useState<number | null>(null);
+  const [hasOrdersNotify, setHasOrdersNotify] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const usuario = getCurrentUser();
       setIsLoggedIn(!!usuario);
       setIsAdmin(!!(usuario && (usuario.role === 'Admin' || usuario.cargo === 'Admin')));
+      try {
+        if (usuario && typeof usuario.id === 'number') {
+          const v = localStorage.getItem(`orders_notify_user_${usuario.id}`);
+          setHasOrdersNotify(v === '1');
+        } else {
+          setHasOrdersNotify(false);
+        }
+      } catch {}
     }
     // initialize cart count and subscribe
     try {
@@ -50,6 +59,24 @@ export default function HomePage() {
       const unsub = subscribeCart((items) => setCartCount(items.reduce((s, i) => s + (i.quantidade || 0), 0)));
       return () => unsub();
     } catch {}
+    function onOrdersUpdated() {
+      try {
+        const u = getCurrentUser();
+        const uid = (u && typeof u.id === 'number') ? u.id : null;
+        if (uid != null) {
+          const v = localStorage.getItem(`orders_notify_user_${uid}`);
+          setHasOrdersNotify(v === '1');
+        } else {
+          setHasOrdersNotify(false);
+        }
+      } catch {}
+    }
+    window.addEventListener('orders-updated', onOrdersUpdated as any);
+    window.addEventListener('storage', onOrdersUpdated as any);
+    return () => {
+      window.removeEventListener('orders-updated', onOrdersUpdated as any);
+      window.removeEventListener('storage', onOrdersUpdated as any);
+    };
   }, []);
 
   // Fecha o popup ao clicar fora
@@ -155,6 +182,9 @@ export default function HomePage() {
                 <span className="material-icons" style={{ verticalAlign: 'middle', fontSize: 22, marginRight: 0 }}>account_circle</span>
               ) : null}
               {isLoggedIn ? '' : 'Login'}
+              {isLoggedIn && hasOrdersNotify ? (
+                <span style={{ position: 'absolute', top: -4, right: -4, background: '#e53935', color: '#fff', borderRadius: 999, width: 16, height: 16, fontSize: 12, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>!</span>
+              ) : null}
             </button>
             {isLoggedIn && showPopup && (
               <div id="login-popup" className={styles.loginPopup}>
@@ -168,10 +198,17 @@ export default function HomePage() {
                   className={styles.loginPopupBtn}
                   onClick={() => {
                     setShowPopup(false);
+                    try {
+                      const u = getCurrentUser();
+                      if (u && typeof u.id === 'number') {
+                        localStorage.removeItem(`orders_notify_user_${u.id}`);
+                        window.dispatchEvent(new Event('orders-updated'));
+                      }
+                    } catch {}
                     router.push('/meus-pedidos');
                   }}
                 >
-                  Meus pedidos
+                  Meus pedidos {hasOrdersNotify ? <span style={{ marginLeft: 6, background: '#e53935', color: '#fff', borderRadius: 999, padding: '0 6px', fontSize: 12, fontWeight: 700 }}>!</span> : null}
                 </button>
                 {isAdmin && (
                   <button

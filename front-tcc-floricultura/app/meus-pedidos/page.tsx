@@ -69,6 +69,13 @@ export default function MeusPedidosPage() {
         router.push('/login');
         return;
       }
+      // limpar badge ao entrar na tela
+      try {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem(`orders_notify_user_${uid}`);
+          window.dispatchEvent(new Event('orders-updated'));
+        }
+      } catch {}
 
       try {
   const all = await fetchOrders() as Order[];

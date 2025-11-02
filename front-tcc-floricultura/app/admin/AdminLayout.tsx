@@ -1,14 +1,36 @@
 "use client";
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { getCurrentUser } from '../../services/authService';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Offcanvas } from 'react-bootstrap';
 import styles from '../../styles/AdminLayout.module.css';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [show, setShow] = useState(false);
+  const pathname = usePathname();
+
+  const isActive = (href: string) => {
+    if (!pathname) return false;
+    // manter ativo também para subrotas (ex.: /admin/pedidos/123)
+    return pathname === href || pathname.startsWith(href + '/');
+  };
+
+  // Persistir estado do sidebar entre navegações/refresh
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('admin_sidebar_open');
+      if (saved === '1') setShow(true);
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('admin_sidebar_open', show ? '1' : '0');
+    } catch {}
+  }, [show]);
 
   useEffect(() => {
     try {
@@ -21,6 +43,33 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       router.push('/');
     }
   }, [router]);
+
+  // bloquear scroll do body quando o sidebar estiver aberto
+  useEffect(() => {
+    if (!show) return;
+    const scrollY = window.scrollY || window.pageYOffset || 0;
+    const prev = {
+      overflow: document.body.style.overflow,
+      position: document.body.style.position,
+      top: document.body.style.top,
+      left: document.body.style.left,
+      right: document.body.style.right,
+    } as const;
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+
+    return () => {
+      document.body.style.overflow = prev.overflow;
+      document.body.style.position = prev.position;
+      document.body.style.top = prev.top;
+      document.body.style.left = prev.left;
+      document.body.style.right = prev.right;
+      window.scrollTo(0, scrollY);
+    };
+  }, [show]);
 
   return (
     <div className={styles.adminContainer}>
@@ -45,32 +94,58 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       )}
 
       <Offcanvas show={show} onHide={() => setShow(false)} placement="start">
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '16px 0 0 0' }}>
+          <Image src="/Logo-floricultura.svg" alt="Logo Floricultura Quatro Estações" width={96} height={96} style={{ objectFit: 'contain', height: 96, width: 'auto' }} />
+        </div>
         <Offcanvas.Header closeButton>
-          <Offcanvas.Title>Painel administrativo</Offcanvas.Title>
+          <div style={{ flex: 1, textAlign: 'center' }}>
+            <Offcanvas.Title style={{ margin: 0 }}>Painel administrativo</Offcanvas.Title>
+          </div>
         </Offcanvas.Header>
-        <Offcanvas.Body>
-          <ul className={styles.adminNavList}>
+        <Offcanvas.Body style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <ul className={styles.adminNavList} style={{ flex: 1 }}>
             <li className={styles.adminNavItem}>
-              <Link href="/admin/pedidos" className={styles.adminNavBtn} onClick={() => setShow(false)}>
-                Gerenciar pedidos
+              <Link
+                href="/admin/pedidos"
+                className={`${styles.adminNavBtn} ${isActive('/admin/pedidos') ? styles.adminNavBtnActive : ''}`}
+                aria-current={isActive('/admin/pedidos') ? 'page' : undefined}
+              >
+                <i className="bi bi-truck" aria-hidden></i> {' '}Gerenciar pedidos
               </Link>
             </li>
             <li className={styles.adminNavItem}>
-              <Link href="/admin/catalogo" className={styles.adminNavBtn} onClick={() => setShow(false)}>
-                Gerenciar catálogo
+              <Link
+                href="/admin/catalogo"
+                className={`${styles.adminNavBtn} ${isActive('/admin/catalogo') ? styles.adminNavBtnActive : ''}`}
+                aria-current={isActive('/admin/catalogo') ? 'page' : undefined}
+              >
+                <i className="bi bi-flower3" aria-hidden></i> {' '}Gerenciar catálogo
               </Link>
             </li>
             <li className={styles.adminNavItem}>
-              <Link href="/admin/categorias" className={styles.adminNavBtn} onClick={() => setShow(false)}>
-                Gerenciar categorias
+              <Link
+                href="/admin/categorias"
+                className={`${styles.adminNavBtn} ${isActive('/admin/categorias') ? styles.adminNavBtnActive : ''}`}
+                aria-current={isActive('/admin/categorias') ? 'page' : undefined}
+              >
+                <i className="bi bi-tag" aria-hidden></i> {' '}Gerenciar categorias
               </Link>
             </li>
             <li className={styles.adminNavItem}>
-              <Link href="/admin/relatorios" className={styles.adminNavBtn} onClick={() => setShow(false)}>
-                Gerar relatórios
+              <Link
+                href="/admin/relatorios"
+                className={`${styles.adminNavBtn} ${isActive('/admin/relatorios') ? styles.adminNavBtnActive : ''}`}
+                aria-current={isActive('/admin/relatorios') ? 'page' : undefined}
+              >
+                <i className="bi bi-file-bar-graph" aria-hidden></i> {' '}Gerar relatórios
               </Link>
             </li>
           </ul>
+          <div style={{ marginTop: 'auto', padding: '8px 0', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+            <Link href="/" className={styles.adminNavBtn} onClick={() => setShow(false)}>
+              <i className="bi bi-grid" aria-hidden></i> {' '}Catálogo
+            </Link>
+          </div>
         </Offcanvas.Body>
       </Offcanvas>
 

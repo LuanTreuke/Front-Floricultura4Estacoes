@@ -6,8 +6,10 @@ import { useRouter } from 'next/navigation';
 import styles from '../../styles/ProductOrder.module.css';
 import { getCart, clearCart, cartTotal, CartItem } from '../../services/cartService';
 import { fetchAddresses, AddressDto } from '../../services/addressService';
+import { fetchPhones } from '../../services/phoneService';
 import { getCurrentUser, User } from '../../services/authService';
 import { createOrder } from '../../services/orderService';
+import BackButton from '../../components/BackButton';
 
 export default function UnifiedOrderPage() {
   const router = useRouter();
@@ -16,6 +18,7 @@ export default function UnifiedOrderPage() {
   const [addresses, setAddresses] = useState<AddressDto[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<number | null>(null);
   const [nomeCliente, setNomeCliente] = useState('');
+  const [hasUsuarioTelefone, setHasUsuarioTelefone] = useState<boolean | null>(null);
   const [nomeDestinatario, setNomeDestinatario] = useState('');
   const [dataEntrega, setDataEntrega] = useState('');
   const [horaEntrega, setHoraEntrega] = useState('');
@@ -32,6 +35,7 @@ export default function UnifiedOrderPage() {
     const usuario = getCurrentUser() as User;
     if (usuario) {
       setNomeCliente(usuario.nome || '');
+      // não definir hasUsuarioTelefone aqui para evitar piscar; aguardar checagem do servidor
     }
     (async () => {
       const all = await fetchAddresses();
@@ -42,7 +46,28 @@ export default function UnifiedOrderPage() {
         if (pref) setSelectedAddress(Number(pref));
         else if (my.length > 0) setSelectedAddress(my[0].id || null);
       } catch { if (my.length > 0) setSelectedAddress(my[0].id || null); }
+      // checar telefone no servidor (não depender apenas do localStorage)
+      try {
+        const phones = await fetchPhones();
+        setHasUsuarioTelefone(Array.isArray(phones) && phones.length > 0 ? true : !!(usuario as any)?.telefone);
+      } catch { /* ignore */ }
     })();
+    // revalidar ao voltar o foco para a aba (após cadastro de telefone)
+    const onFocus = async () => {
+      try {
+        const phones = await fetchPhones();
+        setHasUsuarioTelefone(Array.isArray(phones) && phones.length > 0);
+      } catch { /* ignore */ }
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('focus', onFocus);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') onFocus();
+      });
+    }
+    return () => {
+      if (typeof window !== 'undefined') window.removeEventListener('focus', onFocus);
+    };
   }, []);
 
   // phone selection removed
@@ -90,6 +115,11 @@ export default function UnifiedOrderPage() {
   if (!dataEntrega) missing.push('dataEntrega');
   if (!horaEntrega) missing.push('horaEntrega');
   if (!selectedAddress) missing.push('selectedAddress');
+  if (hasUsuarioTelefone === false) {
+    alert('Para finalizar o pedido, cadastre um telefone de contato.');
+    setLoading(false);
+    return;
+  }
   if (missing.length > 0) {
     const errObj: Record<string, boolean> = {};
     missing.forEach(m => { errObj[m] = true; });
@@ -112,7 +142,7 @@ export default function UnifiedOrderPage() {
         Endereco_id: selectedAddress,
         Usuario_id: usuario.id,
         nome_cliente: nomeCliente || usuario.nome || '',
-  telefone_cliente: (usuario as any)?.telefone || undefined,
+        telefone_cliente: (usuario as any)?.telefone || undefined,
         data_entrega: dataEntrega || undefined,
         hora_entrega: horaEntrega || undefined,
         nome_destinatario: nomeDestinatario || undefined,
@@ -135,7 +165,8 @@ export default function UnifiedOrderPage() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.heading}>Finalizar pedido</h1>
+      <BackButton />
+      <h1 className={styles.heading } style={{ marginTop: 24, fontSize: 30 }}>Finalizar pedido</h1>
       <form onSubmit={handleSubmit} className={styles.form}>
         <label>Endereço</label>
           <select className={`${styles.select} ${errors.selectedAddress ? styles.invalid : ''}`} value={selectedAddress || ''} onChange={e => { setSelectedAddress(Number(e.target.value)); setErrors(prev => ({ ...prev, selectedAddress: false })); try { localStorage.setItem('checkout_selected_address', String(Number(e.target.value))); } catch {} }}>
@@ -143,10 +174,24 @@ export default function UnifiedOrderPage() {
           {addresses.map(a => <option key={a.id} value={a.id}>{`${a.rua}, ${a.numero} - ${a.bairro}`}</option>)}
         </select>
 
+        <div style={{ marginTop: 8 }}>
+          <button type="button" className={styles.primaryBtn} onClick={() => router.push('/cadastro/endereco')}>
+            + Adicionar endereço
+          </button>
+        </div>
+
         <label>Nome</label>
   <input className={`${styles.input} ${errors.nomeCliente ? styles.invalid : ''}`} value={nomeCliente} onChange={e => { setNomeCliente(e.target.value); setErrors(prev => ({ ...prev, nomeCliente: false })); }} />
 
-        {/* telefone removed from form */}
+        {/* Aviso de telefone ausente */}
+        {hasUsuarioTelefone === false && (
+          <div style={{ background: '#fffaf0', border: '1px solid #ffe4a3', padding: 10, borderRadius: 8, color: '#7a4b00' }}>
+            <div style={{ marginBottom: 6 }}>Você ainda não tem um telefone cadastrado. Cadastre para prosseguir.</div>
+            <button type="button" className={styles.secondaryBtn} onClick={() => router.push('/cadastro/telefone/novo?returnTo=/pedido')}>
+              Adicionar telefone
+            </button>
+          </div>
+        )}
 
         <label>Nome do destinatário</label>
   <input className={`${styles.input} ${errors.nomeDestinatario ? styles.invalid : ''}`} value={nomeDestinatario} onChange={e => { setNomeDestinatario(e.target.value); setErrors(prev => ({ ...prev, nomeDestinatario: false })); }} />
@@ -160,9 +205,11 @@ export default function UnifiedOrderPage() {
         <label>Observação</label>
         <textarea className={styles.textarea} value={observacao} onChange={e => setObservacao(e.target.value)} rows={4} />
 
-        <div style={{ marginTop: 12 }}>
-          <button type="submit" className={styles.primaryBtn} disabled={loading}>Confirmar pedido ({items.length} itens) - Total R$ {Number(total).toFixed(2)}</button>
-        </div>
+        {hasUsuarioTelefone !== false && (
+          <div style={{ marginTop: 12 }}>
+            <button type="submit" className={styles.primaryBtn} disabled={loading}>Confirmar pedido ({items.length} itens) - Total R$ {Number(total).toFixed(2)}</button>
+          </div>
+        )}
       </form>
 
       <div style={{ marginTop: 20 }}>

@@ -48,7 +48,7 @@ export default function ReportsDashboard() {
 
     // load Chart.js from CDN and create some demo charts
     const CDN = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
-  const charts: any[] = [];
+  // removido placeholder de gráficos para evitar criar Chart duas vezes no mesmo canvas
     // initial data load
     (async () => {
       try {
@@ -80,24 +80,9 @@ export default function ReportsDashboard() {
       }
     })();
 
-    loadScript(CDN).then(() => {
-  const Chart = (window as any).Chart;
-      if (!Chart) return;
+    loadScript(CDN).catch((e) => console.error('Chart.js load failed', e));
 
-      // charts will be rendered once data is available; we still create empty placeholders here
-      if (chartOrdersRef.current) {
-        const ctx = chartOrdersRef.current.getContext('2d');
-        const c = new Chart(ctx, { type: 'line', data: { labels: [], datasets: [{ label: 'Pedidos', data: [], borderColor: '#28a745', backgroundColor: 'rgba(40,167,69,0.08)' }] }, options: { responsive: true } });
-        charts.push(c);
-      }
-      if (chartUsersRef.current) {
-        const ctx = chartUsersRef.current.getContext('2d');
-        const c = new Chart(ctx, { type: 'bar', data: { labels: [], datasets: [{ label: 'Novos usuários', data: [], backgroundColor: '#17a2b8' }] }, options: { responsive: true } });
-        charts.push(c);
-      }
-    }).catch((e) => console.error('Chart.js load failed', e));
-
-    return () => { charts.forEach(c => c?.destroy && c.destroy()); };
+    return () => { /* nada para destruir aqui; gráficos são gerenciados no efeito de dados */ };
   }, []);
 
   // update charts when orders/users change
@@ -113,6 +98,8 @@ export default function ReportsDashboard() {
         // orders per month (aggregate by YYYY-MM), applying date range filter if present
         if (chartOrdersRef.current) {
           const ctx = chartOrdersRef.current.getContext('2d');
+          // destruir instância anterior, se existir, antes de criar uma nova
+          try { Chart.getChart(chartOrdersRef.current)?.destroy(); } catch {}
           const byMonth: Record<string, number> = {};
 
           // helper: try several fields to find a date string
@@ -177,6 +164,8 @@ export default function ReportsDashboard() {
         // users weekly (simple demo: use usersCount split into 4 weeks evenly)
         if (chartUsersRef.current) {
           const ctx = chartUsersRef.current.getContext('2d');
+          // destruir instância anterior, se existir
+          try { Chart.getChart(chartUsersRef.current)?.destroy(); } catch {}
           const totalUsers = usersCount || 0;
           const perWeek = [Math.floor(totalUsers*0.1), Math.floor(totalUsers*0.2), Math.floor(totalUsers*0.3), Math.max(0, totalUsers - Math.floor(totalUsers*0.6))];
           const chart = new Chart(ctx, { type: 'bar', data: { labels: ['Week 1','Week 2','Week 3','Week 4'], datasets: [{ label: 'Novos usuários', data: perWeek, backgroundColor: '#17a2b8' }] }, options: { responsive: true } });

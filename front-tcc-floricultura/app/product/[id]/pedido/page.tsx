@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useRouter, useParams } from 'next/navigation';
 import { fetchProductById, Product } from '../../../../services/productService';
 import { fetchAddresses, AddressDto } from '../../../../services/addressService';
+import { fetchPhones } from '../../../../services/phoneService';
 import { getCurrentUser, User } from '../../../../services/authService';
 import { createOrder, CreateOrderDto } from '../../../../services/orderService';
 import styles from '../../../../styles/ProductOrder.module.css';
@@ -25,6 +26,7 @@ export default function ProductOrderPage() {
   const [cobrarNoEndereco, _setCobrarNoEndereco] = useState(false);
   const [observacao, setObservacao] = useState('');
   const [orderQuantity, setOrderQuantity] = useState<number>(1);
+  const [hasUsuarioTelefone, setHasUsuarioTelefone] = useState<boolean | null>(null);
 
   useEffect(() => {
     fetchProductById(id).then(p => { setProduct(p); setLoading(false); });
@@ -35,11 +37,32 @@ export default function ProductOrderPage() {
         setAddresses((all || []).filter((a) => a.Usuario_id === usuario.id));
         // prefills com os dados do usuário logado quando disponíveis
   if (usuario.nome) setNomeCliente(usuario.nome);
+        try {
+          const phones = await fetchPhones();
+          setHasUsuarioTelefone(Array.isArray(phones) && phones.length > 0 ? true : !!(usuario as any)?.telefone);
+        } catch { setHasUsuarioTelefone(!!(usuario as any)?.telefone); }
       } else {
         setAddresses([]);
+        setHasUsuarioTelefone(false);
       }
       // no phone select anymore; telefone comes from usuario.telefone when needed
     })();
+    // revalidar ao retornar do cadastro pelo foco da aba
+    const onFocus = async () => {
+      try {
+        const phones = await fetchPhones();
+        setHasUsuarioTelefone(Array.isArray(phones) && phones.length > 0);
+      } catch { /* ignore */ }
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('focus', onFocus);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') onFocus();
+      });
+    }
+    return () => {
+      if (typeof window !== 'undefined') window.removeEventListener('focus', onFocus);
+    };
   }, [id]);
 
   // phone selection removed
@@ -69,6 +92,10 @@ export default function ProductOrderPage() {
     if (!nomeDestinatario || !nomeDestinatario.trim()) missing.push('nomeDestinatario');
     if (!dataEntrega) missing.push('dataEntrega');
     if (!horaEntrega) missing.push('horaEntrega');
+    if (hasUsuarioTelefone === false) {
+      alert('Para finalizar o pedido, cadastre um telefone de contato.');
+      return;
+    }
     if (missing.length > 0) {
       const errObj: Record<string, boolean> = {};
       missing.forEach(m => { errObj[m] = true; });
@@ -150,6 +177,15 @@ export default function ProductOrderPage() {
             <input className={`${styles.input} ${errors.nomeCliente ? styles.invalid : ''}`} value={nomeCliente} onChange={e => { setNomeCliente(e.target.value); setErrors(prev => ({ ...prev, nomeCliente: false })); }} placeholder="Seu nome" />
             {/* telefone removed from form */}
 
+            {hasUsuarioTelefone === false && (
+              <div style={{ background: '#fffaf0', border: '1px solid #ffe4a3', padding: 10, borderRadius: 8, color: '#7a4b00' }}>
+                <div style={{ marginBottom: 6 }}>Você ainda não tem um telefone cadastrado. Cadastre para prosseguir.</div>
+                <button type="button" className={styles.secondaryBtn} onClick={() => router.push(`/cadastro/telefone/novo?returnTo=/product/${id}/pedido`)}>
+                  Adicionar telefone
+                </button>
+              </div>
+            )}
+
             <label>Endereço</label>
             <select className={`${styles.select} ${errors.selectedAddress ? styles.invalid : ''}`} value={selectedAddress || ''} onChange={e => { setSelectedAddress(Number(e.target.value)); setErrors(prev => ({ ...prev, selectedAddress: false })); }}>
               <option value="">Selecione</option>
@@ -188,7 +224,9 @@ export default function ProductOrderPage() {
             </div>
               
             <div className={styles.actions} style={{ justifyContent: 'flex-end', gap: 12 }}>
-              <button type="submit" className={styles.primaryBtn}>Confirmar pedido</button>
+              {hasUsuarioTelefone !== false && (
+                <button type="submit" className={styles.primaryBtn}>Confirmar pedido</button>
+              )}
               <button type="button" onClick={() => router.back()} className={styles.secondaryBtn}>Voltar</button>
             </div>
 

@@ -43,6 +43,13 @@ export function logout() {
     // NOT copy the user's cart into the guest session.
     try { localStorage.removeItem('floricultura_cart_v1'); } catch {}
     localStorage.removeItem('usuario');
+    // limpar badges/flags de pedidos
+    try {
+      Object.keys(localStorage)
+        .filter(k => k.startsWith('orders_notify_user_') || k.startsWith('orders_last_seen_user_'))
+        .forEach(k => localStorage.removeItem(k));
+      if (typeof window !== 'undefined') window.dispatchEvent(new Event('orders-updated'));
+    } catch {}
     try {
       // notify other listeners (same tab) that cart changed/cleared
       if (typeof window !== 'undefined' && window.dispatchEvent) {
