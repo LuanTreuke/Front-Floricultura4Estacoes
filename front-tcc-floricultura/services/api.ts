@@ -1,13 +1,23 @@
 import axios from 'axios';
 import type { InternalAxiosRequestConfig } from 'axios';
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://ff9a450127f2.ngrok-free.app';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 const api = axios.create({
   baseURL: API_URL,
   // withCredentials: true, // enable if you use cookie-based auth
   timeout: 10000,
 });
+
+if (!API_URL) {
+  try {
+    // Surface a helpful warning only in the browser console
+    if (typeof window !== 'undefined') {
+      // eslint-disable-next-line no-console
+      console.warn('[api] NEXT_PUBLIC_API_URL não definido. Configure a variável de ambiente no projeto Vercel.');
+    }
+  } catch {}
+}
 // attach current user id to requests when available so backend can perform simple role checks
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   try {
