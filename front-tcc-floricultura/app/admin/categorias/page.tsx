@@ -78,9 +78,9 @@ export default function CategoriasPage() {
             style={{ flex: 1, padding: 14, fontSize: 16, borderRadius: 8, border: '1px solid #e6e6e6', background: '#fff' }}
           />
           <button
-            className={styles.adminNavBtn}
+            className={styles.headerControlBtn}
             onClick={handleAdd}
-            style={{ padding: '8px 12px', width: 'auto', display: 'inline-flex', borderRadius: 8 }}
+            style={{ background: '#cbead6', color: '#222' }}
           >Adicionar</button>
         </div>
 
@@ -96,14 +96,13 @@ export default function CategoriasPage() {
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <button
-                    className={styles.adminNavBtn}
+                    className={styles.adminActionBtn}
                     onClick={() => handleEdit(cat)}
-                    style={{ padding: '8px 12px', width: 'auto', display: 'inline-flex', borderRadius: 8, background: '#f4f6f7', borderColor: '#e6e6e6', color: '#222' }}
+                    style={{ background: '#f0f2f5', color: '#222' }}
                   >Editar</button>
                   <button
-                    className={styles.adminNavBtn}
+                    className={styles.adminActionBtnDanger}
                     onClick={() => handleDelete(cat)}
-                    style={{ background: '#e86b6b', borderColor: '#e86b6b', color: '#fff', padding: '8px 12px', width: 'auto', display: 'inline-flex', borderRadius: 8 }}
                   >Excluir</button>
                 </div>
               </li>
