@@ -16,6 +16,18 @@ try {
     api.defaults.headers.common['ngrok-skip-browser-warning'] = 'true';
     // garante preferencia por JSON
     api.defaults.headers.common['Accept'] = 'application/json';
+    // evita cache 304 reaproveitar resposta antiga (ex.: HTML do aviso)
+    api.interceptors.request.use((cfg) => {
+      try {
+        const isGet = (cfg.method || 'get').toLowerCase() === 'get';
+        if (isGet) {
+          cfg.headers = { ...(cfg.headers || {}), 'Cache-Control': 'no-cache' } as any;
+          const origParams = (cfg.params as Record<string, unknown>) || {};
+          cfg.params = { ...origParams, _t: Date.now() };
+        }
+      } catch {}
+      return cfg;
+    });
   }
 } catch {}
 

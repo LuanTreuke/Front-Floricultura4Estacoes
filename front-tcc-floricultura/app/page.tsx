@@ -23,7 +23,8 @@ import api from '@/services/api';
 export default function HomePage() {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
-  const [price, setPrice] = useState<[number, number]>([0, 300]);
+  const [price, setPrice] = useState<[number, number]>([0, 99999]);
+  const [maxPrice, setMaxPrice] = useState<number>(99999);
   const [sort, setSort] = useState('new');
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -69,6 +70,15 @@ export default function HomePage() {
     fetchProducts()
       .then(data => {
         setProducts(data);
+        try {
+          const computedMax = Math.max(
+            0,
+            ...data.map((p) => Number((p as any)?.preco) || 0)
+          );
+          const normalized = Number.isFinite(computedMax) && computedMax > 0 ? Math.ceil(computedMax) : 99999;
+          setMaxPrice(normalized);
+          setPrice(([min]) => [0, normalized]);
+        } catch {}
         setLoading(false);
       })
       .catch(() => {
@@ -204,7 +214,7 @@ export default function HomePage() {
           ) : (
             <div style={{ padding: '8px 12px', color: '#666' }}>Carregando categorias...</div>
           )}
-          <PriceRange min={0} max={300} value={price} onChange={setPrice} />
+          <PriceRange min={0} max={maxPrice} value={price} onChange={setPrice} />
         </div>
 
         <div className={styles.sectionTitle}>Nossos produtos</div>
