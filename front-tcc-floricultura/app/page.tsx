@@ -104,8 +104,8 @@ export default function HomePage() {
 
   const safeProducts = Array.isArray(products) ? products : [];
   let filtered = safeProducts.filter((p: Product) => {
-    // only show products with enabled true; if enabled is missing (legacy), treat as visible
-    const isVisible = p.enabled === undefined ? true : !!p.enabled;
+    // treat as visible unless explicitly disabled; null/undefined => visible
+    const isVisible = p.enabled !== false;
     const nomeNormalized = removeAccents(p.nome.toLowerCase());
     const searchNormalized = removeAccents(search.toLowerCase());
     return (
