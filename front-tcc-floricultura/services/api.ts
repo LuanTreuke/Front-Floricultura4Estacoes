@@ -9,6 +9,16 @@ const api = axios.create({
   timeout: 10000,
 });
 
+// ngrok: evita página de aviso (ERR_NGROK_6024) garantindo resposta JSON
+try {
+  if (API_URL && /ngrok-free\.app/i.test(API_URL)) {
+    // header especial que instrui o ngrok a pular a página de aviso
+    api.defaults.headers.common['ngrok-skip-browser-warning'] = 'true';
+    // garante preferencia por JSON
+    api.defaults.headers.common['Accept'] = 'application/json';
+  }
+} catch {}
+
 if (!API_URL) {
   try {
     // Surface a helpful warning only in the browser console
