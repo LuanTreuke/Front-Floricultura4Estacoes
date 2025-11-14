@@ -15,6 +15,7 @@ export default function ImageUpload({ onImageUploaded, currentImage, disabled = 
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string>(currentImage ? buildImageURL(currentImage) : '');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -63,35 +64,85 @@ export default function ImageUpload({ onImageUploaded, currentImage, disabled = 
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+    if (cameraInputRef.current) {
+      cameraInputRef.current.value = '';
+    }
+  };
+
+  const handleCameraClick = () => {
+    cameraInputRef.current?.click();
+  };
+
+  const handleFileClick = () => {
+    fileInputRef.current?.click();
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-        {/* Input de arquivo */}
-        <div style={{ flex: 1 }}>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
-            onChange={handleFileSelect}
-            disabled={disabled || uploading}
-            style={{
-              padding: 8,
-              border: '1px solid #cbead6',
-              borderRadius: 8,
-              width: '100%',
-              fontSize: '0.9rem'
-            }}
-          />
-          <div style={{ 
-            fontSize: '0.8rem', 
-            color: '#666', 
-            marginTop: 4 
-          }}>
-            Formatos: JPG, PNG, GIF, WebP (máx. 5MB)
-          </div>
-        </div>
+      {/* Inputs ocultos */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+        onChange={handleFileSelect}
+        disabled={disabled || uploading}
+        style={{ display: 'none' }}
+      />
+      <input
+        ref={cameraInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={handleFileSelect}
+        disabled={disabled || uploading}
+        style={{ display: 'none' }}
+      />
+
+      {/* Botões visuais */}
+      <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+        <button
+          type="button"
+          onClick={handleCameraClick}
+          disabled={disabled || uploading}
+          style={{
+            background: '#28a745',
+            color: 'white',
+            border: 'none',
+            borderRadius: 8,
+            padding: '12px 16px',
+            fontSize: '0.9rem',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            flex: '1',
+            minWidth: '140px'
+          }}
+        >
+          📷 Tirar Foto
+        </button>
+        
+        <button
+          type="button"
+          onClick={handleFileClick}
+          disabled={disabled || uploading}
+          style={{
+            background: '#007bff',
+            color: 'white',
+            border: 'none',
+            borderRadius: 8,
+            padding: '12px 16px',
+            fontSize: '0.9rem',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            flex: '1',
+            minWidth: '140px'
+          }}
+        >
+          Escolher Arquivo
+        </button>
 
         {/* Botão remover (se há preview) */}
         {preview && (
@@ -103,16 +154,26 @@ export default function ImageUpload({ onImageUploaded, currentImage, disabled = 
               background: '#dc3545',
               color: 'white',
               border: 'none',
-              borderRadius: 6,
-              padding: '8px 12px',
-              fontSize: '0.8rem',
+              borderRadius: 8,
+              padding: '12px 16px',
+              fontSize: '0.9rem',
               cursor: 'pointer',
-              whiteSpace: 'nowrap'
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8
             }}
           >
             Remover
           </button>
         )}
+      </div>
+
+      <div style={{ 
+        fontSize: '0.8rem', 
+        color: '#666', 
+        textAlign: 'center'
+      }}>
+        Formatos: JPG, PNG, GIF, WebP (máx. 15MB)
       </div>
 
       {/* Preview da imagem */}
@@ -156,7 +217,7 @@ export default function ImageUpload({ onImageUploaded, currentImage, disabled = 
           textAlign: 'center',
           fontSize: '0.9rem'
         }}>
-          📤 Fazendo upload da imagem...
+          Fazendo upload da imagem...
         </div>
       )}
     </div>
