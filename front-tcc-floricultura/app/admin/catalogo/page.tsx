@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
 import adminStyles from '../../../styles/AdminLayout.module.css';
 import homeStyles from '../../../styles/HomePage.module.css';
 import { useRouter } from 'next/navigation';
@@ -11,7 +10,6 @@ import PriceRange from '../../../components/PriceRange';
 import SortButtons from '../../../components/SortButtons';
 import api from '@/services/api';
 import { fetchProducts, Product, deleteProduct, updateProduct } from '../../../services/productService';
-import { showDeleteConfirm, showError, showConfirm, showToast, showSuccess, showWarning } from '../../../utils/sweetAlert';
 
 export default function AdminCatalogoPage() {
   const [search, setSearch] = useState('');
@@ -67,55 +65,41 @@ export default function AdminCatalogoPage() {
   function handleEdit(id: number) {
     router.push(`/admin/catalogo/${id}/editar`);
   }
-  async function handleDelete(id: number) {
-    const product = products.find(p => p.id === id);
-    const productName = product?.nome || 'este produto';
-    const confirmed = await showDeleteConfirm(productName);
-    if (confirmed) {
+  function handleDelete(id: number) {
+    if (confirm('Tem certeza que deseja excluir este produto?')) {
       // chama o backend para excluir
       deleteProduct(id).then(success => {
         if (success) {
           setProducts(products.filter(p => p.id !== id));
-          showToast('Produto excluído com sucesso', 'success');
         } else {
-          showError('Falha ao excluir o produto no servidor.');
+          alert('Falha ao excluir o produto no servidor.');
         }
       }).catch(() => {
-        showError('Erro de rede ao tentar excluir o produto.');
+        alert('Erro de rede ao tentar excluir o produto.');
       });
     }
   }
 
   async function toggleEnabled(id: number, value: boolean) {
-    console.log('toggleEnabled chamado:', { id, value });
     // optimistic update
     setProducts(prev => prev.map(p => p.id === id ? { ...p, enabled: value } : p));
     try {
       const res = await updateProduct(id, { enabled: value });
-      console.log('Resposta do backend:', res);
       if (!res) {
         // rollback
         setProducts(prev => prev.map(p => p.id === id ? { ...p, enabled: !value } : p));
-        showError('Falha ao atualizar o produto no servidor.');
-      } else {
-        showToast('Produto atualizado com sucesso', 'success');
+        alert('Falha ao atualizar o produto no servidor.');
       }
     } catch (e) {
-      console.error('Erro ao atualizar produto:', e);
       setProducts(prev => prev.map(p => p.id === id ? { ...p, enabled: !value } : p));
-      showError('Erro de rede ao atualizar o produto.');
+      alert('Erro de rede ao atualizar o produto.');
     }
   }
 
   async function setAllEnabled(value: boolean) {
     // confirm before disabling all
     if (value === false) {
-      const ok = await showConfirm(
-        'Tem certeza que deseja desabilitar todos os produtos?',
-        'Confirmar ação',
-        'Sim, desabilitar todos',
-        'Cancelar'
-      );
+      const ok = confirm('Tem certeza que deseja desabilitar todos os produtos?');
       if (!ok) return;
     }
 
@@ -136,15 +120,17 @@ export default function AdminCatalogoPage() {
       if (failed.length > 0) {
         // rollback failed ones
         setProducts(prev => prev.map(p => failed.includes(p.id) ? { ...p, enabled: prevMap.get(p.id) as boolean } : p));
-        showWarning(`Falha ao atualizar ${failed.length} produto(s).`);
+        alert(`Falha ao atualizar ${failed.length} produto(s).`);
       } else {
         // success
-        showSuccess('Operação concluída com sucesso!');
+        // small feedback
+        // (could use toast) — using alert for simplicity
+        alert('Operação concluída com sucesso.');
       }
     } catch (e) {
       // rollback everything
       setProducts(snapshot);
-      showError('Erro de rede ao atualizar os produtos.');
+      alert('Erro de rede ao atualizar os produtos.');
     } finally {
       setBulkLoading(false);
     }
@@ -154,22 +140,7 @@ export default function AdminCatalogoPage() {
     <div className={adminStyles.adminMain} style={{ padding: 0 }}>
       <div className={homeStyles.container} style={{ padding: 15, boxSizing: 'border-box' }}>
         <div style={{ marginBottom: 24 }}>
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <Image 
-              src="/Logo-floricultura.svg" 
-              alt="Logo Floricultura 4 Estações" 
-              width={400} 
-              height={130} 
-              style={{ objectFit: 'contain' }} 
-            />
-          </div>
-          
-          <div style={{ marginBottom: 24, paddingBottom: 16, borderBottom: '2px solid #dee2e6' }}>
-            <div>
-              <h1 style={{fontSize: '2rem', fontWeight: 600, color: '#343a40', margin: '0 0 4px 0'}}>Gerenciar Catálogo</h1>
-              <p style={{color: '#6c757d', margin: 0, fontSize: '0.95rem'}}>Adicione, edite ou remova produtos do catálogo</p>
-            </div>
-          </div>
+          <h1 style={{fontSize: '2rem', fontWeight: 600}}>Gerenciar Catálogo</h1>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 28 }}>
             <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
               <button
@@ -237,70 +208,22 @@ export default function AdminCatalogoPage() {
               return 0;
             })
             .map((p) => (
-              <div key={p.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', position: 'relative' }}>
+              <div key={p.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
                 <ProductCard
                   id={p.id}
                   name={p.nome}
                   price={`R$${Number(p.preco).toFixed(2)}`}
                   image={p.imagem_url || ''}
-                  noLink={true}
                   topRight={
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-                      <div
-                        style={{ 
-                          display: 'flex', 
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          cursor: 'pointer',
-                          padding: '8px',
-                          borderRadius: '50%',
-                          transition: 'all 0.2s',
-                          background: p.enabled === undefined || p.enabled ? '#2e7d32' : '#d32f2f',
-                          width: '36px',
-                          height: '36px',
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.25)'
-                        }}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const currentValue = p.enabled === undefined ? true : !!p.enabled;
-                        console.log('Clique na checkbox - Produto:', p.id, 'Estado atual:', currentValue, 'Novo estado:', !currentValue);
-                        toggleEnabled(p.id, !currentValue);
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'scale(1.1)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'scale(1)';
-                      }}
-                      title={p.enabled === undefined || p.enabled ? 'Clique para desabilitar' : 'Clique para habilitar'}
-                    >
-                      {p.enabled === undefined || p.enabled ? (
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                      ) : (
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                          <line x1="18" y1="6" x2="6" y2="18"></line>
-                          <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                      )}
-                      </div>
-                      {/* Badge de status */}
-                      <div style={{
-                        background: p.enabled === undefined || p.enabled ? '#2e7d32' : '#d32f2f',
-                        color: '#fff',
-                        padding: '3px 8px',
-                        borderRadius: '4px',
-                        fontSize: '10px',
-                        fontWeight: 600,
-                        whiteSpace: 'nowrap',
-                        pointerEvents: 'none',
-                        boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
-                      }}>
-                        {p.enabled === undefined || p.enabled ? 'ATIVO' : 'INATIVO'}
-                      </div>
-                    </div>
+                    <label style={{ display: 'flex', alignItems: 'center' }}>
+                      <input
+                        type="checkbox"
+                        checked={p.enabled === undefined ? true : !!p.enabled}
+                        onClick={(e) => { e.stopPropagation(); }}
+                        onChange={e => toggleEnabled(p.id, e.target.checked)}
+                        aria-label={p.enabled === undefined || p.enabled ? 'Marcar como inativo' : 'Marcar como ativo'}
+                      />
+                    </label>
                   }
                 />
                 <div style={{ marginTop: 8, display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center' }}>
