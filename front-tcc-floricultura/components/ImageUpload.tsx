@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from 'react';
+import Image from 'next/image';
 import { uploadImage } from '@/services/uploadService';
 import { buildImageURL } from '@/utils/imageUtils';
 
@@ -123,9 +124,11 @@ export default function ImageUpload({ onImageUploaded, currentImage, disabled = 
           textAlign: 'center',
           background: '#f8f9fa'
         }}>
-          <img
+          <Image
             src={preview}
             alt="Preview"
+            width={300}
+            height={200}
             style={{
               maxWidth: '300px',
               maxHeight: '200px',
@@ -137,7 +140,6 @@ export default function ImageUpload({ onImageUploaded, currentImage, disabled = 
               if (process.env.NODE_ENV === 'development') {
                 console.warn('Preview da imagem não pôde ser carregado:', preview);
               }
-              e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDMwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iMTUwIiB5PSIxMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzljYTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+RXJybyBubyBwcmV2aWV3PC90ZXh0Pjwvc3ZnPgo=';
             }}
           />
         </div>

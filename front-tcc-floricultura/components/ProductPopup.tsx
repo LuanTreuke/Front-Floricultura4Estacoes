@@ -6,7 +6,6 @@ import styles from '../styles/ProductDetail.module.css';
 import { fetchProductById, Product } from '../services/productService';
 import { getCurrentUser, User } from '../services/authService';
 import { addToCart } from '../services/cartService';
-import { buildImageURL } from '../utils/imageUtils';
 
 type Props = {
   productId: number;
@@ -92,7 +91,7 @@ export default function ProductPopup({ productId, onClose, inline = false }: Pro
       ) : (
         <div className={styles.layout}>
           {product.imagem_url ? (
-            <Image src={buildImageURL(product.imagem_url)} alt={product.nome} className={styles.image} width={400} height={400} style={{ objectFit: 'cover' }} />
+            <Image src={product.imagem_url} alt={product.nome} className={styles.image} width={400} height={400} style={{ objectFit: 'cover' }} />
           ) : (
             <div className={styles.image}>Img</div>
           )}

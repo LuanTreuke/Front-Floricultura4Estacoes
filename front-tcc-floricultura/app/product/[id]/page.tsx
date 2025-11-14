@@ -7,7 +7,6 @@ import { useRouter, useParams } from 'next/navigation';
 import { fetchProductById, Product } from '../../../services/productService';
 import styles from '../../../styles/ProductDetail.module.css';
 import { addToCart } from '../../../services/cartService';
-import { buildImageURL } from '../../../utils/imageUtils';
 
 export default function ProductPage() {
   const params = useParams();
@@ -35,7 +34,7 @@ export default function ProductPage() {
     <div className={styles.container}>
       <div className={styles.layout}>
         {product.imagem_url ? (
-          <Image src={buildImageURL(product.imagem_url)} alt={product.nome} className={styles.image} width={400} height={400} style={{ objectFit: 'cover' }} />
+          <Image src={product.imagem_url} alt={product.nome} className={styles.image} width={400} height={400} style={{ objectFit: 'cover' }} />
         ) : (
           <div className={styles.image}>Img</div>
         )}

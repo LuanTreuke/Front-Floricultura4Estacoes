@@ -1,11 +1,11 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import styles from '../../../styles/ProductOrder.module.css';
 import { createAddress, AddressDto } from '../../../services/addressService';
 import { getCurrentUser, User } from '../../../services/authService';
 
-export default function CadastroEnderecoPage() {
+function CadastroEnderecoContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const returnTo = searchParams.get('returnTo') || '/';
@@ -63,5 +63,13 @@ export default function CadastroEnderecoPage() {
         {message && <div style={{ marginTop: 8 }}>{message}</div>}
       </form>
     </div>
+  );
+}
+
+export default function CadastroEnderecoPage() {
+  return (
+    <Suspense fallback={<div className={styles.container}>Carregando...</div>}>
+      <CadastroEnderecoContent />
+    </Suspense>
   );
 }

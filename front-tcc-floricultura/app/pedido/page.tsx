@@ -12,7 +12,6 @@ import { createOrder } from '../../services/orderService';
 import BackButton from '../../components/BackButton';
 import Breadcrumb from '../../components/Breadcrumb';
 import { showSuccess, showError, showValidationError, showLoginRequired } from '../../utils/sweetAlert';
-import { buildImageURL } from '../../utils/imageUtils';
 
 export default function UnifiedOrderPage() {
   const router = useRouter();
@@ -349,7 +348,7 @@ export default function UnifiedOrderPage() {
         {items.map(it => (
           <div key={it.id} style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 8 }}>
             {it.imagem_url ? (
-              <Image src={buildImageURL(it.imagem_url)} alt={it.nome || ''} width={64} height={64} style={{ objectFit: 'cover', borderRadius: 8 }} />
+              <Image src={it.imagem_url} alt={it.nome || ''} width={64} height={64} style={{ objectFit: 'cover', borderRadius: 8 }} />
             ) : (
               <div style={{ width: 64, height: 64, background: '#f3f3f3', borderRadius: 8 }} />
             )}

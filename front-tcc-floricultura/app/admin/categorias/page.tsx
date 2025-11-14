@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Swal from 'sweetalert2';
 import styles from '../../../styles/AdminLayout.module.css';
 import { fetchCategories, createCategory, updateCategory, deleteCategory, moveCategoryUp, moveCategoryDown, Categoria } from '../../../services/categoryService';
-import { showValidationError, showError, showDeleteConfirm, showToast } from '../../../utils/sweetAlert';
+import { showValidationError, showError, showSuccess, showDeleteConfirm, showToast } from '../../../utils/sweetAlert';
 
 export default function CategoriasPage() {
   const [categorias, setCategorias] = useState<Categoria[]>([]);
