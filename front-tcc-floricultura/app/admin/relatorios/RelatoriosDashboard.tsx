@@ -17,7 +17,6 @@ declare module 'jspdf' {
   }
 }
 
-// @ts-ignore - jspdf-autotable não tem tipos oficiais
 import autoTable from 'jspdf-autotable';
 
 interface Order {
