@@ -9,8 +9,11 @@ import CategoryFilter from '../components/CategoryFilter';
 import PriceRange from '../components/PriceRange';
 import SortButtons from '../components/SortButtons';
 import ProductCard from '../components/ProductCard';
+import ProductPopup from '../components/ProductPopup';
 import CartPopup from '../components/CartPopup';
+import Breadcrumb from '../components/Breadcrumb';
 import { getCart, subscribeCart } from '../services/cartService';
+import { showConfirm } from '../utils/sweetAlert';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 
@@ -22,7 +25,8 @@ import api from '@/services/api';
 export default function HomePage() {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
-  const [price, setPrice] = useState<[number, number]>([0, 300]);
+  const [price, setPrice] = useState<[number, number]>([0, 99999]);
+  const [maxPrice, setMaxPrice] = useState<number>(99999);
   const [sort, setSort] = useState('new');
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,12 +37,23 @@ export default function HomePage() {
   
   const [showCartPopup, setShowCartPopup] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  const [showProductPopup, setShowProductPopup] = useState(false);
+  const [activeProductId, setActiveProductId] = useState<number | null>(null);
+  const [hasOrdersNotify, setHasOrdersNotify] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const usuario = getCurrentUser();
       setIsLoggedIn(!!usuario);
       setIsAdmin(!!(usuario && (usuario.role === 'Admin' || usuario.cargo === 'Admin')));
+      try {
+        if (usuario && typeof usuario.id === 'number') {
+          const v = localStorage.getItem(`orders_notify_user_${usuario.id}`);
+          setHasOrdersNotify(v === '1');
+        } else {
+          setHasOrdersNotify(false);
+        }
+      } catch {}
     }
     // initialize cart count and subscribe
     try {
@@ -46,6 +61,24 @@ export default function HomePage() {
       const unsub = subscribeCart((items) => setCartCount(items.reduce((s, i) => s + (i.quantidade || 0), 0)));
       return () => unsub();
     } catch {}
+    function onOrdersUpdated() {
+      try {
+        const u = getCurrentUser();
+        const uid = (u && typeof u.id === 'number') ? u.id : null;
+        if (uid != null) {
+          const v = localStorage.getItem(`orders_notify_user_${uid}`);
+          setHasOrdersNotify(v === '1');
+        } else {
+          setHasOrdersNotify(false);
+        }
+      } catch {}
+    }
+    window.addEventListener('orders-updated', onOrdersUpdated as any);
+    window.addEventListener('storage', onOrdersUpdated as any);
+    return () => {
+      window.removeEventListener('orders-updated', onOrdersUpdated as any);
+      window.removeEventListener('storage', onOrdersUpdated as any);
+    };
   }, []);
 
   // Fecha o popup ao clicar fora
@@ -66,6 +99,15 @@ export default function HomePage() {
     fetchProducts()
       .then(data => {
         setProducts(data);
+        try {
+          const computedMax = Math.max(
+            0,
+            ...data.map((p) => Number((p as any)?.preco) || 0)
+          );
+          const normalized = Number.isFinite(computedMax) && computedMax > 0 ? Math.ceil(computedMax) : 99999;
+          setMaxPrice(normalized);
+          setPrice(([min]) => [0, normalized]);
+        } catch {}
         setLoading(false);
       })
       .catch(() => {
@@ -99,9 +141,10 @@ export default function HomePage() {
     return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   }
 
-  let filtered = products.filter((p: Product) => {
-    // only show products with enabled true; if enabled is missing (legacy), treat as visible
-    const isVisible = p.enabled === undefined ? true : !!p.enabled;
+  const safeProducts = Array.isArray(products) ? products : [];
+  let filtered = safeProducts.filter((p: Product) => {
+    // treat as visible unless explicitly disabled; null/undefined => visible
+    const isVisible = p.enabled !== false;
     const nomeNormalized = removeAccents(p.nome.toLowerCase());
     const searchNormalized = removeAccents(search.toLowerCase());
     return (
@@ -119,6 +162,10 @@ export default function HomePage() {
   return (
     <div>
       <div className={styles.container}>
+        <Breadcrumb items={[
+          { label: 'Página Inicial' }
+        ]} />
+        
         <header className={styles.header}>
           <div className={styles.logo}>
             <Image src="/Logo-floricultura.svg" alt="Logo Floricultura Quatro Estações" width={96} height={96} style={{ height: 96, width: 'auto', display: 'block', objectFit: 'contain' }} />
@@ -141,6 +188,9 @@ export default function HomePage() {
                 <span className="material-icons" style={{ verticalAlign: 'middle', fontSize: 22, marginRight: 0 }}>account_circle</span>
               ) : null}
               {isLoggedIn ? '' : 'Login'}
+              {isLoggedIn && hasOrdersNotify ? (
+                <span className={styles.notificationBadge}>!</span>
+              ) : null}
             </button>
             {isLoggedIn && showPopup && (
               <div id="login-popup" className={styles.loginPopup}>
@@ -154,10 +204,17 @@ export default function HomePage() {
                   className={styles.loginPopupBtn}
                   onClick={() => {
                     setShowPopup(false);
+                    try {
+                      const u = getCurrentUser();
+                      if (u && typeof u.id === 'number') {
+                        localStorage.removeItem(`orders_notify_user_${u.id}`);
+                        window.dispatchEvent(new Event('orders-updated'));
+                      }
+                    } catch {}
                     router.push('/meus-pedidos');
                   }}
                 >
-                  Meus pedidos
+                  Meus pedidos {hasOrdersNotify ? <span style={{ marginLeft: 6, background: '#e53935', color: '#fff', borderRadius: 999, padding: '0 6px', fontSize: 12, fontWeight: 700 }}>!</span> : null}
                 </button>
                 {isAdmin && (
                   <button
@@ -172,12 +229,22 @@ export default function HomePage() {
                 )}
                 <button
                   className={styles.loginPopupBtn}
-                  onClick={() => {
-                    // desloga: remove o usuário armazenado e atualiza a interface
-                    logout();
-                    setIsLoggedIn(false);
+                  onClick={async () => {
+                    // Fechar o popup antes de mostrar a confirmação
                     setShowPopup(false);
-                    router.push('/');
+                    
+                    // desloga: remove o usuário armazenado e atualiza a interface
+                    const confirmado = await showConfirm(
+                      'Deseja realmente sair?',
+                      'Você será desconectado da sua conta.',
+                      'Sim, sair',
+                      'Cancelar'
+                    );
+                    if (confirmado) {
+                      logout();
+                      setIsLoggedIn(false);
+                      router.push('/');
+                    }
                   }}
                 >
                   Sair
@@ -200,7 +267,7 @@ export default function HomePage() {
           ) : (
             <div style={{ padding: '8px 12px', color: '#666' }}>Carregando categorias...</div>
           )}
-          <PriceRange min={0} max={300} value={price} onChange={setPrice} />
+          <PriceRange min={0} max={maxPrice} value={price} onChange={setPrice} />
         </div>
 
         <div className={styles.sectionTitle}>Nossos produtos</div>
@@ -217,12 +284,20 @@ export default function HomePage() {
               name={p.nome}
               price={`R$${Number(p.preco).toFixed(2)}`}
               image={p.imagem_url || ''}
+              onClick={() => { setActiveProductId(p.id); setShowProductPopup(true); }}
             />
           ))}
         </div>
 
         
       </div>
+
+      {showProductPopup && activeProductId !== null && (
+        <ProductPopup
+          productId={activeProductId}
+          onClose={() => setShowProductPopup(false)}
+        />
+      )}
 
   <footer className={styles.footerSection}>
         <div className={styles.footerContent}>

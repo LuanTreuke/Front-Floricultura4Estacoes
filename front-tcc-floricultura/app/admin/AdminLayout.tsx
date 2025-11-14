@@ -140,15 +140,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <i className="bi bi-file-bar-graph" aria-hidden></i> {' '}Gerar relatórios
               </Link>
             </li>
-            <li className={styles.adminNavItem}>
-              <Link
-                href="/admin/whatsapp"
-                className={`${styles.adminNavBtn} ${isActive('/admin/whatsapp') ? styles.adminNavBtnActive : ''}`}
-                aria-current={isActive('/admin/whatsapp') ? 'page' : undefined}
-              >
-                <i className="bi bi-whatsapp" aria-hidden></i> {' '}Conectar WhatsApp
-              </Link>
-            </li>
           </ul>
           <div style={{ marginTop: 'auto', padding: '8px 0', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
             <Link href="/" className={styles.adminNavBtn} onClick={() => setShow(false)}>
