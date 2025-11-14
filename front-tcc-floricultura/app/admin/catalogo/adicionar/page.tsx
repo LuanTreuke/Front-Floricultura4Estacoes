@@ -6,6 +6,7 @@ import { addProduct, Product } from '@/services/productService';
 import { fetchCategories, Categoria } from '@/services/categoryService';
 import { showSuccess, showError } from '../../../../utils/sweetAlert';
 import ImageUpload from '../../../../components/ImageUpload';
+import Image from 'next/image';
 
 export default function AdicionarProdutoPage() {
   const [nome, setNome] = useState('');
@@ -59,6 +60,15 @@ export default function AdicionarProdutoPage() {
 
   return (
   <div style={{maxWidth: 800, margin: '0 auto', color: '#222'}}>
+          <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0',  }}>
+            <Image 
+              src="/Logo-floricultura.svg" 
+              alt="Logo Floricultura 4 Estações" 
+              width={520} 
+              height={120} 
+              style={{ objectFit: 'contain' }} 
+            />
+          </div>
       <h1 style={{fontSize: '2rem', fontWeight: 600, marginBottom: 24}}>Adicione um produto</h1>
       <form onSubmit={handleSubmit} style={{background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.08)', padding: 32, display: 'flex', flexDirection: 'column', gap: 24}}>
         <div style={{display: 'flex', flexDirection: 'column', gap: 8}}>
