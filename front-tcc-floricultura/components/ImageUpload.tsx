@@ -129,14 +129,15 @@ export default function ImageUpload({ onImageUploaded, currentImage, disabled = 
             color: 'white',
             border: 'none',
             borderRadius: 8,
-            padding: '0.61px 16px',
+            padding: '12px 16px',
             fontSize: '0.9rem',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             gap: 8,
             flex: '1',
-            minWidth: '140px'
+            minWidth: '140px',
+            maxHeight: '41.61px'
           }}
         >
           <i className="bi bi-camera" style={{ verticalAlign: 'middle', fontSize: 22, marginRight: 0 }}></i> Tirar Foto 
