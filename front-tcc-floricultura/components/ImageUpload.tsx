@@ -129,7 +129,7 @@ export default function ImageUpload({ onImageUploaded, currentImage, disabled = 
             color: 'white',
             border: 'none',
             borderRadius: 8,
-            padding: '12px 16px',
+            padding: '0.61px 16px',
             fontSize: '0.9rem',
             cursor: 'pointer',
             display: 'flex',
