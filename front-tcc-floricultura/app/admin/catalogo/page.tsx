@@ -142,7 +142,7 @@ export default function AdminCatalogoPage() {
         // success
         showSuccess('Operação concluída com sucesso!');
       }
-    } catch (e) {
+    } catch {
       // rollback everything
       setProducts(snapshot);
       showError('Erro de rede ao atualizar os produtos.');
