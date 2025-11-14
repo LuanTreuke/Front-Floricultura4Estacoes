@@ -7,6 +7,7 @@ import { fetchAddresses } from '../../../services/addressService';
 import styles from '../../../styles/AdminPedidos.module.css';
 import { showError, showToast, showConfirm } from '../../../utils/sweetAlert';
 import { formatDateToYYYYMMDD } from '../../../utils/dateUtils';
+import { buildImageURL } from '@/utils/imageUtils';
 
 export default function AdminPedidosPage() {
   type AnyObj = Record<string, unknown>;
@@ -521,7 +522,13 @@ export default function AdminPedidosPage() {
               {(o._images && o._images.length > 0) ? (
                 <div style={{ position: 'relative', width: '100%', height: '100%' }}>
                   {o._images && o._images[o._imageIndex || 0] ? (
-                    <Image src={String(o._images[o._imageIndex || 0])} alt={String(o.nome_cliente ?? o.id ?? '')} width={140} height={140} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
+                    <Image
+                      src={buildImageURL(String(o._images[o._imageIndex || 0]))}
+                      alt={String(o.nome_cliente ?? o.id ?? '')}
+                      width={140}
+                      height={140}
+                      style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                    />
                   ) : (
                     <div style={{ width: '100%', height: '100%', background: '#f3f3f3' }} />
                   )}
