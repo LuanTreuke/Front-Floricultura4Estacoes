@@ -137,7 +137,7 @@ export default function ImageUpload({ onImageUploaded, currentImage, disabled = 
             gap: 8,
             flex: '1',
             minWidth: '140px',
-            maxHeight: '41.61px'
+            maxHeight: '45.61px'
           }}
         >
           <i className="bi bi-camera" style={{ verticalAlign: 'middle', fontSize: 22, marginRight: 0 }}></i> Tirar Foto 
