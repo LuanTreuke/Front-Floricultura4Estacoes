@@ -25,6 +25,8 @@ export default function ImageUpload({ onImageUploaded, currentImage, disabled = 
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
     if (!validTypes.includes(file.type)) {
       alert('Tipo de arquivo não suportado. Use: JPG, PNG, GIF ou WebP');
+      // Limpar o input para permitir nova seleção
+      e.target.value = '';
       return;
     }
 
@@ -32,6 +34,8 @@ export default function ImageUpload({ onImageUploaded, currentImage, disabled = 
     const maxSize = 15 * 1024 * 1024;
     if (file.size > maxSize) {
       alert('Arquivo muito grande. Máximo 15MB permitido.');
+      // Limpar o input para permitir nova seleção
+      e.target.value = '';
       return;
     }
 
@@ -55,6 +59,14 @@ export default function ImageUpload({ onImageUploaded, currentImage, disabled = 
       setPreview(currentImage ? buildImageURL(currentImage) : '');
     } finally {
       setUploading(false);
+      // Limpar ambos os inputs após o upload (sucesso ou erro)
+      // para permitir nova seleção do mesmo arquivo
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      if (cameraInputRef.current) {
+        cameraInputRef.current.value = '';
+      }
     }
   };
 
@@ -70,11 +82,19 @@ export default function ImageUpload({ onImageUploaded, currentImage, disabled = 
   };
 
   const handleCameraClick = () => {
-    cameraInputRef.current?.click();
+    // Limpar o input antes de abrir para garantir que onChange sempre dispare
+    if (cameraInputRef.current) {
+      cameraInputRef.current.value = '';
+      cameraInputRef.current.click();
+    }
   };
 
   const handleFileClick = () => {
-    fileInputRef.current?.click();
+    // Limpar o input antes de abrir para garantir que onChange sempre dispare
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+      fileInputRef.current.click();
+    }
   };
 
   return (
