@@ -2,11 +2,14 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { getCurrentUser, User } from '../../services/authService';
 import { fetchOrders, updateOrderStatus } from '../../services/orderService';
+import { getCurrentUser, User } from '../../services/authService';
 import { fetchProductById } from '../../services/productService';
-import styles from '../../styles/AdminPedidos.module.css';
+import styles from '../../styles/OrderDetails.module.css';
 import BackButton from '../../components/BackButton';
+import Breadcrumb from '../../components/Breadcrumb';
+import { showConfirm, showError, showToast } from '../../utils/sweetAlert';
+import { buildImageURL } from '../../utils/imageUtils';
 
 export default function MeusPedidosPage() {
   const router = useRouter();
@@ -119,14 +122,21 @@ export default function MeusPedidosPage() {
 
 
   async function handleCancel(id: number) {
-    if (!confirm('Deseja cancelar este pedido?')) return;
+    const confirmed = await showConfirm(
+      'Deseja cancelar este pedido?',
+      'Confirmar cancelamento',
+      'Sim, cancelar pedido',
+      'Não cancelar'
+    );
+    if (!confirmed) return;
     try {
       // atualiza status para 'Cancelado' (backend aceita string)
       await updateOrderStatus(id, 'Cancelado');
       setOrders(curr => curr.map(o => o.id === id ? { ...o, status: 'Cancelado' } : o));
+      showToast('Pedido cancelado com sucesso', 'success');
     } catch (e) {
       console.error(e);
-      alert('Erro ao cancelar pedido');
+      showError('Erro ao cancelar pedido');
     }
   }
 
@@ -159,6 +169,19 @@ export default function MeusPedidosPage() {
   return (
     <div className={styles.container}>
       <BackButton />
+      <Breadcrumb items={[
+        { label: 'Página Inicial', href: '/' },
+        { label: 'Meus Pedidos' }
+      ]} />
+      <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0' }}>
+        <Image 
+          src="/Logo-floricultura.svg" 
+          alt="Logo Floricultura 4 Estações" 
+          width={520} 
+          height={120} 
+          style={{ objectFit: 'contain' }} 
+        />
+      </div>
       <h1 style={{ textAlign: 'center' }}>Meus Pedidos</h1>
       {orders.length === 0 ? (
         <div>Você não possui pedidos.</div>
@@ -173,7 +196,7 @@ export default function MeusPedidosPage() {
                       {(o._images && (o._images as string[]).length > 0) ? (
                     <div style={{ position: 'relative' }}>
                       {o._images && (o._images as string[])[o._imageIndex || 0] ? (
-                        <Image src={String((o._images as string[])[o._imageIndex || 0])} alt={`Pedido ${String(o.id ?? '')}`} width={160} height={160} style={{ objectFit: 'cover', borderRadius: 8 }} />
+                        <Image src={buildImageURL(String((o._images as string[])[o._imageIndex || 0]))} alt={`Pedido ${String(o.id ?? '')}`} width={160} height={160} style={{ objectFit: 'cover', borderRadius: 8 }} />
                       ) : (
                         <div style={{ width: 160, height: 160, background: '#f3f3f3', borderRadius: 8 }} />
                       )}

@@ -10,6 +10,9 @@ import { fetchPhones } from '../../services/phoneService';
 import { getCurrentUser, User } from '../../services/authService';
 import { createOrder } from '../../services/orderService';
 import BackButton from '../../components/BackButton';
+import Breadcrumb from '../../components/Breadcrumb';
+import { showSuccess, showError, showValidationError, showLoginRequired } from '../../utils/sweetAlert';
+import { buildImageURL } from '../../utils/imageUtils';
 
 export default function UnifiedOrderPage() {
   const router = useRouter();
@@ -23,7 +26,8 @@ export default function UnifiedOrderPage() {
   const [dataEntrega, setDataEntrega] = useState('');
   const [horaEntrega, setHoraEntrega] = useState('');
   const [observacao, setObservacao] = useState('');
-  const cobrarNoEndereco = false;
+  const [cobrarNoEndereco, setCobrarNoEndereco] = useState(false);
+  const [vemRetirar, setVemRetirar] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, boolean>>({});
 
@@ -37,14 +41,36 @@ export default function UnifiedOrderPage() {
       setNomeCliente(usuario.nome || '');
       // não definir hasUsuarioTelefone aqui para evitar piscar; aguardar checagem do servidor
     }
+    
+    // Restaurar dados salvos do localStorage
+    try {
+      const saved = localStorage.getItem('pedido_carrinho_form');
+      if (saved) {
+        const data = JSON.parse(saved);
+        if (data.nomeCliente) setNomeCliente(data.nomeCliente);
+        if (data.nomeDestinatario) setNomeDestinatario(data.nomeDestinatario);
+        if (data.dataEntrega) setDataEntrega(data.dataEntrega);
+        if (data.horaEntrega) setHoraEntrega(data.horaEntrega);
+        if (data.vemRetirar !== undefined) setVemRetirar(data.vemRetirar);
+        if (data.observacao) setObservacao(data.observacao);
+        if (data.selectedAddress) setSelectedAddress(data.selectedAddress);
+      }
+    } catch { /* ignore */ }
+    
     (async () => {
       const all = await fetchAddresses();
       const my = (all || []).filter((a) => a.Usuario_id === (usuario && usuario.id));
       setAddresses(my);
       try {
-        const pref = localStorage.getItem('checkout_selected_address');
-        if (pref) setSelectedAddress(Number(pref));
-        else if (my.length > 0) setSelectedAddress(my[0].id || null);
+        const saved = localStorage.getItem('pedido_carrinho_form');
+        if (saved) {
+          const data = JSON.parse(saved);
+          if (data.selectedAddress) setSelectedAddress(data.selectedAddress);
+        } else {
+          const pref = localStorage.getItem('checkout_selected_address');
+          if (pref) setSelectedAddress(Number(pref));
+          else if (my.length > 0) setSelectedAddress(my[0].id || null);
+        }
       } catch { if (my.length > 0) setSelectedAddress(my[0].id || null); }
       // checar telefone no servidor (não depender apenas do localStorage)
       try {
@@ -74,14 +100,15 @@ export default function UnifiedOrderPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (items.length === 0) return alert('Carrinho vazio');
+    if (items.length === 0) return showValidationError('Carrinho vazio');
     if (!selectedAddress) {
       setErrors(prev => ({ ...prev, selectedAddress: true }));
-      return alert('Selecione um endereço');
+      return showValidationError('Selecione um endereço');
     }
     const usuario = getCurrentUser() as User;
     if (!usuario || !usuario.id) {
-      if (confirm('Você precisa estar logado para finalizar. Ir para login?')) router.push('/login');
+      const goToLogin = await showLoginRequired();
+      if (goToLogin) router.push('/login');
       return;
     }
 
@@ -93,16 +120,16 @@ export default function UnifiedOrderPage() {
         if (timePart.length === 5) timePart = timePart + ':00';
         const delivery = new Date(`${dataEntrega}T${timePart}`);
         if (isNaN(delivery.getTime())) {
-          alert('Data ou hora de entrega inválida');
+          showError('Data ou hora de entrega inválida');
           return;
         }
         const now = new Date();
         if (delivery.getTime() < now.getTime()) {
-          alert('A data e hora de entrega não podem ser anteriores à data/hora atual');
+          showError('A data e hora de entrega não podem ser anteriores à data/hora atual');
           return;
         }
       } catch {
-        alert('Erro ao validar data/hora de entrega');
+        showError('Erro ao validar data/hora de entrega');
         return;
       }
     }
@@ -116,7 +143,7 @@ export default function UnifiedOrderPage() {
   if (!horaEntrega) missing.push('horaEntrega');
   if (!selectedAddress) missing.push('selectedAddress');
   if (hasUsuarioTelefone === false) {
-    alert('Para finalizar o pedido, cadastre um telefone de contato.');
+    showValidationError('Para finalizar o pedido, cadastre um telefone de contato.');
     setLoading(false);
     return;
   }
@@ -124,12 +151,12 @@ export default function UnifiedOrderPage() {
     const errObj: Record<string, boolean> = {};
     missing.forEach(m => { errObj[m] = true; });
     setErrors(prev => ({ ...prev, ...errObj }));
-    alert('Preencha os campos obrigatórios');
+    showValidationError('Preencha os campos obrigatórios');
     setLoading(false);
     return;
   }
   // ensure cart not empty
-  if (!items || items.length === 0) { alert('Carrinho vazio'); setLoading(false); return; }
+  if (!items || items.length === 0) { showValidationError('Carrinho vazio'); setLoading(false); return; }
     try {
       // preparar payload do carrinho e enviar para o campo `carrinho` (string JSON)
       const cartPayload = items.map(i => ({ id: i.id, nome: i.nome, preco: i.preco, quantidade: i.quantidade, imagem_url: i.imagem_url }));
@@ -147,17 +174,22 @@ export default function UnifiedOrderPage() {
         hora_entrega: horaEntrega || undefined,
         nome_destinatario: nomeDestinatario || undefined,
         cobrar_no_endereco: cobrarNoEndereco || false,
+        vem_retirar: vemRetirar || false,
       };
   console.debug('[UnifiedOrderPage] createOrder DTO ->', dto);
   await createOrder(dto);
       clearCart();
       setItems([]);
-      alert('Pedido criado com sucesso');
+      // Limpar dados salvos do localStorage
+      try {
+        localStorage.removeItem('pedido_carrinho_form');
+      } catch { /* ignore */ }
+      await showSuccess('Pedido criado com sucesso!');
       router.push('/');
     } catch (e) {
       console.error(e);
       const msg = e instanceof Error ? e.message : String(e);
-      alert('Erro ao criar pedido: ' + msg);
+      showError('Erro ao criar pedido: ' + msg);
     } finally {
       setLoading(false);
     }
@@ -166,6 +198,12 @@ export default function UnifiedOrderPage() {
   return (
     <div className={styles.container}>
       <BackButton />
+      <Breadcrumb 
+        items={[
+          { label: 'Página inicial', href: '/' },
+          { label: 'Finalizar Pedido' }
+        ]}
+      />
       <h1 className={styles.heading } style={{ marginTop: 24, fontSize: 30 }}>Finalizar pedido</h1>
       <form onSubmit={handleSubmit} className={styles.form}>
         <label>Endereço</label>
@@ -175,7 +213,22 @@ export default function UnifiedOrderPage() {
         </select>
 
         <div style={{ marginTop: 8 }}>
-          <button type="button" className={styles.primaryBtn} onClick={() => router.push('/cadastro/endereco')}>
+          <button type="button" className={styles.primaryBtn} onClick={() => {
+            // Salvar dados do formulário no localStorage
+            try {
+              const formData = {
+                nomeCliente,
+                nomeDestinatario,
+                dataEntrega,
+                horaEntrega,
+                observacao,
+                selectedAddress,
+                vemRetirar,
+              };
+              localStorage.setItem('pedido_carrinho_form', JSON.stringify(formData));
+            } catch { /* ignore */ }
+            router.push('/cadastro/endereco?returnTo=/pedido');
+          }}>
             + Adicionar endereço
           </button>
         </div>
@@ -193,14 +246,93 @@ export default function UnifiedOrderPage() {
           </div>
         )}
 
-        <label>Nome do destinatário</label>
+        <label>Quem vai receber?</label>
   <input className={`${styles.input} ${errors.nomeDestinatario ? styles.invalid : ''}`} value={nomeDestinatario} onChange={e => { setNomeDestinatario(e.target.value); setErrors(prev => ({ ...prev, nomeDestinatario: false })); }} />
 
-        <label>Data de entrega</label>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <input type="date" className={`${styles.input} ${errors.dataEntrega ? styles.invalid : ''}`} value={dataEntrega} onChange={e => { setDataEntrega(e.target.value); setErrors(prev => ({ ...prev, dataEntrega: false })); }} />
-          <input type="time" className={`${styles.input} ${errors.horaEntrega ? styles.invalid : ''}`} value={horaEntrega} onChange={e => { setHoraEntrega(e.target.value); setErrors(prev => ({ ...prev, horaEntrega: false })); }} />
+        <label 
+          style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: 8, 
+            marginTop: 8,
+            cursor: 'pointer',
+            userSelect: 'none'
+          }}
+          onClick={() => {
+            const newValue = !vemRetirar;
+            setVemRetirar(newValue);
+            if (newValue) setCobrarNoEndereco(false);
+          }}
+        >
+          <div
+            style={{
+              width: '20px',
+              height: '20px',
+              borderRadius: '4px',
+              border: '2px solid #2e7d32',
+              backgroundColor: vemRetirar ? '#2e7d32' : '#fff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              transition: 'all 0.2s'
+            }}
+          >
+            {vemRetirar && (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            )}
+          </div>
+          <span>Vou retirar na loja</span>
+        </label>
+
+        <div style={{ display: 'flex', gap: 16, width: '100%', marginTop: 12 }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <label>{vemRetirar ? 'Data de retirada' : 'Data de entrega'}</label>
+            <input type="date" className={`${styles.input} ${errors.dataEntrega ? styles.invalid : ''}`} value={dataEntrega} onChange={e => { setDataEntrega(e.target.value); setErrors(prev => ({ ...prev, dataEntrega: false })); }} placeholder="dd/mm/aaaa" />
+          </div>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <label>{vemRetirar ? 'Hora de retirada' : 'Hora de entrega'}</label>
+            <input type="time" className={`${styles.input} ${errors.horaEntrega ? styles.invalid : ''}`} value={horaEntrega} onChange={e => { setHoraEntrega(e.target.value); setErrors(prev => ({ ...prev, horaEntrega: false })); }} placeholder="--:--" />
+          </div>
         </div>
+
+        {!vemRetirar && (
+          <label 
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 8, 
+              marginTop: 8,
+              cursor: 'pointer',
+              userSelect: 'none'
+            }}
+            onClick={() => setCobrarNoEndereco(!cobrarNoEndereco)}
+          >
+            <div
+              style={{
+                width: '20px',
+                height: '20px',
+                borderRadius: '4px',
+                border: '2px solid #2e7d32',
+                backgroundColor: cobrarNoEndereco ? '#2e7d32' : '#fff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                transition: 'all 0.2s'
+              }}
+            >
+              {cobrarNoEndereco && (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              )}
+            </div>
+            <span>Cobrar no endereço</span>
+          </label>
+        )}
 
         <label>Observação</label>
         <textarea className={styles.textarea} value={observacao} onChange={e => setObservacao(e.target.value)} rows={4} />
@@ -217,7 +349,7 @@ export default function UnifiedOrderPage() {
         {items.map(it => (
           <div key={it.id} style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 8 }}>
             {it.imagem_url ? (
-              <Image src={it.imagem_url} alt={it.nome || ''} width={64} height={64} style={{ objectFit: 'cover', borderRadius: 8 }} />
+              <Image src={buildImageURL(it.imagem_url)} alt={it.nome || ''} width={64} height={64} style={{ objectFit: 'cover', borderRadius: 8 }} />
             ) : (
               <div style={{ width: 64, height: 64, background: '#f3f3f3', borderRadius: 8 }} />
             )}

@@ -1,12 +1,14 @@
 "use client";
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import styles from '../../../styles/ProductOrder.module.css';
 import { createAddress, AddressDto } from '../../../services/addressService';
 import { getCurrentUser, User } from '../../../services/authService';
 
 export default function CadastroEnderecoPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get('returnTo') || '/';
   const [rua, setRua] = useState('');
   const [numero, setNumero] = useState('');
   const [bairro, setBairro] = useState('');
@@ -30,7 +32,7 @@ export default function CadastroEnderecoPage() {
     try {
       await createAddress(dto);
         setMessage('Endereço criado com sucesso');
-      setTimeout(() => router.push('/'), 1200);
+      setTimeout(() => router.push(returnTo), 1200);
   } catch (err: unknown) {
   console.error('createAddress error', err);
   const msg = (err instanceof Error) ? err.message : String(err);

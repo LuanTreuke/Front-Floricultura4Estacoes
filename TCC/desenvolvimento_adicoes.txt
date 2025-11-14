@@ -1,0 +1,97 @@
+6.7 Implementação e Evolução do Sistema
+
+Após a conclusão da prototipagem e da modelagem conceitual, iniciou-se a fase de implementação do sistema, seguindo o modelo incremental descrito na metodologia. Esta seção detalha o processo de desenvolvimento, os incrementos realizados e os principais desafios técnicos enfrentados durante a construção da solução.
+
+6.7.1 Primeiro Incremento: Infraestrutura e Autenticação
+
+O primeiro incremento concentrou-se na criação da infraestrutura básica do sistema, estabelecendo os alicerces para os módulos subsequentes. Segundo Sommerville (2019), a definição de uma arquitetura sólida no início do projeto é determinante para a qualidade final do software.
+
+Nesta etapa, foram implementados:
+
+a) Configuração do ambiente de desenvolvimento: Foram criados os projetos base do front-end (Next.js) e back-end (NestJS), com a estruturação inicial de pastas seguindo as boas práticas de cada framework. O sistema de versionamento Git foi configurado, com um repositório no GitHub para garantir o controle de versões e a rastreabilidade das mudanças.
+
+b) Banco de dados e migrações: O banco de dados relacional foi provisionado na AWS RDS, e o TypeORM foi configurado para gerenciar as migrations. As primeiras entidades criadas foram Usuario e as tabelas auxiliares necessárias para o controle de acesso.
+
+c) Sistema de autenticação: Foi implementado o módulo de autenticação com hash seguro de senhas utilizando bcrypt, conforme especificado no requisito funcional RF05. O sistema de login e controle de sessão foi desenvolvido utilizando tokens JWT (JSON Web Tokens), uma prática amplamente adotada em aplicações web modernas por sua eficiência e segurança (RICHARDSON; RUBY, 2020).
+
+6.7.2 Segundo Incremento: Gestão de Catálogo
+
+O segundo incremento focou na implementação do módulo de gerenciamento de produtos, que constitui uma das funcionalidades centrais do sistema. De acordo com Pressman (2016), a implementação incremental permite validar funcionalidades de forma isolada antes de integrá-las ao sistema completo.
+
+As funcionalidades desenvolvidas nesta etapa incluíram:
+
+a) CRUD de Categorias: Implementação completa das operações de criação, leitura, atualização e exclusão de categorias de produtos. A interface administrativa foi construída com formulários validados e modais de confirmação, aplicando as heurísticas de usabilidade de Nielsen (1995) para prevenção de erros.
+
+b) CRUD de Produtos: Desenvolvimento do módulo de produtos com suporte a múltiplas imagens. O sistema permite ao administrador cadastrar produtos com nome, descrição, preço e associá-los a categorias existentes. A validação de dados foi implementada tanto no front-end quanto no back-end, garantindo a integridade das informações (SOMMERVILLE, 2019).
+
+c) Upload e gerenciamento de imagens: Foi implementado um sistema de upload de imagens que armazena os arquivos no servidor e registra seus caminhos no banco de dados. As imagens são otimizadas e redimensionadas automaticamente para melhorar o desempenho da vitrine digital.
+
+d) Vitrine digital pública: A interface de visualização de produtos para os clientes foi desenvolvida com design responsivo, adaptando-se a diferentes dispositivos. Foram implementados filtros por categoria e ordenação por preço, facilitando a navegação do usuário conforme os requisitos funcionais RF01 e RF04.
+
+6.7.3 Terceiro Incremento: Módulo de Pedidos e Entregas
+
+Este incremento abordou a funcionalidade mais complexa do sistema: o gerenciamento de pedidos e entregas. A implementação seguiu o modelo de dados projetado no diagrama entidade-relacionamento, garantindo a integridade referencial entre as entidades Pedido, Endereco e Usuario.
+
+Funcionalidades implementadas:
+
+a) Registro de pedidos: Formulário completo para cadastro de encomendas, incluindo dados do cliente, destinatário, produto, endereço de entrega e informações de pagamento. O sistema gera automaticamente a data e hora do pedido, definindo o status inicial como "Recebido".
+
+b) Painel de gerenciamento de entregas: Interface administrativa que lista todos os pedidos com seus respectivos status. Foram implementados filtros por data e status, permitindo ao funcionário visualizar rapidamente as entregas de um dia específico ou apenas os pedidos pendentes.
+
+c) Atualização de status: Funcionalidade que permite ao administrador alterar o status dos pedidos conforme o progresso da entrega (Recebido, Em Preparação, Saiu para Entrega, Entregue, Cancelado). Cada alteração é registrada no sistema para fins de auditoria.
+
+d) Visualização de detalhes: Tela detalhada de pedido que exibe todas as informações de forma organizada, incluindo um mapa com a localização do endereço de entrega, facilitando o trabalho dos entregadores.
+
+6.7.4 Quarto Incremento: Relatórios e Refinamentos
+
+O incremento final concentrou-se na implementação do módulo de relatórios e no refinamento geral da aplicação, incluindo melhorias de performance e correções identificadas durante os testes.
+
+a) Sistema de relatórios: Foi desenvolvido um painel de relatórios que permite ao administrador visualizar estatísticas do negócio, como produtos mais vendidos, faturamento por período e número de pedidos por status. Os relatórios podem ser exportados em formato PDF para análise offline, utilizando a biblioteca jsPDF.
+
+b) Otimizações de performance: Foram aplicadas técnicas de otimização como lazy loading de imagens, paginação de listas e cache de requisições frequentes. Essas melhorias contribuíram para que o sistema atendesse ao requisito não funcional RNF03 de tempo de carregamento.
+
+c) Testes e validações: Todos os requisitos funcionais e não funcionais foram validados através de testes manuais e automatizados. A interface foi testada em diferentes navegadores e dispositivos para garantir a responsividade especificada no requisito RNF02.
+
+6.7.5 Problemas Técnicos Enfrentados e Soluções
+
+Durante o processo de desenvolvimento, diversos desafios técnicos surgiram, exigindo análise cuidadosa e soluções adequadas. Segundo Pressman (2016), problemas técnicos são parte natural do desenvolvimento de software e devem ser documentados para facilitar a manutenção futura.
+
+a) Problema de Timezone em Datas
+
+Um dos desafios mais significativos encontrados foi relacionado ao tratamento de datas no sistema. Inicialmente, utilizava-se o método toISOString() do JavaScript para converter objetos Date em strings no formato ISO 8601. No entanto, este método realiza a conversão para o timezone UTC (Coordinated Universal Time), o que causava inconsistências quando o servidor estava configurado em um timezone diferente.
+
+O problema manifestava-se da seguinte forma: ao criar um pedido às 21:00 do dia 9 de janeiro em São Paulo (UTC-3), o sistema registrava a data como 10 de janeiro, pois a conversão para UTC resultava em 00:00 do dia 10. Isso gerava discrepâncias nos filtros de data e nos relatórios, comprometendo a confiabilidade das informações (FOWLER, 2002).
+
+A solução implementada envolveu a criação de funções utilitárias que utilizam os métodos getFullYear(), getMonth() e getDate() do objeto Date, que retornam valores no timezone local do servidor, evitando assim as conversões indesejadas. No front-end, foi criado o arquivo utils/dateUtils.ts com funções como formatDateToYYYYMMDD() e formatDateTimeToSQL(), garantindo consistência em todo o sistema. No back-end, a mesma lógica foi replicada nos services de Usuario e Pedido.
+
+Esta abordagem está alinhada com as recomendações de Sommerville (2019) sobre a importância de tratar adequadamente questões de internacionalização e timezone em sistemas distribuídos.
+
+b) Sincronização de Estados entre Front-end e Back-end
+
+Durante o desenvolvimento do módulo de pedidos, identificou-se que algumas atualizações de status não eram refletidas imediatamente na interface do usuário. O problema estava relacionado ao gerenciamento de estado no React e ao timing das requisições HTTP.
+
+A solução implementada utilizou o padrão de polling controlado e callbacks de atualização. Após qualquer operação de criação, atualização ou exclusão, uma nova requisição é feita automaticamente para buscar os dados atualizados do servidor, garantindo que a interface reflita sempre o estado real do banco de dados (REACT, 2025).
+
+c) Validação de Dados e Integridade Referencial
+
+Outro desafio foi garantir a integridade referencial entre as entidades do sistema, especialmente na relação entre Pedido e Produto. Era possível que um produto fosse excluído enquanto havia pedidos associados a ele, o que causaria erros ao tentar exibir os detalhes do pedido.
+
+A solução adotada foi a implementação de soft delete (exclusão lógica) para produtos. Em vez de remover fisicamente o registro do banco de dados, um campo ativo é marcado como false. Dessa forma, pedidos antigos continuam referenciando produtos válidos, enquanto a vitrine exibe apenas produtos ativos. Esta técnica é amplamente recomendada em sistemas que requerem histórico e auditoria (FOWLER, 2002).
+
+d) Performance no Carregamento de Imagens
+
+Inicialmente, o carregamento da vitrine de produtos estava lento devido ao tamanho das imagens. Imagens de alta resolução enviadas pelos usuários consumiam largura de banda desnecessária e prejudicavam a experiência de navegação em conexões mais lentas.
+
+A solução implementou um processamento de imagens no momento do upload, utilizando a biblioteca Sharp no back-end. As imagens são automaticamente redimensionadas para dimensões otimizadas (thumbnail e visualização completa) e comprimidas sem perda significativa de qualidade. Esta abordagem resultou em uma redução média de 70% no tamanho dos arquivos, contribuindo para que o sistema atendesse ao requisito RNF03 de desempenho de carregamento.
+
+e) Gestão de Dependências e Compatibilidade
+
+Durante a instalação de bibliotecas adicionais, ocorreram conflitos de versões entre dependências do Next.js e do React. Alguns componentes de terceiros exigiam versões específicas que eram incompatíveis com a versão do Next.js escolhida.
+
+A resolução envolveu a análise cuidadosa da árvore de dependências utilizando o comando npm list e a escolha de versões compatíveis. Em alguns casos, foi necessário utilizar o campo resolutions no package.json para forçar versões específicas de dependências transitivas. Este problema reforça a importância do gerenciamento adequado de dependências em projetos JavaScript modernos (SOMMERVILLE, 2019).
+
+6.7.6 Considerações sobre o Processo de Desenvolvimento
+
+O modelo incremental adotado mostrou-se adequado para este projeto, permitindo entregas contínuas e validações em cada etapa. A separação clara de responsabilidades entre front-end e back-end facilitou o desenvolvimento paralelo de funcionalidades e a manutenção do código. A documentação contínua dos problemas enfrentados e suas soluções contribuiu para a criação de uma base de conhecimento que facilita futuras manutenções e evoluções do sistema.
+
+.

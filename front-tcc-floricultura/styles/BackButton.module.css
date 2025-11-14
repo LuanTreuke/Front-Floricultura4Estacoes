@@ -16,6 +16,7 @@
   top: calc(12px + env(safe-area-inset-top, 0px));
   left: calc(12px + env(safe-area-inset-left, 0px));
   z-index: 30002;
+  -webkit-tap-highlight-color: transparent;
 }
 .button:hover {
   background: rgba(0,0,0,0.06);

@@ -57,8 +57,9 @@
   width: 72px; 
   padding: 8px; 
   border: 1px solid #e6efe7; 
-  border-radius: 8px; 
   text-align: center; 
+  border-radius: 10px !important;
+  margin-left: 1px;
 }
 .removeBtn { 
   background: #f3f3f3; 
@@ -66,6 +67,12 @@
   padding: 8px 12px; 
   border-radius: 8px; 
   cursor: pointer; 
+}
+
+.controlsRow {
+  display: flex;
+  gap: 1px;
+  align-items: center;
 }
 
 .item > div:last-child { 
@@ -84,7 +91,7 @@
   font-weight: 700; 
 }
 .checkoutBtn {
-  padding: 12px 20px;
+  padding: 12px 10px;
   background: #2f7a3e;
   color: #fff;
   border: none;
@@ -94,63 +101,6 @@
 .checkoutBtn[disabled] { 
   opacity: 0.6; 
   cursor: not-allowed; 
-}
-
-@media (max-width: 700px) {
-  .item { 
-    flex-direction: column; 
-    align-items: center; 
-  }
-  .itemImage { 
-    width: 60%; 
-    height: 200px; 
-    flex: none; 
-  }
-  .qtyInput { 
-    width: 100%; 
-  }
-  .summary { 
-    flex-direction: column; 
-    align-items: stretch; 
-  }
-  
-  .item { 
-    padding: 10px; 
-  }
-  .itemImage { 
-    height: 160px; 
-    border-radius: 8px; 
-  }
-  .itemInfo { 
-    margin-top: 8px; 
-  }
-  .qtyWrap { 
-    width: 120px; 
-    margin: 8px 0 0 0; 
-  }
-  .qtyInput { 
-    width: 100%; 
-    box-sizing: border-box; 
-  }
-  .controlsRow { 
-    display: flex; 
-    gap: 12px; 
-    align-items: center; 
-    justify-content: center; 
-    margin-top: 8px; 
-    width: 100%; 
-  }
-  .removeWrap { 
-    display: flex; 
-    align-items: center; 
-  }
-  .removeBtn { 
-    padding: 6px 10px; 
-    font-size: 0.95rem; 
-  }
-  .total { 
-    font-size: 60%;
-  }
 }
 
 /* footer row (back | total + finalize) - visible on all sizes, inline */
@@ -171,9 +121,9 @@
   cursor: pointer; 
 }
 .mobileRightInline { 
+  gap: 12px;
   display: flex; 
   align-items: center; 
-  gap: 12px; 
 }
 
 /* panel wrapper used by the popup to control height and hide scrollbar */
@@ -205,4 +155,68 @@
   margin: 0 0 8px 0;
   font-weight: 700;
   color: #7a3b12;
+}
+
+@media (max-width: 700px) {
+  .item { 
+    flex-direction: column; 
+    align-items: center; 
+  }
+  .itemImage { 
+    width: 60%; 
+    height: 200px; 
+    flex: none; 
+  }
+  .summary { 
+    flex-direction: column; 
+    align-items: stretch; 
+  }
+  .item { 
+    padding: 10px; 
+  }
+  .itemImage { 
+    height: 160px; 
+    border-radius: 8px; 
+  }
+  .itemInfo { 
+    margin-top: 8px; 
+  }
+  .qtyWrap { 
+    width: 120px; 
+    margin: 8px 0 0 0; 
+  }
+  .qtyInput { 
+    width: 100%; 
+    box-sizing: border-box;
+    border-radius: 10px !important;
+  }
+  .controlsRow { 
+    gap: 12px; 
+    justify-content: center; 
+    margin-top: 8px; 
+    width: 100%; 
+  }
+  .removeWrap { 
+    display: flex; 
+    align-items: center;
+    margin-top: 5px; 
+  }
+  .removeBtn { 
+    padding: 6px 10px; 
+    font-size: 0.95rem; 
+  }
+  .total { 
+    font-size: 100%;
+    width: 100%;
+    text-align: center;
+  }
+  .checkoutBtn {
+    padding: 20px 4px;
+    width: 100%;
+    font-size: 80%;
+    font-weight: 700;
+  }
+  .mobileRightInline { 
+    gap: 2px;
+  }
 }

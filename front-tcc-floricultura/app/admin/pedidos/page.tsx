@@ -5,6 +5,8 @@ import { fetchOrders, updateOrderStatus } from '../../../services/orderService';
 import { fetchProductById } from '../../../services/productService';
 import { fetchAddresses } from '../../../services/addressService';
 import styles from '../../../styles/AdminPedidos.module.css';
+import { showError, showToast, showConfirm } from '../../../utils/sweetAlert';
+import { formatDateToYYYYMMDD } from '../../../utils/dateUtils';
 
 export default function AdminPedidosPage() {
   type AnyObj = Record<string, unknown>;
@@ -22,6 +24,8 @@ export default function AdminPedidosPage() {
     status?: string;
     data_pedido?: string;
     data_entrega?: string;
+    cobrar_no_endereco?: boolean | number | null;
+    vem_retirar?: boolean | number | null;
   };
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,15 +33,16 @@ export default function AdminPedidosPage() {
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [dateFilter, setDateFilter] = useState<string | null>(() => {
     // inicializa com a data local (YYYY-MM-DD)
-    const now = new Date();
-    const y = now.getFullYear();
-    const m = String(now.getMonth() + 1).padStart(2, '0');
-    const d = String(now.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
-  }); // YYYY-MM-DD
+    return formatDateToYYYYMMDD();
+  });
+  const [endDateFilter, setEndDateFilter] = useState<string | null>(() => {
+    // inicializa com a data local (YYYY-MM-DD)
+    return formatDateToYYYYMMDD();
+  });
   const [sortBy, setSortBy] = useState<'hora_pedido' | 'hora_entrega' | null>('hora_pedido');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
-  const [statusSelections, setStatusSelections] = useState<Record<string, string>>({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusSelections, setStatusSelections] = useState<Record<string, string>>({}); 
 
   function displayStatus(status?: string | null) {
     if (!status) return '—';
@@ -168,25 +173,86 @@ export default function AdminPedidosPage() {
       console.error('Failed to toggle notifications', e);
       // revert optimistic change
       setNotifyDisabled(curr => ({ ...curr, [orderId]: prev }));
-      alert('Erro ao atualizar preferências de notificação');
+      showError('Erro ao atualizar preferências de notificação');
     }
   }
 
   async function handleChangeStatus(id: number, status: string) {
+    const statusLabels: Record<string, string> = {
+      'Pendente': 'Pendente',
+      'Em preparo': 'Em preparo',
+      'Pronto para entrega': 'Pronto para entrega',
+      'Em rota de entrega': 'Saiu para entrega',
+      'Em_Rota': 'Saiu para entrega',
+      'Entregue': 'Entregue',
+      'Cancelado': 'Cancelado'
+    };
+    
+    const statusLabel = statusLabels[status] || status;
+    const confirmed = await showConfirm(
+      `Deseja alterar o status do pedido #${id} para "${statusLabel}"?`,
+      'Confirmar altera\u00e7\u00e3o de status',
+      'Sim, alterar',
+      'Cancelar'
+    );
+    
+    if (!confirmed) return;
+    
     try {
       await updateOrderStatus(id, status);
       setOrders(orders.map(o => o.id === id ? { ...o, status } : o));
-    } catch (err) { console.error(err); alert('Erro ao atualizar status'); }
+      showToast('Status atualizado com sucesso', 'success');
+    } catch (err) { console.error(err); showError('Erro ao atualizar status'); }
   }
 
   // image carousel controls removed from admin view (keeps UI simpler). If needed later, re-add handlers.
 
+  // Função helper para normalizar strings (remove acentos e converte para minúsculas)
+  const normalizeString = (str: string) => {
+    return str
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+  };
+
   // aplica filtros e ordenação sem modificar o estado original
   const visibleOrders = React.useMemo(() => {
     let arr = (orders || []).slice();
+    
+    // Filtro de pesquisa
+    if (searchTerm && searchTerm.trim()) {
+      const term = normalizeString(searchTerm.trim());
+      arr = arr.filter(o => {
+        // Pesquisar por ID
+        if (o.id && String(o.id).includes(term)) return true;
+        
+        // Pesquisar por nome do cliente
+        const nomeCliente = normalizeString(o.nome_cliente || o.usuario?.nome || '');
+        if (nomeCliente.includes(term)) return true;
+        
+        // Pesquisar por nome de produtos
+        if (o._productNames && o._productNames.length > 0) {
+          if (o._productNames.some((name: string) => normalizeString(name).includes(term))) return true;
+        }
+        
+        return false;
+      });
+    }
+    
     if (statusFilter) arr = arr.filter(o => (o.status || '').toLowerCase() === statusFilter.toLowerCase());
-    if (dateFilter) {
-      arr = arr.filter(o => (o.data_pedido === dateFilter) || (o.data_entrega === dateFilter));
+    if (dateFilter || endDateFilter) {
+      arr = arr.filter(o => {
+        const pedidoDate = o.data_pedido as string | undefined;
+        const entregaDate = o.data_entrega as string | undefined;
+        const orderDate = pedidoDate || entregaDate;
+        
+        if (!orderDate) return false;
+        
+        const start = dateFilter || '0000-00-00';
+        const end = endDateFilter || '9999-12-31';
+        
+        return orderDate >= start && orderDate <= end;
+      });
     }
     if (sortBy) {
       arr.sort((a: AnyObj, b: AnyObj) => {
@@ -194,21 +260,87 @@ export default function AdminPedidosPage() {
         const bval = b[sortBy] as unknown as string | undefined;
         const ta = aval ? (aval.length === 5 ? aval + ':00' : aval) : '00:00:00';
         const tb = bval ? (bval.length === 5 ? bval + ':00' : bval) : '00:00:00';
-        const da = ((a['data_pedido'] as string) || (a['data_entrega'] as string) ) || '';
-        const db = ((b['data_pedido'] as string) || (b['data_entrega'] as string) ) || '';
+        
+        // Usar a data correspondente ao tipo de ordenação
+        const dateField = sortBy === 'hora_pedido' ? 'data_pedido' : 'data_entrega';
+        const da = (a[dateField] as string) || '';
+        const db = (b[dateField] as string) || '';
+        
         const dta = new Date(da + 'T' + ta).getTime() || 0;
         const dtb = new Date(db + 'T' + tb).getTime() || 0;
         return sortDir === 'asc' ? dta - dtb : dtb - dta;
       });
     }
     return arr;
-  }, [orders, statusFilter, dateFilter, sortBy, sortDir]);
+  }, [orders, statusFilter, dateFilter, endDateFilter, sortBy, sortDir, searchTerm]);
 
   if (loading) return <div className={styles.container}>Carregando pedidos...</div>;
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Gerenciar Pedidos</h1>
+      <div style={{ display: 'flex', justifyContent: 'center'}}>
+        <Image 
+          src="/Logo-floricultura.svg" 
+          alt="Logo Floricultura 4 Estações" 
+          width={400} 
+          height={130} 
+          style={{ objectFit: 'contain' }} 
+        />
+      </div>
+      
+      <div className={styles.header}>
+        <div>
+          <h1 className={styles.title}>Gerenciar Pedidos</h1>
+          <p className={styles.subtitle}>Acompanhe e gerencie todos os pedidos</p>
+        </div>
+      </div>
+      
+      {/* Barra de pesquisa */}
+      <div style={{ marginBottom: 16, position: 'relative' }}>
+        <input 
+          type="text"
+          placeholder="Pesquisar por nome do cliente, produto ou ID"
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          style={{
+            width: '100%',
+            padding: '12px 48px 12px 16px',
+            fontSize: '15px',
+            border: '2px solid #e0e0e0',
+            borderRadius: '8px',
+            outline: 'none',
+            transition: 'border-color 0.2s',
+          }}
+          onFocus={(e) => e.target.style.borderColor = '#2e7d32'}
+          onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
+        />
+        <svg 
+          width="20" 
+          height="20" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="#999" 
+          strokeWidth="2" 
+          strokeLinecap="round" 
+          strokeLinejoin="round"
+          style={{
+            position: 'absolute',
+            right: '16px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            pointerEvents: 'none'
+          }}
+        >
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        {searchTerm && (
+          <div style={{ marginTop: 8, fontSize: 14, color: '#666' }}>
+            {visibleOrders.length} {visibleOrders.length === 1 ? 'resultado encontrado' : 'resultados encontrados'}
+          </div>
+        )}
+      </div>
+      
       <div className={styles.header}>
         <div className={styles.toolbar}>
           <div className={styles.filters}>
@@ -240,9 +372,86 @@ export default function AdminPedidosPage() {
             <label style={{ fontWeight: 600, marginRight: 8 }}>Data</label>
             {/* mobile-only label (CSS will show this only on small screens) */}
             <span className={styles.mobileDateLabel}>Data</span>
-            <input type="date" value={dateFilter || ''} onChange={e => setDateFilter(e.target.value || null)} />
-            {dateFilter && <button className={`${styles.secondaryBtn} ${styles.clearBtn}`} onClick={() => setDateFilter(null)}>Limpar</button>}
-            <button className={`${styles.secondaryBtn} ${styles.clearBtn}`} onClick={() => { setStatusFilter(null); setDateFilter(null); setSortBy(null); setSortDir('desc'); }}>Limpar</button>
+            <input 
+              type="date" 
+              value={dateFilter || ''} 
+              onChange={e => {
+                const value = e.target.value || null;
+                setDateFilter(value);
+                // Se a data final estiver vazia, preenche com a mesma data
+                if (!endDateFilter && value) {
+                  setEndDateFilter(value);
+                }
+              }}
+              max={endDateFilter || undefined}
+              placeholder="Data inicial"
+              style={{
+                border: '1px solid #c8e6c9',
+                borderRadius: '6px',
+                padding: '8px 12px',
+                fontSize: '14px',
+                outline: 'none',
+                transition: 'border-color 0.2s'
+              }}
+              onFocus={(e) => e.currentTarget.style.borderColor = '#81c784'}
+              onBlur={(e) => e.currentTarget.style.borderColor = '#c8e6c9'}
+            />
+            <span style={{ margin: '0 8px', fontWeight: 500 }}>até</span>
+            <input 
+              type="date" 
+              value={endDateFilter || ''} 
+              onChange={e => {
+                const value = e.target.value || null;
+                setEndDateFilter(value);
+                // Se a data inicial estiver vazia, preenche com a mesma data
+                if (!dateFilter && value) {
+                  setDateFilter(value);
+                }
+              }}
+              min={dateFilter || undefined}
+              placeholder="Data final"
+              style={{
+                border: '1px solid #c8e6c9',
+                borderRadius: '6px',
+                padding: '8px 12px',
+                fontSize: '14px',
+                outline: 'none',
+                transition: 'border-color 0.2s'
+              }}
+              onFocus={(e) => e.currentTarget.style.borderColor = '#81c784'}
+              onBlur={(e) => e.currentTarget.style.borderColor = '#c8e6c9'}
+            />
+          </div>
+          <div style={{ display: 'flex', gap: '4px' }}>
+            {(dateFilter || endDateFilter) && <button 
+              className={`${styles.secondaryBtn} ${styles.clearBtn}`} 
+              onClick={() => { setDateFilter(null); setEndDateFilter(null); }}
+              style={{ 
+                whiteSpace: 'nowrap',
+                fontSize: '0.9rem',
+                padding: '6px 12px'
+              }}
+            >
+              Limpar Datas
+            </button>}
+            {(statusFilter || dateFilter || endDateFilter || sortBy || searchTerm) && <button 
+              className={`${styles.secondaryBtn} ${styles.clearBtn}`} 
+              onClick={() => { 
+                setStatusFilter(null); 
+                setDateFilter(null); 
+                setEndDateFilter(null); 
+                setSortBy(null); 
+                setSortDir('desc'); 
+                setSearchTerm(''); 
+              }}
+              style={{ 
+                whiteSpace: 'nowrap',
+                fontSize: '0.9rem',
+                padding: '6px 12px'
+              }}
+            >
+              Limpar Tudo
+            </button>}
           </div>
         </div>
       </div>
@@ -250,13 +459,64 @@ export default function AdminPedidosPage() {
       <div className={styles.grid}>
         {visibleOrders.map(o => (
           <div key={o.id} className={styles.card}>
-            <button className={styles.bellBtn} onClick={() => toggleNotify(typeof o.id === 'number' ? o.id as number : undefined)} aria-label="Toggle notifications for this order">
-              {notifyDisabled && typeof o.id === 'number' && notifyDisabled[o.id] ? (
-                <i className="bi bi-bell-slash" aria-hidden></i>
-              ) : (
-                <i className="bi bi-bell" aria-hidden></i>
-              )}
-            </button>
+            {o.telefone_cliente && (
+              <a
+                href={`https://wa.me/${String(o.telefone_cliente).replace(/\D/g, '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.whatsappBtn}
+                title="Enviar mensagem no WhatsApp"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                </svg>
+              </a>
+            )}
+            <label 
+              style={{ 
+                position: 'absolute', 
+                top: 10, 
+                right: 10, 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '8px',
+                fontSize: '13px',
+                fontWeight: 500,
+                cursor: 'pointer',
+                backgroundColor: 'rgba(255,255,255,0.95)',
+                padding: '8px 12px',
+                borderRadius: '6px',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+                zIndex: 10,
+                userSelect: 'none'
+              }}
+              onClick={(e) => {
+                e.preventDefault();
+                toggleNotify(typeof o.id === 'number' ? o.id as number : undefined);
+              }}
+            >
+              <span style={{ whiteSpace: 'nowrap' }}>Notificar cliente?</span>
+              <div
+                style={{
+                  width: '20px',
+                  height: '20px',
+                  borderRadius: '4px',
+                  border: '2px solid #2e7d32',
+                  backgroundColor: !(notifyDisabled && typeof o.id === 'number' && notifyDisabled[o.id]) ? '#2e7d32' : '#fff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  transition: 'all 0.2s'
+                }}
+              >
+                {!(notifyDisabled && typeof o.id === 'number' && notifyDisabled[o.id]) && (
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                )}
+              </div>
+            </label>
             <div className={styles.thumb}>
               {(o._images && o._images.length > 0) ? (
                 <div style={{ position: 'relative', width: '100%', height: '100%' }}>
@@ -272,9 +532,9 @@ export default function AdminPedidosPage() {
             </div>
 
             <div className={styles.details}>
-                <div className={styles.meta}>
-                  <div><strong>Cliente:</strong> {o.nome_cliente || o.usuario?.nome}</div>
-                  <div><strong>Para:</strong> {o.nome_destinatario || '—'}</div>
+              <div className={styles.meta}>
+                <div><strong>Cliente:</strong> {o.nome_cliente || o.usuario?.nome}</div>
+                <div><strong>Para:</strong> {o.nome_destinatario || '—'}</div>
                 <div><strong>Telefone:</strong> {o.telefone_cliente || '—'}</div>
                 <div>
                   <strong>Endereço:</strong>{' '}
@@ -284,10 +544,10 @@ export default function AdminPedidosPage() {
                     o.Endereco_id ? `ID ${o.Endereco_id}` : '—'
                   )}
                 </div>
-                {/* horários: hora de entrega e hora do pedido (empilhados abaixo do endereço) */}
+                
                 <div className={styles.times}>
                   <div>
-                    <strong>Hora de entrega:</strong> {formatTime(o['hora_entrega'] as string | null)}
+                    <strong>{(o.vem_retirar === true || o.vem_retirar === 1) ? 'Hora de retirada:' : 'Hora de entrega:'}</strong> {formatTime(o['hora_entrega'] as string | null)}
                     {(() => {
                       const d = (o['data_entrega'] as string | null);
                       const fm = (function(d?: string | null) {
@@ -321,6 +581,35 @@ export default function AdminPedidosPage() {
                     })()}
                   </div>
                 </div>
+                
+                {(o.cobrar_no_endereco === true || o.cobrar_no_endereco === 1) ? (
+                  <div style={{ marginTop: 8 }}>
+                    <strong style={{ color: '#2e7d32' }}>Cobrar no endereço</strong>
+                  </div>
+                ) : null}
+                
+                {(o.vem_retirar === true || o.vem_retirar === 1) ? (
+                  <div style={{ marginTop: 8 }}>
+                    <strong style={{ color: '#1976d2' }}>Vem retirar</strong>
+                  </div>
+                ) : null}
+                
+                {o.observacao && String(o.observacao).trim() && !String(o.observacao).startsWith('{') ? (
+                  <div style={{ marginTop: 8 }}>
+                    <strong>Observação:</strong>
+                    <div style={{ 
+                      marginTop: 4, 
+                      padding: '8px 12px', 
+                      background: '#f5f5f5', 
+                      borderRadius: '6px',
+                      fontSize: '0.9rem',
+                      color: '#555',
+                      whiteSpace: 'pre-wrap'
+                    }}>
+                      {String(o.observacao)}
+                    </div>
+                  </div>
+                ) : null}
               </div>
 
               {/* produtos */}
@@ -362,28 +651,26 @@ export default function AdminPedidosPage() {
                       const val = e.target.value;
                       if (typeof o.id === 'number') setStatusSelections(curr => ({ ...curr, [String(o.id)]: val }));
                     }}
-                    style={{ padding: '8px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.08)', minWidth: 140 }}
+                    className={styles.statusSelect}
                   >
                     <option value="">Alterar status</option>
                     {['Preparando', 'Em_Rota', 'Entregue', 'Cancelado'].map(s => (
                       <option key={s} value={s}>{s === 'Em_Rota' ? 'Saiu para entrega' : s.replace('_', ' ')}</option>
                     ))}
                   </select>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <button
-                      className={styles.btn}
-                      onClick={() => {
-                        const sel = statusSelections[String(o.id ?? '')] || '';
-                        if (typeof o.id === 'number' && sel) {
-                          handleChangeStatus(o.id, sel);
-                          setStatusSelections(curr => ({ ...curr, [String(o.id)]: '' }));
-                        }
-                      }}
-                      disabled={!statusSelections[String(o.id ?? '')]}
-                    >
-                      Atualizar
-                    </button>
-                  </div>
+                  <button
+                    className={`${styles.btn} ${styles.statusUpdateBtn}`}
+                    onClick={() => {
+                      const sel = statusSelections[String(o.id ?? '')] || '';
+                      if (typeof o.id === 'number' && sel) {
+                        handleChangeStatus(o.id, sel);
+                        setStatusSelections(curr => ({ ...curr, [String(o.id)]: '' }));
+                      }
+                    }}
+                    disabled={!statusSelections[String(o.id ?? '')]}
+                  >
+                    Atualizar
+                  </button>
                 </div>
             </div>
           </div>

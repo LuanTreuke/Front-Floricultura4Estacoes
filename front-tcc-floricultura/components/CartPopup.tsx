@@ -6,6 +6,7 @@ import cartStyles from '../styles/ShoppingCart.module.css';
 import { getCart, CartItem, updateQty, removeFromCart, cartTotal, subscribeCart } from '../services/cartService';
 import { fetchAddresses } from '../services/addressService';
 import { getCurrentUser } from '../services/authService';
+import { buildImageURL } from '../utils/imageUtils';
 
 type Props = {
   onClose?: () => void;
@@ -208,7 +209,7 @@ export default function CartPopup({ onClose, inline = false }: Props) {
             {items.map((it) => (
               <div key={it.id} className={cartStyles.item}>
                 {it.imagem_url ? (
-                  <Image src={it.imagem_url} className={cartStyles.itemImage} alt={it.nome || ''} width={64} height={64} style={{ objectFit: 'cover', borderRadius: 8 }} />
+                  <Image src={buildImageURL(it.imagem_url)} className={cartStyles.itemImage} alt={it.nome || ''} width={64} height={64} style={{ objectFit: 'cover', borderRadius: 8 }} />
                 ) : (
                   <div className={cartStyles.itemImage} />
                 )}
@@ -252,29 +253,6 @@ export default function CartPopup({ onClose, inline = false }: Props) {
             ))}
           </div>
           
-          {/* Address selector for checkout (uses addresses state so it's not unused) */}
-          {inline && usuarioAny && usuarioAny.id ? (
-            <div style={{ margin: '12px 0' }}>
-              {addresses.length > 0 ? (
-                <label style={{ display: 'block', marginBottom: 6 }}>
-                  Endereço de entrega
-                  <select
-                    value={selectedAddress ?? ''}
-                    onChange={(e) => setSelectedAddress(e.target.value ? Number(e.target.value) : null)}
-                    style={{ display: 'block', marginTop: 6 }}
-                  >
-                    {addresses.map((a) => (
-                      <option key={a.id} value={a.id}>{String(a['logradouro'] ?? `Endereço ${a.id}`)}</option>
-                    ))}
-                  </select>
-                </label>
-              ) : (
-                <div style={{ marginTop: 6 }}>
-                  <small>Nenhum endereço cadastrado. Adicione em Minha Conta &gt; Endereços.</small>
-                </div>
-              )}
-            </div>
-          ) : null}
           <div className={cartStyles.footerRow}>
             <button
               className={cartStyles.backBtn}

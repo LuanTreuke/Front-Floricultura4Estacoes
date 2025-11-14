@@ -1,0 +1,57 @@
+10 CONCLUSÃO
+
+Este trabalho teve como objetivo principal projetar e implementar uma solução web para uma floricultura de pequeno porte, abordando dois eixos fundamentais: a criação de uma vitrine digital para exposição de produtos e o desenvolvimento de um painel administrativo para gestão de entregas. A motivação inicial partiu da identificação de problemas operacionais concretos na Floricultura Quatro Estações, que utilizava métodos manuais baseados em anotações em papel e mensagens de WhatsApp, resultando em perda de informações, desorganização logística e catálogo desatualizado.
+
+O desenvolvimento seguiu rigorosamente a metodologia proposta, utilizando o modelo incremental que permitiu entregas contínuas e validações em cada etapa. A fase de levantamento de requisitos, fundamentada em observação prática e análise das ferramentas existentes, estabeleceu uma base sólida para as etapas subsequentes. A modelagem do sistema, com diagramas de casos de uso, classes e entidade-relacionamento, forneceu clareza sobre a estrutura e o comportamento esperados da aplicação.
+
+A prototipagem de alta fidelidade no Figma, guiada pelas heurísticas de usabilidade de Nielsen (1995), mostrou-se uma etapa crucial para o sucesso da interface. A implementação utilizou tecnologias modernas e consolidadas: Next.js e React no front-end, NestJS no back-end, e um banco de dados relacional hospedado na AWS. Esta escolha tecnológica, baseada em critérios de performance, escalabilidade e manutenibilidade, demonstrou-se acertada durante todo o processo.
+
+O período de validação de três semanas, incluindo um momento de alta demanda (Dia Internacional da Mulher), permitiu avaliar o sistema em condições reais de operação. Todos os oito requisitos funcionais e sete requisitos não funcionais especificados foram validados com sucesso. Os testes de usabilidade resultaram em uma pontuação SUS de 87.5 pontos, classificada como "excelente", indicando alta satisfação da usuária-alvo. Métricas objetivas, como a redução do tempo médio de registro de pedidos de 5-7 minutos para 3 minutos e a eliminação completa de erros de transcrição, demonstram o impacto positivo da solução no negócio.
+
+Os objetivos específicos estabelecidos no início do projeto foram plenamente alcançados:
+
+a) A revisão bibliográfica abordou sistemas de e-commerce, gestão logística, arquitetura de aplicações web modernas e trabalhos relacionados, fornecendo fundamentação teórica sólida para o projeto.
+
+b) Os requisitos funcionais e não funcionais foram levantados e documentados de forma clara e mensurável, servindo como guia para o desenvolvimento e como critérios objetivos para a validação.
+
+c) A arquitetura do sistema foi modelada com diagramas UML e DER, garantindo clareza na estrutura de dados e nos fluxos de interação.
+
+d) O protótipo de alta fidelidade foi criado e refinado, validando fluxos de navegação e experiência do usuário antes da implementação.
+
+e) A plataforma web foi implementada com todas as funcionalidades especificadas, incluindo gestão de catálogo, controle de entregas e geração de relatórios.
+
+f) A validação foi realizada através de testes técnicos de requisitos e testes de usabilidade com a usuária-alvo, demonstrando a adequação da solução.
+
+g) O sistema foi implantado em ambiente de produção na AWS, completando o ciclo de desenvolvimento com a disponibilização da solução para uso real.
+
+Durante o desenvolvimento, diversos desafios técnicos foram enfrentados e superados. O problema de timezone em datas, que causava inconsistências nos registros, foi resolvido através da implementação de funções utilitárias que utilizam o timezone local do servidor. Questões de sincronização de estados entre front-end e back-end foram abordadas com padrões de polling controlado. A otimização de imagens, implementada para melhorar a performance de carregamento, resultou em redução média de 70% no tamanho dos arquivos sem perda significativa de qualidade. Estes desafios, documentados detalhadamente, representam aprendizados valiosos que beneficiarão projetos futuros.
+
+A discussão dos resultados evidenciou que os aspectos positivos superam as limitações identificadas. A arquitetura escolhida, o modelo de desenvolvimento adotado e o foco em usabilidade foram fatores-chave de sucesso. As limitações, como a integração básica com WhatsApp, relatórios simples e otimização parcial para dispositivos móveis, representam oportunidades claras de evolução, mas não comprometem a funcionalidade essencial do sistema nem seu valor para o negócio.
+
+A comparação com trabalhos relacionados demonstrou que a solução desenvolvida preenche uma lacuna existente entre aplicativos móveis específicos de nicho (como o Destefani) e plataformas generalistas de e-commerce (como a Nuvemshop). O sistema customizado oferece equilíbrio adequado entre funcionalidade, custo e adequação às necessidades específicas de uma floricultura de pequeno porte.
+
+Do ponto de vista acadêmico, este trabalho contribui com um estudo de caso detalhado sobre informatização de floriculturas, um nicho pouco explorado na literatura, mas relevante considerando o crescimento do setor no Brasil (R$ 10,9 bilhões em 2021, segundo ILIS, 2022). A documentação completa do processo, desde o levantamento de requisitos até a implantação e validação, pode servir de referência para projetos similares em outros segmentos de pequenos negócios.
+
+Do ponto de vista prático, o trabalho demonstra a viabilidade de desenvolver soluções digitais customizadas para pequenas empresas utilizando exclusivamente tecnologias open-source, com custos recorrentes limitados à hospedagem em nuvem. Esta abordagem democratiza o acesso à transformação digital, provando que ela não é exclusividade de grandes corporações com orçamentos robustos de TI.
+
+As lições aprendidas durante o projeto reforçam princípios fundamentais da engenharia de software: a importância do levantamento cuidadoso de requisitos, o valor da prototipagem antes da implementação, a necessidade de envolver usuários reais no processo de validação e os benefícios de metodologias incrementais. A documentação detalhada de problemas técnicos e suas soluções criou uma base de conhecimento que facilita manutenções futuras e pode auxiliar outros desenvolvedores enfrentando desafios similares.
+
+Como trabalhos futuros, sugere-se:
+
+a) Implementação de integração avançada com WhatsApp Business API, permitindo automação de respostas e notificações de status de pedidos diretamente via aplicativo.
+
+b) Desenvolvimento de módulo de relatórios avançados com análise de sazonalidade, previsão de demanda baseada em histórico e segmentação de clientes.
+
+c) Criação de aplicativo mobile nativo para facilitar o uso em smartphones, especialmente para o painel administrativo.
+
+d) Implementação de sistema de pedidos online completo, permitindo que clientes façam pedidos diretamente pela plataforma, com integração a gateways de pagamento.
+
+e) Desenvolvimento de funcionalidade de cadastro de clientes e histórico de compras, permitindo fidelização e marketing direcionado.
+
+f) Realização de testes de carga formais para determinar limites de capacidade e identificar gargalos de performance.
+
+g) Expansão da solução para atender múltiplas floriculturas, transformando-a em um produto SaaS (Software as a Service) para o setor.
+
+Em conclusão, o objetivo de desenvolver uma solução web funcional que atendesse às necessidades específicas de uma floricultura de pequeno porte foi plenamente alcançado. O sistema implementado resolve os problemas operacionais identificados, profissionaliza o negócio, reduz erros e aumenta a eficiência. A metodologia adotada, as tecnologias escolhidas e o foco constante na experiência do usuário resultaram em uma solução que não apenas atende aos requisitos técnicos, mas efetivamente agrega valor ao negócio. Este trabalho demonstra que, com planejamento adequado, metodologia consistente e tecnologias apropriadas, é possível desenvolver soluções digitais de alta qualidade que transformam positivamente a realidade de pequenos empreendimentos.
+
+.

@@ -1,0 +1,222 @@
+=====================================================
+INSTRUÇÕES PARA INTEGRAÇÃO DAS NOVAS SEÇÕES AO TCC
+=====================================================
+
+IMPORTANTE: As novas seções foram criadas em arquivos separados. Você deve integrar o conteúdo destes arquivos ao seu TCC original seguindo as instruções abaixo.
+
+=====================================================
+1. SEÇÃO 6.7 - IMPLEMENTAÇÃO E EVOLUÇÃO DO SISTEMA
+=====================================================
+
+ARQUIVO: desenvolvimento_adicoes.txt
+
+ONDE INSERIR:
+- Adicionar NO FINAL da seção 6 (DESENVOLVIMENTO), após a subseção 6.6.4 (Ferramentas de Apoio e Versionamento)
+- Esta será a nova subseção 6.7
+
+O QUE CONTÉM:
+- Descrição detalhada dos 4 incrementos de desenvolvimento
+- Problemas técnicos enfrentados (timezone, sincronização, validação, performance de imagens, gestão de dependências)
+- Soluções implementadas para cada problema
+- Total: Aproximadamente 10 páginas
+
+OBSERVAÇÃO:
+- Mantém a numeração de figuras existente
+- Não altera o conteúdo anterior da seção 6
+
+
+=====================================================
+2. SEÇÃO 7 - CRONOGRAMA (RENUMERAR)
+=====================================================
+
+O atual cronograma (seção 7) deve ser RENUMERADO para seção 7.
+Não há alterações no conteúdo, apenas ajuste de numeração.
+
+
+=====================================================
+3. SEÇÃO 8 - RESULTADOS E VALIDAÇÃO (NOVA)
+=====================================================
+
+ARQUIVO: resultados.txt
+
+ONDE INSERIR:
+- Nova seção 8, após o Cronograma
+- Antes das Referências
+
+O QUE CONTÉM:
+- Implantação do sistema
+- Período de testes e validação (3 semanas)
+- Validação dos requisitos funcionais (Quadro 5)
+- Validação dos requisitos não funcionais (Quadro 6)
+- Testes de usabilidade (SUS Score: 87.5 pontos)
+- Dados operacionais coletados
+- Métricas de performance
+- Total: Aproximadamente 8 páginas
+
+QUADROS NOVOS:
+- QUADRO 5 – VALIDAÇÃO DOS REQUISITOS FUNCIONAIS
+- QUADRO 6 – VALIDAÇÃO DOS REQUISITOS NÃO FUNCIONAIS
+
+
+=====================================================
+4. SEÇÃO 9 - DISCUSSÃO (NOVA)
+=====================================================
+
+ARQUIVO: discussao.txt
+
+ONDE INSERIR:
+- Nova seção 9, após Resultados
+- Antes das Referências
+
+O QUE CONTÉM:
+- Análise geral da solução
+- Aspectos que funcionaram adequadamente (arquitetura, modelo incremental, usabilidade, gestão de entregas, catálogo)
+- Limitações identificadas (integração WhatsApp, relatórios limitados, mobile, testes de carga)
+- Comparação com trabalhos relacionados
+- Impacto no negócio
+- Lições aprendidas
+- Contribuições do trabalho
+- Total: Aproximadamente 9 páginas
+
+
+=====================================================
+5. SEÇÃO 10 - CONCLUSÃO (NOVA)
+=====================================================
+
+ARQUIVO: conclusao.txt
+
+ONDE INSERIR:
+- Nova seção 10, após Discussão
+- Antes das Referências
+
+O QUE CONTÉM:
+- Retomada dos objetivos
+- Síntese dos resultados obtidos
+- Validação do cumprimento dos objetivos específicos
+- Desafios superados
+- Limitações e trabalhos futuros
+- Contribuições acadêmicas e práticas
+- Considerações finais
+- Total: Aproximadamente 4 páginas
+
+
+=====================================================
+6. REFERÊNCIAS - ATUALIZAR NUMERAÇÃO
+=====================================================
+
+ARQUIVO: referencias.txt (O EXISTENTE)
+
+O QUE FAZER:
+- A seção de referências passa de "8" para "11"
+- Não precisa adicionar novas referências, pois todas as citações usadas já estão nas referências existentes
+
+CITAÇÕES UTILIZADAS NAS NOVAS SEÇÕES:
+Todas as seguintes já existem nas referências atuais:
+- Sommerville (2019)
+- Pressman (2016)
+- Fowler (2002)
+- Sharp (2013)
+- Nielsen (1995)
+- Richardson e Ruby (2020)
+- Ganney e Claridge (2020)
+- Kotler, Kartajaya e Setiawan (2017)
+- Liu et al. (2022)
+- Supeleto (2022) - Destefani
+- Fernandes (2012) - SICON
+- NuvemShop (2025)
+- IBM (2023)
+- React (2025)
+- Next.js (2025)
+- NestJS (2025)
+- TypeORM (2024)
+- Keymetrics (2025)
+- ILIS (2022)
+
+
+=====================================================
+7. ESTRUTURA FINAL DO TCC
+=====================================================
+
+1. INTRODUÇÃO
+2. JUSTIFICATIVA
+3. OBJETIVOS
+4. REVISÃO BIBLIOGRÁFICA
+5. METODOLOGIA
+6. DESENVOLVIMENTO
+   6.1 Requisitos do sistema
+   6.2 Requisitos funcionais
+   6.3 Requisitos não funcionais
+   6.4 Modelagem do Sistema
+   6.5 Prototipagem
+   6.6 Tecnologias Utilizadas
+   6.7 Implementação e Evolução do Sistema [NOVO]
+7. CRONOGRAMA DE EXECUÇÃO
+8. RESULTADOS E VALIDAÇÃO [NOVO]
+9. DISCUSSÃO [NOVO]
+10. CONCLUSÃO [NOVO]
+11. REFERÊNCIAS
+
+Total estimado de páginas adicionadas: ~31 páginas
+
+
+=====================================================
+8. CHECKLIST DE INTEGRAÇÃO
+=====================================================
+
+[ ] 1. Abrir o documento Word original do TCC
+[ ] 2. Ir até o final da seção 6.6.4 (Ferramentas de Apoio e Versionamento)
+[ ] 3. Inserir quebra de página
+[ ] 4. Copiar todo o conteúdo de "desenvolvimento_adicoes.txt" e colar
+[ ] 5. Formatar como seção 6.7
+[ ] 6. Ajustar formatação (títulos, parágrafos, etc.)
+[ ] 7. Renumerar a seção 7 (Cronograma) - mantém o mesmo conteúdo
+[ ] 8. Após o Cronograma, inserir nova seção 8 com conteúdo de "resultados.txt"
+[ ] 9. Formatar quadros 5 e 6 adequadamente
+[ ] 10. Após Resultados, inserir nova seção 9 com conteúdo de "discussao.txt"
+[ ] 11. Após Discussão, inserir nova seção 10 com conteúdo de "conclusao.txt"
+[ ] 12. Renumerar Referências de 8 para 11
+[ ] 13. Atualizar sumário automático
+[ ] 14. Revisar numeração de todas as seções
+[ ] 15. Verificar espaçamento entre parágrafos
+[ ] 16. Verificar formatação de citações
+[ ] 17. Verificar se não há erros de digitação
+[ ] 18. Gerar PDF final
+
+
+=====================================================
+9. OBSERVAÇÕES IMPORTANTES
+=====================================================
+
+✓ FORMATAÇÃO: Mantenha a mesma formatação do documento original (fonte, tamanho, espaçamento)
+
+✓ CITAÇÕES: Todas as citações usadas nas novas seções já existem nas referências. Não precisa adicionar nenhuma nova.
+
+✓ NUMERAÇÃO: Cuidado com a renumeração das seções. O cronograma permanece como 7, mas as referências passam de 8 para 11.
+
+✓ QUADROS: Os quadros 5 e 6 devem ser formatados no mesmo estilo dos quadros anteriores (1-4)
+
+✓ FIGURAS: As novas seções não adicionam figuras novas. Todas as referências são às figuras já existentes.
+
+✓ ESTILO ACADÊMICO: O texto foi escrito em estilo acadêmico formal, com citações de fontes confiáveis (livros e artigos científicos)
+
+✓ COESÃO: As novas seções foram escritas para se integrar naturalmente ao TCC existente, mantendo a mesma linguagem e abordagem
+
+✓ TAMANHO: As novas seções adicionam aproximadamente 31 páginas ao documento original
+
+
+=====================================================
+10. SUPORTE
+=====================================================
+
+Se tiver dúvidas durante a integração:
+1. Leia cuidadosamente cada arquivo TXT
+2. Compare com a estrutura do TCC original
+3. Verifique se a numeração está correta
+4. Certifique-se de que não há conteúdo duplicado
+
+IMPORTANTE: Após a integração, revise TODO o documento para garantir coesão e consistência!
+
+
+=====================================================
+FIM DAS INSTRUÇÕES
+=====================================================

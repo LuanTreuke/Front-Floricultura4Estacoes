@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { addProduct, Product } from '@/services/productService';
 import { fetchCategories, Categoria } from '@/services/categoryService';
+import { showSuccess, showError } from '../../../../utils/sweetAlert';
+import ImageUpload from '../../../../components/ImageUpload';
 
 export default function AdicionarProdutoPage() {
   const [nome, setNome] = useState('');
@@ -11,14 +13,13 @@ export default function AdicionarProdutoPage() {
   const [preco, setPreco] = useState('');
   const [categoria, setCategoria] = useState('');
   const [categories, setCategories] = useState<Categoria[]>([]);
-  const [imagem, setImagem] = useState<File | null>(null);
+  const [imagemUrl, setImagemUrl] = useState('');
   const [enabled, setEnabled] = useState(true);
   const router = useRouter();
 
-  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
-    if (e.target.files && e.target.files[0]) {
-      setImagem(e.target.files[0]);
-    }
+  function handleImageUploaded(url: string) {
+    console.log('📸 Imagem carregada:', url);
+    setImagemUrl(url);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -28,15 +29,16 @@ export default function AdicionarProdutoPage() {
         nome,
         descricao,
         preco: Number(preco),
-        imagem_url: imagem ? '' : '',
+        imagem_url: imagemUrl,
         Categoria_id: Number(categoria || 0),
-          enabled,
+        enabled,
       };
+      console.log('📤 Enviando produto:', dto);
       await addProduct(dto as Omit<Product, 'id'>);
-      alert('Produto adicionado com sucesso!');
+      await showSuccess('Produto adicionado com sucesso!');
       router.push('/admin/catalogo');
     } catch {
-      alert('Erro ao adicionar produto!');
+      showError('Erro ao adicionar produto!');
     }
   }
 
@@ -60,8 +62,8 @@ export default function AdicionarProdutoPage() {
       <h1 style={{fontSize: '2rem', fontWeight: 600, marginBottom: 24}}>Adicione um produto</h1>
       <form onSubmit={handleSubmit} style={{background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.08)', padding: 32, display: 'flex', flexDirection: 'column', gap: 24}}>
         <div style={{display: 'flex', flexDirection: 'column', gap: 8}}>
-          <label style={{fontWeight: 500}}>Imagens do produto</label>
-          <input type="file" accept="image/*" onChange={handleImageChange} style={{marginBottom: 8}} />
+          <label style={{fontWeight: 500}}>Imagem do produto</label>
+          <ImageUpload onImageUploaded={handleImageUploaded} />
         </div>
         <div style={{display: 'flex', flexDirection: 'column', gap: 8}}>
           <label>Nome do produto</label>

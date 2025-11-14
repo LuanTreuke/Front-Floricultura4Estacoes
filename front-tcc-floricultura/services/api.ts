@@ -1,7 +1,16 @@
 import axios from 'axios';
 import type { InternalAxiosRequestConfig } from 'axios';
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
+// Debug: Log da configuração da API (apenas em desenvolvimento)
+if (process.env.NODE_ENV === 'development') {
+  console.log('🔧 API Configuration:', {
+    API_URL,
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+    NODE_ENV: process.env.NODE_ENV
+  });
+}
 
 const api = axios.create({
   baseURL: API_URL,
@@ -39,6 +48,19 @@ if (!API_URL) {
       console.warn('[api] NEXT_PUBLIC_API_URL não definido. Configure a variável de ambiente no projeto Vercel.');
     }
   } catch {}
+}
+
+// Debug: Interceptador para logar requests (apenas em desenvolvimento)
+if (process.env.NODE_ENV === 'development') {
+  api.interceptors.request.use((config) => {
+    console.log('📡 API Request:', {
+      method: config.method?.toUpperCase(),
+      url: config.url,
+      baseURL: config.baseURL,
+      fullURL: `${config.baseURL}${config.url}`
+    });
+    return config;
+  });
 }
 // attach current user id to requests when available so backend can perform simple role checks
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {

@@ -11,7 +11,9 @@ import SortButtons from '../components/SortButtons';
 import ProductCard from '../components/ProductCard';
 import ProductPopup from '../components/ProductPopup';
 import CartPopup from '../components/CartPopup';
+import Breadcrumb from '../components/Breadcrumb';
 import { getCart, subscribeCart } from '../services/cartService';
+import { showConfirm } from '../utils/sweetAlert';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 
@@ -160,6 +162,10 @@ export default function HomePage() {
   return (
     <div>
       <div className={styles.container}>
+        <Breadcrumb items={[
+          { label: 'Página Inicial' }
+        ]} />
+        
         <header className={styles.header}>
           <div className={styles.logo}>
             <Image src="/Logo-floricultura.svg" alt="Logo Floricultura Quatro Estações" width={96} height={96} style={{ height: 96, width: 'auto', display: 'block', objectFit: 'contain' }} />
@@ -183,7 +189,7 @@ export default function HomePage() {
               ) : null}
               {isLoggedIn ? '' : 'Login'}
               {isLoggedIn && hasOrdersNotify ? (
-                <span style={{ position: 'absolute', top: -4, right: -4, background: '#e53935', color: '#fff', borderRadius: 999, width: 16, height: 16, fontSize: 12, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>!</span>
+                <span className={styles.notificationBadge}>!</span>
               ) : null}
             </button>
             {isLoggedIn && showPopup && (
@@ -223,12 +229,22 @@ export default function HomePage() {
                 )}
                 <button
                   className={styles.loginPopupBtn}
-                  onClick={() => {
-                    // desloga: remove o usuário armazenado e atualiza a interface
-                    logout();
-                    setIsLoggedIn(false);
+                  onClick={async () => {
+                    // Fechar o popup antes de mostrar a confirmação
                     setShowPopup(false);
-                    router.push('/');
+                    
+                    // desloga: remove o usuário armazenado e atualiza a interface
+                    const confirmado = await showConfirm(
+                      'Deseja realmente sair?',
+                      'Você será desconectado da sua conta.',
+                      'Sim, sair',
+                      'Cancelar'
+                    );
+                    if (confirmado) {
+                      logout();
+                      setIsLoggedIn(false);
+                      router.push('/');
+                    }
                   }}
                 >
                   Sair

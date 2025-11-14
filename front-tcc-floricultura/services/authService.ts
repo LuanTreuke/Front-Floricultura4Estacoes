@@ -1,4 +1,5 @@
 import api from './api';
+import { formatDateToYYYYMMDD } from '../utils/dateUtils';
 
 export async function login(email: string, senha: string) {
   const res = await api.post(`/usuario/login`, { email, senha });
@@ -6,11 +7,25 @@ export async function login(email: string, senha: string) {
 }
 
 export async function cadastro(data: { nome: string; email: string; senha: string; telefone?: string }) {
-  const res = await api.post(`/usuario/cadastro`, data);
+  // Adicionar data_cadastro automaticamente (formato YYYY-MM-DD para DATE)
+  const dataCadastro = formatDateToYYYYMMDD();
+  
+  const res = await api.post(`/usuario/cadastro`, {
+    ...data,
+    data_cadastro: dataCadastro
+  });
   return res.data;
 }
 
-export type User = { id?: number; nome?: string; role?: string; cargo?: string; telefone?: string; email?: string } | null;
+export type User = { 
+  id?: number; 
+  nome?: string; 
+  role?: string; 
+  cargo?: string; 
+  telefone?: string; 
+  email?: string;
+  data_cadastro?: string;
+} | null;
 
 export function getCurrentUser(): User {
   if (typeof window === 'undefined') return null;

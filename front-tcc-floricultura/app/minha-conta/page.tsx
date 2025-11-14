@@ -1,12 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useEffect, useState } from 'react';
-import styles from '../../styles/MyAccount.module.css';
-import { getCurrentUser, User } from '../../services/authService';
-import { fetchPhones, PhoneDto, deletePhone } from '../../services/phoneService';
-import { fetchAddresses, AddressDto, updateAddress, deleteAddress } from '../../services/addressService';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import styles from '../../styles/MyAccount.module.css';
+import { fetchPhones, deletePhone, PhoneDto } from '../../services/phoneService';
+import { fetchAddresses, updateAddress, deleteAddress, AddressDto } from '../../services/addressService';
+import { getCurrentUser, User } from '../../services/authService';
+import { showConfirm, showToast } from '../../utils/sweetAlert';
 import BackButton from '../../components/BackButton';
+import Breadcrumb from '../../components/Breadcrumb';
 
 export default function MyAccountPage() {
   const router = useRouter();
@@ -35,9 +38,11 @@ export default function MyAccountPage() {
   }, [router]);
 
   async function handleDeletePhone() {
-    if (!confirm('Remover telefone?')) return;
+    const confirmed = await showConfirm('Deseja remover o telefone?', 'Confirmar remoção', 'Sim, remover', 'Cancelar');
+    if (!confirmed) return;
     await deletePhone(0);
     setPhones([]);
+    showToast('Telefone removido com sucesso', 'success');
     try {
       if (typeof window !== 'undefined') {
         const cur = getCurrentUser();
@@ -60,9 +65,11 @@ export default function MyAccountPage() {
   }
 
   async function handleDeleteAddress(id: number) {
-    if (!confirm('Remover endereço?')) return;
+    const confirmed = await showConfirm('Deseja remover este endereço?', 'Confirmar remoção', 'Sim, remover', 'Cancelar');
+    if (!confirmed) return;
     await deleteAddress(id);
     setAddresses(addresses.filter(a => a.id !== id));
+    showToast('Endereço removido com sucesso', 'success');
   }
 
   // handleAddAddress removed; use dedicated cadastro/endereco page which can redirect back using ?returnTo=
@@ -72,6 +79,19 @@ export default function MyAccountPage() {
   return (
     <div className={styles.container}>
       <BackButton />
+      <Breadcrumb items={[
+        { label: 'Página Inicial', href: '/' },
+        { label: 'Minha Conta' }
+      ]} />
+      <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0',  }}>
+        <Image 
+          src="/Logo-floricultura.svg" 
+          alt="Logo Floricultura 4 Estações" 
+          width={520} 
+          height={120} 
+          style={{ objectFit: 'contain' }} 
+        />
+      </div>
       <h1 style={{ textAlign: 'center' }}>Minha conta</h1>
 
       <section className={styles.section}>

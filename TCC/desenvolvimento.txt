@@ -1,0 +1,397 @@
+6 DESENVOLVIMENTO
+6.1 Requisitos do sistema
+O levantamento dos requisitos garante que o sistema desenvolvido atenda às necessidades da floricultura. Segundo Sommerville (2019), os requisitos de software são descrições das funcionalidades e restrições que o sistema deve atender, e são classificados geralmente como requisitos funcionais e não funcionais. A correta identificação e documentação desses requisitos é importante para o sucesso do projeto de software, pois servem como base para o design, implementação e validação do sistema.
+
+6.1.1 Requisitos de Ambiente (Hardware e Software)
+Para garantir o funcionamento adequado da plataforma web, são definidos os seguintes requisitos de hardware e software, tanto para o ambiente do servidor, onde a aplicação será hospedada, quanto para o ambiente do cliente, que acessa o sistema.
+6.1.1.1 Requisitos para a Hospedagem
+Estes são os requisitos para o ambiente do servidor, que abrigará os componentes de back-end (NestJS), front-end (Next.js) e o banco de dados da aplicação.
+Requisitos de Hardware:
+CPU: 1 vCPU (ou equivalente).
+Memória RAM: Mínimo de 512 MB, recomendado 1 GB para maior estabilidade.
+Armazenamento: Mínimo de 10 GB de espaço em disco (SSD recomendado para melhor performance).
+Requisitos de Software:
+Sistema Operacional: Linux ou qualquer outro sistema compatível com Node.js.
+Ambiente de Execução: Node.js, conforme especificado no back-end do projeto.
+Sistema de Banco de Dados: Compatível com a implementação, como um serviço de banco de dados da AWS.
+Servidor Web (se necessário): Nginx ou Apache para servir como proxy reverso (prática recomendada em produção).
+6.1.1.2 Requisitos para o usuário
+Estes são os requisitos para os dispositivos que acessarão o sistema, seja o cliente final visualizando o catálogo ou o funcionário gerenciando o painel administrativo.
+Requisitos de Hardware:
+Qualquer computador de mesa, notebook, tablet ou smartphone capaz de executar um navegador de internet moderno.
+Memória RAM: Mínimo de 2 GB.
+Resolução de Tela: O sistema será responsivo, adaptando-se a diferentes resoluções, com um mínimo de 320px de largura para dispositivos móveis.
+Requisitos de Software:
+Sistema Operacional: Windows, macOS, Linux, Android ou iOS.
+Navegador de Internet (Browser): Qualquer navegador moderno com suporte completo às tecnologias web essenciais: HTML5, CSS3 e JavaScript, especificamente a versão ECMAScript 2015 (ES6) ou superior.
+Conectividade: Acesso à internet. O tempo de carregamento da página é otimizado para ser de até 5 segundos em uma conexão 3G padrão.
+6.2 Requisitos funcionais 
+Os requisitos funcionais representam as funcionalidades essenciais que o sistema deve oferecer, refletindo as ações esperadas pelos usuários no contexto da floricultura. Como afirma Pressman (2016), requisitos funcionais descrevem "os serviços que o sistema deve fornecer, as reações do sistema a entradas específicas e seu comportamento em determinadas situações". No Quadro 2, é detalhado cada requisito funcional do sistema.
+
+QUADRO 2 –  REQUISITOS FUNCIONAIS
+ID
+Requisito Funcional
+Descrição
+RF01
+Exibição dos produtos em vitrine digital
+A vitrine digital deve apresentar os produtos com foto, nome, valor e descrição, permitindo que o cliente visualize as opções de forma clara e atrativa
+RF02
+Gerenciamento de Produtos
+O administrador deve poder cadastrar, editar e excluir produtos do catálogo. Ao cadastrar ou editar, ele deverá associar o produto a uma categoria previamente definida.
+RF03
+Gerenciamento de Categorias
+O administrador deve poder criar, editar e excluir as categorias de produtos, garantindo a consistência dos dados para a organização e filtragem na vitrine.
+RF04
+Filtro de produtos por categoria
+Na vitrine, o cliente deve poder filtrar os produtos por categoria, tornando a experiência de navegação mais rápida e intuitiva.
+RF05
+Autenticação e Controle de Acesso
+O acesso à área administrativa deve ser restrito a usuários autenticados com login e senha e com as devidas permissões, garantindo a segurança das operações. As senhas dos usuários devem ser armazenadas no banco de dados de forma segura, utilizando um algoritmo de hashing moderno com salt (ex: Bcrypt).
+RF06
+Registro e Gerenciamento de Entregas
+O administrador deve poder registrar novas entregas (pedidos), inserindo informações detalhadas do cliente, do destinatário, do produto escolhido e do agendamento.
+RF07
+Acompanhamento do Status das Entregas
+Cada pedido deve ter um status (ex: “Recebido”, “Entregue”) que o administrador possa atualizar para organizar o fluxo logístico e controlar as encomendas.
+RF08
+Geração de Relatórios Simples
+O sistema deve permitir a geração de relatórios básicos, como o de produtos mais vendidos, para fornecer informações que auxiliem na tomada de decisões estratégicas.
+
+FONTE: Elaborado pelo autor (2025).
+6.3 Requisitos não funcionais 
+Já os requisitos não funcionais tratam de propriedades do sistema, como desempenho, usabilidade, confiabilidade e portabilidade. De acordo com Glinz (2007), requisitos não funcionais influenciam diretamente a experiência do usuário e a aceitabilidade do sistema, mesmo que não definam comportamentos diretamente observáveis. O quadro 3 apresenta todos os requisitos não funcionais do sistema, cada um com sua descrição e objetivo.
+
+
+QUADRO 3 –  REQUISITOS NÃO FUNCIONAIS
+ID
+Requisito Não Funcional
+Descrição
+RNF
+01
+Interface Amigável e Intuitiva
+A interface será construída com foco na simplicidade e organização lógica , utilizando ícones e botões claros para reduzir a curva de aprendizado e permitir o uso eficiente por usuários com pouca familiaridade com tecnologia.
+RNF
+02
+Responsividade e Compatibilidade
+A plataforma será responsiva e compatível com diferentes resoluções de tela , adaptando-se a smartphones, tablets e desktops para garantir o funcionamento correto em qualquer dispositivo do usuário.
+RNF
+03
+Desempenho de Carregamento
+As páginas principais do sistema, como a vitrine e o painel administrativo, devem ter um tempo de carregamento máximo de 5 segundos em uma conexão 3G padrão , visando minimizar a frustração do usuário e melhorar a experiência de navegação.
+RNF
+04
+Alta Disponibilidade 
+O sistema deverá manter uma disponibilidade de 95% do tempo , com alta tolerância a falhas, para garantir o acesso contínuo à plataforma, inclusive em períodos de alto volume de acessos.
+RNF
+05
+Arquitetura Escalável
+A arquitetura do sistema será estruturada de forma modular e escalável , com separação de componentes, a fim de facilitar a manutenção e a inclusão de novas funcionalidades no futuro sem a necessidade de uma reestruturação completa.
+RNF
+06
+Performance de Transação
+A operação de salvar um novo registro (ex: um produto ou uma entrega) deve ser concluída e retornar uma confirmação ao usuário em no máximo 1.5 segundos.
+RNF
+07
+Feedback de Interface
+Todas as operações de criação, edição ou exclusão devem fornecer um feedback visual imediato ao usuário (ex: uma notificação de "sucesso" ou "erro").
+
+FONTE: Elaborado pelo autor (2025). 
+6.3.1 Métodos de validação
+RNF01: Realização de testes práticos com o usuário-alvo, que deverá executar tarefas predefinidas (ex: cadastrar um produto) sem treinamento. O sucesso será medido pela capacidade de completar a tarefa de forma autônoma.
+RNF02: Verificação da interface utilizando as ferramentas de desenvolvedor dos navegadores para simular diferentes dispositivos. Validação final através de testes de navegação em um celular e um desktop físicos.
+
+RNF03: Utilização de ferramentas como o Google Lighthouse para 
+auditar as páginas principais, com a simulação de rede configurada para "3G Lenta". Os relatórios devem apontar um tempo de interação inferior a 5s.
+RNF04: Configuração de um serviço de monitoramento de uptime (ex: UptimeRobot, AWS CloudWatch) para verificar a disponibilidade do sistema em intervalos regulares (ex: a cada 5 minutos) durante um período de observação.
+RNF05: Inspeção da arquitetura do código-fonte para verificar a correta separação de responsabilidades entre as camadas (Controller, Service, Repository e Entity), garantindo baixo acoplamento e alta coesão.
+RNF06: Execução da ação de salvar 10 vezes em ambiente de teste e cálculo do tempo médio de resposta do servidor para a requisição.
+RNF07: Execução de todas as operações de CRUD, verificando se uma notificação visual clara e apropriada é exibida em cada caso.
+6.4 Modelagem do Sistema
+A modelagem do sistema foi necessária para garantir organização e clareza na estrutura da aplicação. Foram utilizados diferentes diagramas para representar as funcionalidades, entidades e interações do sistema.
+6.4.1 Diagrama de Casos de Uso
+Este diagrama representa as funcionalidades principais disponíveis no sistema e os atores envolvidos em cada ação (LUCIDCHART, s.d.). A figura 7 os detalha a seguir:
+FIGURA 7 – DIAGRAMA DE CASOS  DE USO
+
+
+FONTE: Elaborado pelo autor (2025).
+6.4.1.1 Detalhamento dos casos de uso
+1. Caso de Uso: Visualizar Catálogo
+Ator Principal: Cliente
+Resumo: Permite que um visitante ou cliente visualize os produtos oferecidos pela floricultura através de uma vitrine digital interativa.
+Pré-condições: Nenhuma. O catálogo é de acesso público.
+Fluxo Principal (Cenário de Sucesso):
+O Cliente acessa a página principal da aplicação.
+O sistema busca e exibe a lista de produtos disponíveis, mostrando para cada um a imagem, nome e preço.
+O Cliente pode opcionalmente utilizar os filtros de categoria e preço para refinar a busca.
+O sistema atualiza a lista de produtos em tempo real conforme os filtros são aplicados.
+O Cliente clica em um produto para ver mais detalhes.
+Pós-condições: O Cliente visualizou os produtos e pode decidir qual comprar, por meio de contato no whatsapp da floricultura.
+Fluxo Alternativo: Caso não haja produtos cadastrados no sistema, uma mensagem informativa como "Nenhum produto encontrado" é exibida.
+
+2. Caso de Uso: Gerenciar Produtos
+Ator Principal: Funcionário
+Resumo: Representa o conjunto de funcionalidades que permitem ao Funcionário manter o catálogo de produtos da floricultura atualizado. Conforme o requisito funcional RF02, este caso de uso engloba o ciclo de vida completo de um produto.
+Pré-condições: O funcionário deve estar autenticado no sistema com permissões de administrador.
+Fluxo Principal (Cenário de Sucesso):
+O funcionário acessa a área de "Gerenciar Catálogo".
+O sistema exibe a lista de todos os produtos cadastrados.
+A partir desta tela, o Funcionário pode iniciar uma das seguintes ações:
+Cadastrar: Clica em "Adicionar Produto" , preenche o formulário com nome, descrição, preço, imagem e seleciona uma categoria de uma lista pré-definida, e então salva o novo produto.
+Editar: Seleciona um produto existente, o sistema exibe um formulário com os dados atuais, o funcionário altera as informações desejadas e salva.
+Excluir: Seleciona um produto, confirma a ação em uma janela de aviso e o sistema remove o produto do banco de dados.
+Pós-condições: O catálogo de produtos é modificado (um item foi criado, atualizado ou removido).
+3. Caso de Uso: Adicionar Encomenda
+Ator Principal: Funcionário
+Resumo: Permite que o Funcionário registre no sistema uma nova venda ou pedido de entrega, centralizando as informações logísticas.
+Pré-condições: O funcionário deve estar autenticado no sistema com permissões de administrador.
+Fluxo Principal (Cenário de Sucesso):
+O Funcionário acessa a área de "Entregas" e seleciona a opção para adicionar uma nova encomenda.
+O sistema apresenta o formulário de "Adicionar Entrega".
+O Funcionário preenche todos os campos obrigatórios: dados do produto, data e hora da entrega, nome e telefone do cliente, nome do destinatário, endereço completo e informações de pagamento.
+Ao submeter o formulário, o sistema valida os dados inseridos.
+O sistema salva as informações no banco de dados, criando um novo registro de Pedido com o status inicial "Recebido".
+O sistema exibe uma mensagem de sucesso e atualiza a lista de entregas.
+Pós-condições: Uma nova encomenda é registrada e fica visível no painel de gerenciamento de entregas.
+4. Caso de Uso: Gerenciar Categorias
+Ator Principal: Funcionário
+Resumo: Permite que o Funcionário administre a lista de categorias de produtos, garantindo a organização e a consistência dos dados do catálogo.
+Pré-condições: O funcionário deve estar autenticado no sistema com permissões de administrador.
+Fluxo Principal (Cenário de Sucesso):
+O funcionário acessa a funcionalidade de gerenciamento de categorias no painel administrativo.
+O sistema exibe a lista de todas as categorias já criadas.
+O Funcionário pode realizar as seguintes ações:
+Criar: Adiciona uma nova categoria informando seu nome.
+Editar: Altera o nome de uma categoria existente.
+Excluir: Remove uma categoria que não está mais em uso.
+Pós-condições: A lista de categorias disponíveis para associação com produtos é atualizada.
+Fluxo Alternativo: O sistema deve impedir a exclusão de uma categoria se houver produtos associados a ela, informando o usuário sobre a restrição.
+5. Caso de Uso: Gerar Relatórios
+Ator Principal: Funcionário
+Resumo: Permite que o funcionário gere relatórios simples para análise do desempenho do negócio, conforme o requisito funcional RF08.
+Pré-condições: O funcionário deve estar autenticado no sistema com permissões de administrador.
+Fluxo Principal (Cenário de Sucesso):
+O Funcionário acessa a seção de "Relatórios" do sistema.
+O sistema apresenta os tipos de relatórios disponíveis (ex: "Produtos Mais Vendidos").
+O Funcionário seleciona o tipo de relatório e, opcionalmente, um período de tempo.
+O sistema processa os dados de pedidos e produtos para compilar as informações.
+O sistema exibe o relatório formatado na tela.
+Pós-condições: O funcionário obtém insights sobre o desempenho das vendas para auxiliar na tomada de decisões.
+6. Caso de Uso: Contatar Empresa
+Ator Principal: Cliente
+Resumo: Este caso de uso permite que o Cliente inicie uma conversa direta com a floricultura através do aplicativo WhatsApp. O objetivo é fornecer um canal de comunicação de baixa fricção para tirar dúvidas, solicitar orçamentos ou fazer encomendas que não se encaixam diretamente nos produtos do catálogo.
+Pré-condições: O cliente precisa ter acesso à internet. A presença do aplicativo WhatsApp no dispositivo do cliente facilita a interação.
+Fluxo Principal (Cenário de Sucesso):
+O Cliente visualiza um botão ou ícone de contato na página da vitrine (ex: "Faça seu pedido!").
+O Cliente clica no botão.
+O sistema redireciona o navegador do Cliente para uma URL específica da API do WhatsApp.
+Esta URL abre o aplicativo WhatsApp (se instalado no dispositivo) ou a interface do WhatsApp Web, já com uma conversa iniciada com o número de telefone da floricultura.
+Pós-condições: O Cliente está fora da aplicação e dentro do ambiente do WhatsApp, pronto para se comunicar com a floricultura.
+Fluxo Alternativo: Caso o Cliente não tenha o WhatsApp instalado em seu dispositivo (especialmente em um desktop), o navegador abrirá o WhatsApp Web e solicitará que ele se conecte à sua conta escaneando um QR Code com o celular.
+6.4.2 Diagrama de Classes
+O diagrama de classes apresenta a estrutura lógica do sistema, com os objetos principais, atributos e métodos envolvidos no processo (GEEKSFORGEEKS, 2025). A figura 8 apresenta o diagrama de classes do sistema:
+
+FIGURA 8 – DIAGRAMA DE CLASSES
+
+FONTE: Elaborado pelo autor (2025).
+6.4.3 Diagrama Entidade-Relacionamento (DER)
+O DER foi elaborado para representar graficamente o banco de dados do sistema, destacando as tabelas, atributos e relacionamentos (LUCIDCHART, s.d.).
+Para ilustrar as cardinalidades, o diagrama utiliza a notação pé de galinha (crow's foot), um padrão adotado na modelagem de dados por sua expressividade e clareza visual (SOMMERVILLE, 2019). A notação "pé de galinha" é utilizada em DERs para representar os relacionamentos entre entidades, especificando com clareza a cardinalidade e a obrigatoriedade das participações. Essa notação faz uso de símbolos gráficos nas extremidades das linhas de relacionamento:
+Um pequeno círculo indica participação opcional (zero ocorrências possíveis);
+Duas barras verticais (||) representam participação obrigatória e única (um e somente um);
+Um tridente ou “pé de galinha” (três linhas divergentes) simboliza a cardinalidade de muitos (uma ou mais ocorrências).
+A combinação desses símbolos em cada extremidade da linha de relacionamento permite definir se a associação entre entidades é do tipo um-para-um (1:1), um-para-muitos (1:N) ou muitos-para-muitos (N:N), contribuindo para a clareza e a integridade do modelo de dados (HEUSER, 2009). A figura 9 apresenta o diagrama de entidade relacionamento do sistema:
+FIGURA 9 – DIAGRAMA ENTIDADE RELACIONAMENTO
+
+FONTE: Elaborado pelo autor (2025).
+6.4.3.1 Detalhamento do modelo de dados e regras de negócio
+O Diagrama Entidade-Relacionamento (DER) projetado para o sistema, embora visualmente simples, foi estruturado para garantir a integridade dos dados, a segurança e o alinhamento com as regras de negócio específicas da floricultura. Esta seção detalha as decisões de design por trás do modelo.
+a) Entidade Usuario e o Controle de Acesso por Papel (role)
+A entidade Usuario é o pilar do controle de acesso ao painel administrativo. A decisão de incluir o atributo role com o tipo ENUM ('Admin', 'Funcionario') diretamente no banco de dados é estratégica por dois motivos:
+Integridade de Dados: O banco de dados só permitirá a inserção dos valores predefinidos, eliminando o risco de papéis inválidos serem cadastrados no sistema.
+Implementação da Regra de Negócio: Conforme definido no requisito funcional de autenticação, nem todos os usuários podem ter acesso a todas as funcionalidades. A lógica de negócio na aplicação tratará esse atributo da seguinte forma: antes de executar uma operação crítica (como cadastrar um novo produto ou gerar relatórios), a camada de controle (Controller) verificará o role do usuário logado. Se o valor não for 'Admin', a ação será bloqueada, retornando uma mensagem de acesso não autorizado. Isso garante que apenas administradores possam realizar ações sensíveis.
+b) Entidades Categoria e Produto
+A separação de Categoria em uma entidade própria, em vez de ser um simples campo de texto no Produto, é uma decisão de normalização de dados. Isso resolve um problema comum em sistemas de catálogo: a inconsistência de dados. Sem uma entidade Categoria, os usuários poderiam cadastrar "Buquês", "buques" e "Buque", tratando-os como três categorias distintas. Com a entidade Categoria, o administrador cria uma lista única e controlada, e ao cadastrar um Produto, ele seleciona uma das categorias existentes. Isso garante a consistência para os filtros da vitrine e para a geração de relatórios.
+c) Entidade Pedido
+A entidade Pedido centraliza todas as informações de uma transação. As decisões de design mais importantes aqui são:
+Composição com Endereco: Um endereço de entrega não existe no sistema sem um Pedido associado. A relação de composição garante que cada pedido tenha seu próprio registro de endereço, evitando que a alteração de um endereço em um pedido afete outro, e garante que, se um pedido for excluído, seu endereço correspondente também seja.
+Armazenamento de Dados do Cliente: Os dados essenciais do comprador (nome_cliente, telefone_cliente) são armazenados diretamente na tabela Pedido. Isso simplifica o modelo, alinhando-o à necessidade do negócio, que é registrar a informação da venda de forma direta, conforme o processo descrito no protótipo.
+Rastreabilidade com Usuario: A chave estrangeira usuario_id cria um vínculo direto do Pedido com o Usuario que o registrou. Isso é fundamental para a rastreabilidade e auditoria, permitindo saber qual funcionário registrou cada venda. 
+6.5 Prototipagem
+A prototipagem da interface foi realizada utilizando a ferramenta Figma, uma plataforma online voltada ao design de interfaces e prototipação de aplicações digitais. As telas iniciais foram pensadas com base nos requisitos do sistema e, posteriormente, refinadas com ajustes visuais, hierarquia de informação e responsividade. Durante o processo, foram aplicadas as heurísticas de usabilidade propostas por Jakob Nielsen, um conjunto de dez princípios amplamente aceitos para orientar o design de interfaces eficientes e intuitivas. Essas heurísticas incluem diretrizes como visibilidade do status do sistema, correspondência entre o sistema e o mundo real, controle e liberdade do usuário, consistência, prevenção de erros, entre outras, que contribuem diretamente para uma boa experiência do usuário (NIELSEN, 1995). O uso do Figma favoreceu a criação de wireframes, mockups e protótipos navegáveis de forma intuitiva, priorizando usabilidade e apelo visual.
+A Figura 10 apresenta a tela principal da vitrine digital, que é a interface pública do sistema. Seu objetivo é exibir os produtos disponíveis de forma visualmente atrativa, com imagem, nome e preço , além de oferecer ferramentas de filtro e ordenação para facilitar a navegação e a decisão de compra do cliente. Além disso, a tela possui o botão de ação principal ("Faça seu pedido!"), que direciona o cliente para o contato via WhatsApp.
+
+FIGURA 10 – VITRINE DIGITAL
+
+FONTE: Elaborado pelo autor (2025).
+
+
+A Figura 11 demonstra a aplicação do design responsivo no protótipo, apresentando a versão da vitrine digital para dispositivos móveis. Conforme o requisito não funcional RNF02.
+
+
+
+FIGURA 11 – VITRINE DIGITAL (VERSÃO MOBILE)
+
+FONTE: Elaborado pelo autor (2025).
+A Figura 12 detalha a página de um produto específico. Nela, são exibidos a imagem em destaque, uma descrição completa, o preço e o botão de ação principal ("Faça seu pedido!"), que direciona o cliente para o contato via WhatsApp.
+
+
+FIGURA 12 – DETALHES DO PRODUTO
+
+FONTE: Elaborado pelo autor (2025).
+A Figura 13 ilustra a tela de autenticação, que serve como portal de entrada para a área restrita do sistema. Nela, o funcionário deve inserir suas credenciais (e-mail e senha) para acessar as funcionalidades de gerenciamento, conforme o requisito funcional RF05.
+
+
+
+
+
+
+
+
+
+
+
+
+FIGURA 13 – TELA DE LOGIN
+
+FONTE: Elaborado pelo autor (2025).
+A Figura 14 exibe o painel de gerenciamento de entregas, o núcleo do controle logístico do sistema. A tela apresenta uma lista de encomendas com seu respectivo status (ex: "Recebido"), ela permite ver os detalhes da entrega e oferece opções de filtragem por uma data específica através do calendário.
+
+
+
+
+
+
+
+
+FIGURA 14 – GERENCIAMENTO DE ENTREGAS
+
+FONTE: Elaborado pelo autor (2025).
+A Figura 15 detalha o formulário para adicionar uma nova encomenda. Esta tela foi projetada para centralizar o registro de todas as informações cruciais para a entrega, como dados do cliente, do destinatário, endereço completo, produto e horário.
+
+
+
+FIGURA 15 – ADIÇÃO DE ENCOMENDA
+
+FONTE: Elaborado pelo autor (2025).
+A Figura 16 exemplifica uma das heurísticas de usabilidade aplicadas no projeto, a de prevenção de erros. O sistema apresenta uma janela modal de confirmação antes de executar uma ação destrutiva, como o cancelamento de uma edição ou uma exclusão de imagem, garantindo que o usuário tenha controle total sobre suas ações.
+
+
+FIGURA 16 – CONFIRMAÇÕES DE AÇÃO
+
+FONTE: Elaborado pelo autor (2025).
+A Figura 17 apresenta o painel de gerenciamento de catálogo, que serve como a visão geral administrativa dos produtos. Esta tela permite ao funcionário visualizar todos os itens, utilizar filtros de categoria e ordenação, buscar por um produto específico e iniciar o processo de adição ou edição de um item no catálogo.
+FIGURA 17 – TELA DE GERENCIAMENTO DE CATÁLOGO
+
+FONTE: Elaborado pelo autor (2025).
+A Figura 18 ilustra o formulário para a criação de um novo produto. Nele, o administrador insere todas as informações essenciais, como nome, descrição, preço, imagens e associa o item a uma categoria pré-existente, garantindo a consistência dos dados do catálogo.
+
+FIGURA 18 – TELA DE CADASTRO DE NOVO PRODUTO
+
+FONTE: Elaborado pelo autor (2025).
+A Figura 19 exibe a tela de detalhe de um produto a partir da perspectiva do administrador. Diferente da visão do cliente, esta interface fornece acesso direto às ações de "Editar produto" e "Excluir produto", centralizando as operações de gerenciamento para um item específico.
+
+
+
+
+
+FIGURA 19 – TELA DE DETALHE E AÇÕES DO PRODUTO
+
+FONTE: Elaborado pelo autor (2025).
+A Figura 20 detalha o formulário de edição de um produto. Os campos são pré-preenchidos com as informações existentes para facilitar as alterações, e esta tela serve como portal para o gerenciamento das imagens do produto.
+
+
+
+
+
+
+
+
+
+
+
+
+
+FIGURA 20 – TELA DE EDIÇÃO DE PRODUTO
+
+FONTE: Elaborado pelo autor (2025).
+A Figura 21 apresenta a interface dedicada para o gerenciamento das imagens de um produto que aparecerão na vitrine. A tela permite ao administrador adicionar novas imagens, seja por upload ou captura, e excluir fotos existentes de forma individualizada.
+
+
+
+
+
+
+
+
+
+
+FIGURA 21 – TELA DE GERENCIAMENTO DE IMAGENS DO PRODUTO
+
+FONTE: Elaborado pelo autor (2025).
+A Figura 22 mostra o painel para a gestão de categorias. Esta interface permite ao administrador visualizar a lista de todas as categorias existentes, excluí-las e iniciar, através de um modal, a criação de novas categorias para a organização dos produtos.
+
+
+
+
+
+
+
+
+
+FIGURA 22 – TELA DE GERENCIAMENTO DE CATEGORIAS
+
+FONTE: Elaborado pelo autor (2025).
+
+A Figura 23 apresenta o modal utilizado para adicionar uma categoria.
+
+
+
+
+
+
+
+
+
+
+
+
+FIGURA 23 – TELA DE ADICIONAR CATEGORIA
+
+FONTE: Elaborado pelo autor (2025).
+A Figura 24 exibe a tela de relatórios do sistema. Projetada para inteligência de negócio, ela permite ao administrador selecionar um tipo de relatório (ex: "Produtos mais vendidos"), filtrar por um período de tempo e baixar os relatórios gerados.
+
+
+
+
+
+
+
+
+FIGURA 24 – TELA DE GERAÇÃO DE RELATÓRIOS
+
+FONTE: Elaborado pelo autor (2025).
+
+6.6 Tecnologias Utilizadas
+A seleção das tecnologias para este projeto foi pautada por critérios de performance, escalabilidade, manutenibilidade e pela robustez de cada ferramenta. A seguir, detalha-se o conjunto de tecnologias (stack) adotado para o desenvolvimento da solução. A figura 25 apresenta a arquitetura das tecnologias utilizadas:
+
+
+
+
+
+
+
+FIGURA 25 – TECNOLOGIAS UTILIZADAS
+
+FONTE: Elaborado pelo autor (2025).
+6.6.1 Front-end
+A interface do usuário foi construída com React.js, uma biblioteca JavaScript mantida pelo Facebook, reconhecida por sua abordagem baseada em componentes. Essa arquitetura permite a criação de UIs complexas a partir de peças isoladas e reutilizáveis, o que simplifica o desenvolvimento e a manutenção (REACT, 2025).
+Para estruturar a aplicação React, foi utilizado o framework Next.js. A escolha pelo Next.js foi estratégica devido às suas funcionalidades que otimizam a performance e a experiência do usuário, como a renderização no lado do servidor (Server-Side Rendering - SSR) e a geração de sites estáticos (Static Site Generation - SSG). Esses recursos melhoram o tempo de carregamento inicial da página e são benéficos para a indexação por motores de busca (SEO) (NEXT.JS, 2025).
+Para a estilização, optou-se pelo Tailwind CSS, um framework utility-first que permite construir interfaces customizadas de forma rápida, aplicando classes diretamente no HTML, sem a necessidade de escrever CSS customizado, o que acelera o desenvolvimento e mantém a consistência visual (TAILWIND CSS, 2025).
+
+6.6.2 Back-end
+Para o desenvolvimento do servidor e da API RESTful, a escolha foi o NestJS, um framework progressivo para Node.js. O NestJS utiliza TypeScript por padrão, o que adiciona tipagem estática ao JavaScript, aumentando a robustez do código e reduzindo a ocorrência de erros em tempo de execução. Sua arquitetura é fortemente inspirada em padrões de desenvolvimento consolidados e faz uso extensivo de Injeção de Dependência (Dependency Injection), o que promove um código modular, desacoplado, escalável e altamente testável (NESTJS, 2025). O ambiente de execução para o back-end é o Node.js, escolhido por sua arquitetura orientada a eventos e não-bloqueante, ideal para construir aplicações de rede de alta performance. Para a comunicação com o banco de dados, foi utilizado o TypeORM. Além do mapeamento objeto-relacional, a ferramenta foi empregada para gerenciar a evolução do esquema do banco de dados através de Migrations, garantindo que as alterações na estrutura das tabelas sejam versionadas e aplicadas de forma consistente (TypeORM, 2024).
+Para garantir a disponibilidade da aplicação back-end em um ambiente de produção, será utilizado o PM2, um gerenciador de processos avançado para Node.js. A ferramenta atua como um supervisor do processo da aplicação, assegurando que ela permaneça em execução contínua (24/7). Suas principais responsabilidades no projeto são o reinício automático da aplicação em caso de falhas inesperadas e o gerenciamento do modo cluster, que permite à aplicação utilizar todos os núcleos de CPU disponíveis no servidor, otimizando a performance e a capacidade de resposta sob carga (KEYMETRICS, 2025). 
+6.6.3 Banco de Dados
+Para a persistência dos dados, foi selecionada uma solução de banco de dados relacional hospedada na nuvem da Amazon Web Services (AWS), como o Amazon RDS. A escolha pela AWS se justifica por sua alta disponibilidade, escalabilidade sob demanda e segurança, permitindo que a infraestrutura de dados cresça conforme a necessidade do negócio, ao mesmo tempo que se beneficia do Nível Gratuito (Free Tier) para viabilizar os custos iniciais do projeto.
+6.6.4 Ferramentas de Apoio e Versionamento
+O desenvolvimento será realizado no ambiente de desenvolvimento integrado (IDE) Visual Studio Code. Para a modelagem dos diagramas UML e do DER, foram utilizadas as ferramentas Mermaid.js e Draw.io. A prototipagem da interface foi feita no Figma. Por fim, todo o código-fonte do projeto será versionado com o Git e gerenciado na plataforma GitHub, garantindo um controle de versão seguro.

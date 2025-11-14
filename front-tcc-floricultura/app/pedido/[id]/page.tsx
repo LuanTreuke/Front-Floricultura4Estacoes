@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import styles from '../../../styles/OrderDetails.module.css';
 import { fetchOrderById } from '../../../services/orderService';
+import { buildImageURL } from '../../../utils/imageUtils';
 
 function formatDateTime(dateStr?: string, timeStr?: string) {
   if (!dateStr) return '—';
@@ -44,6 +45,7 @@ export default function PedidoDetalhePage() {
     data_pedido?: string;
     hora_pedido?: string;
     cobrar_no_endereco?: number | string | boolean;
+    vem_retirar?: number | string | boolean;
     observacao?: unknown;
     carrinho?: unknown;
   };
@@ -112,6 +114,7 @@ export default function PedidoDetalhePage() {
             <div className={styles.status}><span className={styles.label}>Status:</span> {displayStatus(order.status as string | null)}</div>
             <div><span className={styles.label}>Pedido em:</span> <span className={styles.muted}>{formatDateTime(order.data_pedido, order.hora_pedido)}</span></div>
             <div><span className={styles.label}>Cobrar no endereço:</span> <span className={styles.muted}>{((order.cobrar_no_endereco === 1) || (order.cobrar_no_endereco === '1') || (order.cobrar_no_endereco === true)) ? 'Sim' : 'Não'}</span></div>
+            <div><span className={styles.label}>Vem retirar:</span> <span className={styles.muted}>{((order.vem_retirar === 1) || (order.vem_retirar === '1') || (order.vem_retirar === true)) ? 'Sim' : 'Não'}</span></div>
           </div>
         </div>
 
@@ -121,7 +124,7 @@ export default function PedidoDetalhePage() {
             {unique.map((it: AnyObj, idx: number) => (
               <li key={idx} className={styles.productItem}>
                 {((it['imagem_url'] as string | undefined) || (it['imagem'] as string | undefined) || (it['imagemUrl'] as string | undefined)) ? (
-                  <Image src={String((it['imagem_url'] as string | undefined) || (it['imagem'] as string | undefined) || (it['imagemUrl'] as string | undefined))} alt={(it['nome'] as string | undefined) ?? ''} width={80} height={80} className={styles.productImg} style={{ objectFit: 'cover' }} />
+                  <Image src={buildImageURL(String((it['imagem_url'] as string | undefined) || (it['imagem'] as string | undefined) || (it['imagemUrl'] as string | undefined)))} alt={(it['nome'] as string | undefined) ?? ''} width={80} height={80} className={styles.productImg} style={{ objectFit: 'cover' }} />
                 ) : (
                   <div className={styles.productImg}>Img</div>
                 )}

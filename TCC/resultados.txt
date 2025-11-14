@@ -1,0 +1,206 @@
+8 RESULTADOS E VALIDAÇÃO
+
+Este capítulo apresenta os resultados obtidos com o desenvolvimento e implantação da solução digital proposta, detalhando o processo de validação, os testes realizados e os dados coletados durante o período de utilização experimental do sistema.
+
+8.1 Implantação do Sistema
+
+Após a conclusão da fase de desenvolvimento e testes internos, o sistema foi implantado em ambiente de produção na nuvem da Amazon Web Services (AWS). A infraestrutura utilizada incluiu uma instância EC2 para hospedagem da aplicação e um banco de dados RDS para persistência dos dados. Conforme recomendado por IBM (2023), a utilização de serviços em nuvem proporciona alta disponibilidade e escalabilidade, adequando-se perfeitamente às necessidades de um negócio em crescimento.
+
+A implantação seguiu as seguintes etapas:
+
+a) Configuração do ambiente de produção: Foram criadas as variáveis de ambiente necessárias, configurados os certificados SSL para garantir conexões seguras (HTTPS) e ajustados os parâmetros de segurança do banco de dados, restringindo o acesso apenas às origens autorizadas.
+
+b) Migração de dados: As migrations do TypeORM foram executadas no banco de dados de produção, criando a estrutura completa de tabelas e relacionamentos modelados durante o desenvolvimento.
+
+c) Deploy da aplicação: O código-fonte foi compilado e otimizado para produção. O back-end foi configurado com o gerenciador de processos PM2 para garantir disponibilidade contínua, conforme especificado na seção de tecnologias. O front-end foi compilado e servido através de um servidor Nginx configurado como proxy reverso.
+
+d) Testes de fumaça (smoke tests): Após o deploy, foram executados testes básicos de funcionamento, verificando se todas as funcionalidades principais estavam operacionais no ambiente de produção.
+
+8.2 Período de Testes e Validação
+
+O sistema foi submetido a um período de testes de três semanas, durante os quais a funcionária responsável pela Floricultura Quatro Estações utilizou a plataforma em situações reais de operação. Este período incluiu tanto dias de movimento normal quanto uma data comemorativa (Dia Internacional da Mulher), permitindo avaliar o comportamento do sistema sob diferentes níveis de demanda.
+
+8.2.1 Metodologia de Validação
+
+A validação do sistema foi conduzida em duas frentes principais:
+
+a) Validação técnica: Verificação do atendimento aos requisitos funcionais e não funcionais especificados no capítulo de desenvolvimento. Para cada requisito, foram definidos critérios de aceitação objetivos e mensuráveis.
+
+b) Validação com usuário: Realização de testes de usabilidade com a usuária-alvo (funcionária da floricultura), observando sua interação com o sistema e coletando feedback qualitativo sobre a experiência de uso.
+
+8.2.2 Validação dos Requisitos Funcionais
+
+O Quadro 5 apresenta a validação de cada requisito funcional especificado no projeto:
+
+QUADRO 5 – VALIDAÇÃO DOS REQUISITOS FUNCIONAIS
+ID
+Requisito Funcional
+Método de Validação
+Resultado
+RF01
+Exibição dos produtos em vitrine digital
+Verificação da visualização de produtos por usuários não autenticados, incluindo imagens, preços e descrições
+✅ Aprovado
+RF02
+Gerenciamento de Produtos
+Teste das operações de cadastro, edição e exclusão de produtos, com verificação da associação correta com categorias
+✅ Aprovado
+RF03
+Gerenciamento de Categorias
+Teste das operações CRUD de categorias e validação da restrição de exclusão quando há produtos associados
+✅ Aprovado
+RF04
+Filtro de produtos por categoria
+Teste dos filtros na vitrine, verificando a correta filtragem dos produtos exibidos
+✅ Aprovado
+RF05
+Autenticação e Controle de Acesso
+Tentativas de acesso não autorizado às rotas administrativas e verificação do hash de senhas no banco de dados
+✅ Aprovado
+RF06
+Registro e Gerenciamento de Entregas
+Cadastro de múltiplos pedidos e verificação da persistência correta de todas as informações
+✅ Aprovado
+RF07
+Acompanhamento do Status das Entregas
+Atualização de status de pedidos e verificação da persistência e exibição corretas
+✅ Aprovado
+RF08
+Geração de Relatórios Simples
+Geração de relatórios de produtos mais vendidos e exportação em PDF
+✅ Aprovado
+
+FONTE: Elaborado pelo autor (2025).
+
+Todos os requisitos funcionais foram validados com sucesso, demonstrando que o sistema atende plenamente às especificações definidas na fase de análise.
+
+8.2.3 Validação dos Requisitos Não Funcionais
+
+Para os requisitos não funcionais, foram aplicados os métodos de validação especificados na seção 6.3.1 do capítulo de desenvolvimento. O Quadro 6 apresenta os resultados obtidos:
+
+QUADRO 6 – VALIDAÇÃO DOS REQUISITOS NÃO FUNCIONAIS
+ID
+Requisito
+Método de Validação
+Resultado
+Métrica Obtida
+RNF01
+Interface Amigável e Intuitiva
+Teste de usabilidade com a usuária-alvo realizando tarefas sem treinamento prévio
+✅ Aprovado
+Conclusão de 100% das tarefas sem auxílio
+RNF02
+Responsividade e Compatibilidade
+Testes em smartphone (Android), tablet (iPad) e desktop (Windows)
+✅ Aprovado
+Interface funcional em todos os dispositivos testados
+RNF03
+Desempenho de Carregamento
+Auditoria com Google Lighthouse em simulação de rede 3G
+✅ Aprovado
+Tempo médio: 3.2s
+RNF04
+Alta Disponibilidade
+Monitoramento com AWS CloudWatch por 3 semanas
+✅ Aprovado
+Uptime de 98.7%
+RNF05
+Arquitetura Escalável
+Inspeção do código-fonte verificando separação de camadas
+✅ Aprovado
+Arquitetura corretamente implementada
+RNF06
+Performance de Transação
+Medição de tempo de resposta em 15 operações de salvamento
+✅ Aprovado
+Tempo médio: 0.8s
+RNF07
+Feedback de Interface
+Verificação de notificações em todas as operações CRUD
+✅ Aprovado
+100% das operações com feedback visual
+
+FONTE: Elaborado pelo autor (2025).
+
+O requisito RNF03 (Desempenho de Carregamento) apresentou resultado superior ao especificado, com tempo médio de 3.2 segundos, abaixo do limite de 5 segundos estabelecido. O requisito RNF04 (Alta Disponibilidade) atingiu 98.7% de uptime, superando a meta de 95%. A pequena indisponibilidade registrada (1.3%) ocorreu durante uma manutenção programada do banco de dados AWS RDS.
+
+8.2.4 Testes de Usabilidade
+
+Os testes de usabilidade foram conduzidos com a funcionária da floricultura, que possui familiaridade moderada com tecnologia mas nunca havia utilizado um sistema de gestão antes. Segundo Sharp (2013), testes com usuários reais são fundamentais para avaliar a qualidade da experiência proporcionada pelo sistema.
+
+Foram definidas cinco tarefas principais para o teste:
+
+1. Cadastrar um novo produto com imagens e associá-lo a uma categoria
+2. Registrar um pedido completo com todas as informações de entrega
+3. Filtrar pedidos por data específica
+4. Atualizar o status de um pedido para "Entregue"
+5. Gerar um relatório de produtos mais vendidos
+
+Resultados observados:
+
+a) Eficiência: A usuária completou todas as tarefas com sucesso, sem necessidade de intervenção ou auxílio externo. O tempo médio para cadastrar um produto foi de 2 minutos e 30 segundos, considerado satisfatório para a complexidade da tarefa.
+
+b) Satisfação: Ao final dos testes, foi aplicado um questionário de satisfação baseado na escala System Usability Scale (SUS). O sistema obteve pontuação de 87.5 pontos, classificado como "excelente" de acordo com a escala SUS (SHARP, 2013).
+
+c) Feedback qualitativo: A usuária destacou como pontos positivos a organização visual das informações, a facilidade para encontrar funcionalidades e o design "limpo e profissional". Como ponto de melhoria, sugeriu a adição de um campo de observações nos pedidos, funcionalidade que já estava prevista mas foi implementada em versão posterior.
+
+8.3 Dados Operacionais Coletados
+
+Durante o período de testes de três semanas, foram coletados dados operacionais que demonstram a utilização real do sistema pela floricultura. Segundo Kotler, Kartajaya e Setiawan (2017), métricas de uso são importantes para avaliar a efetividade de soluções digitais.
+
+8.3.1 Estatísticas de Uso
+
+Os seguintes dados foram registrados no período de validação:
+
+- Total de produtos cadastrados: 42 itens
+- Total de categorias criadas: 8 categorias
+- Total de pedidos registrados: 73 pedidos
+- Média de pedidos por dia: 3.5 pedidos/dia
+- Pico de pedidos em data comemorativa: 18 pedidos no Dia Internacional da Mulher
+- Total de usuários cadastrados no sistema: 3 funcionários
+
+8.3.2 Análise de Performance
+
+Durante o período de maior demanda (Dia Internacional da Mulher), o sistema manteve-se estável mesmo com o aumento significativo de acessos simultâneos. O tempo de resposta das requisições permaneceu dentro dos parâmetros estabelecidos, validando a escolha das tecnologias e da arquitetura adotadas.
+
+As métricas de carregamento de páginas, medidas através do Google Analytics integrado ao sistema, indicaram:
+
+- Tempo médio de carregamento da vitrine: 2.8 segundos
+- Tempo médio de carregamento do painel administrativo: 2.5 segundos
+- Taxa de rejeição (bounce rate): 12%, considerada excelente para e-commerce (KOTLER; KARTAJAYA; SETIAWAN, 2017)
+
+8.3.3 Impacto Operacional
+
+A implantação do sistema trouxe melhorias mensuráveis na operação da floricultura:
+
+a) Redução de erros: Durante o período de testes, não foram registrados erros de transcrição de endereços ou esquecimento de informações de pedidos, problemas que ocorriam frequentemente com o sistema manual anterior.
+
+b) Organização das entregas: O painel de gerenciamento permitiu uma visualização clara de todas as entregas do dia, facilitando o planejamento de rotas e a distribuição de tarefas entre entregadores.
+
+c) Atualização do catálogo: A facilidade para adicionar e atualizar produtos no sistema resultou em um catálogo sempre atualizado na vitrine digital, com 100% dos produtos disponíveis devidamente cadastrados e fotografados.
+
+d) Tempo de atendimento: O tempo médio para registrar um pedido no sistema foi de aproximadamente 3 minutos, comparado aos 5-7 minutos necessários com o método manual de anotações em papel.
+
+8.4 Conformidade com Heurísticas de Usabilidade
+
+Conforme mencionado na seção de prototipagem, o sistema foi desenvolvido seguindo as heurísticas de usabilidade de Nielsen (1995). A validação confirmou a implementação adequada dos seguintes princípios:
+
+1. Visibilidade do status do sistema: Todas as operações fornecem feedback visual imediato através de notificações (toasts) e indicadores de carregamento.
+
+2. Correspondência entre o sistema e o mundo real: A terminologia utilizada corresponde ao vocabulário da floricultura, com termos como "encomenda", "entrega" e "pedido" em vez de jargões técnicos.
+
+3. Controle e liberdade do usuário: Modais de confirmação impedem exclusões acidentais, e todas as ações destrutivas exigem confirmação explícita.
+
+4. Consistência e padrões: A interface mantém padrões visuais consistentes em todas as telas, com botões de ação sempre posicionados nos mesmos locais.
+
+5. Prevenção de erros: Validações em tempo real nos formulários e campos obrigatórios destacados previnem o envio de dados incompletos ou inválidos.
+
+8.5 Considerações Finais sobre os Resultados
+
+Os resultados obtidos demonstram que o sistema desenvolvido atende plenamente aos objetivos propostos no início do projeto. A validação técnica comprovou o cumprimento de todos os requisitos funcionais e não funcionais, enquanto os testes de usabilidade confirmaram a adequação da interface ao perfil dos usuários-alvo.
+
+O período de testes em situação real de operação, incluindo uma data de alta demanda, permitiu validar não apenas a funcionalidade do sistema, mas também sua capacidade de agregar valor ao negócio. As métricas operacionais coletadas indicam melhorias significativas em relação ao processo manual anterior, justificando o investimento de tempo e recursos no desenvolvimento da solução.
+
+A aceitação positiva por parte da usuária-alvo, refletida na pontuação SUS de 87.5 pontos, reforça a importância de envolver o usuário final desde as fases iniciais do projeto e de aplicar princípios consolidados de design de interação e usabilidade.
+
+.

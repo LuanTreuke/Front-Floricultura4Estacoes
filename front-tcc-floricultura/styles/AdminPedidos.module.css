@@ -8,16 +8,23 @@
 .header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 4px; /* toolbar spacing from title (title moved above) */
+    align-items: flex-start;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #dee2e6;
 }
 
 .title {
-    font-size: 1.4rem;
-    margin: 15 0 0 0;
-    color: #0b0b0b;
-    margin-bottom: 12px; /* ensure title sits on its own line with spacing */
+    font-size: 2rem;
+    font-weight: 600;
+    color: #343a40;
+    margin: 0 0 4px 0;
+}
+
+.subtitle {
+    color: #6c757d;
+    margin: 0;
+    font-size: 0.95rem;
 }
 
 .toolbar {
@@ -74,7 +81,7 @@
 .card {
     display: flex;
     gap: 16px;
-    align-items: flex-start;
+    align-items: center;
     background: #ffffff;
     padding: 14px;
     border-radius: 10px;
@@ -105,6 +112,33 @@
 
 .bellBtn svg { display: block; }
 .bellBtn i { font-size: 18px; line-height: 1; }
+
+.whatsappBtn {
+    position: absolute;
+    left: 14px;
+    top: 6px;
+    background: #25D366;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    color: #fff;
+    z-index: 30;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.whatsappBtn:hover {
+    background: #128C7E;
+    transform: scale(1.05);
+}
+
+.whatsappBtn svg { display: block; }
 
 .rightMeta {
     /* push the right-side meta lower so bell appears above it on desktop */
@@ -163,13 +197,14 @@
 }
 
 .statusColumn {
+    max-height: 100px;
     width: 180px;
     flex: 0 0 180px;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     gap: 10px;
-    padding-top: 20px;
+    padding-top: 15px;
 }
 
 .statusLabel {
@@ -181,6 +216,18 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    width: 100%;
+}
+
+.statusSelect {
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.08);
+    width: 100%;
+    font-size: 14px;
+}
+
+.statusUpdateBtn {
     width: 100%;
 }
 
@@ -225,6 +272,17 @@
         box-shadow: 0 6px 14px rgba(0,0,0,0.12);
         z-index: 60;
     }
+    
+    /* WhatsApp button on mobile over the image */
+    .whatsappBtn {
+        left: 12px;
+        top: 12px;
+        width: 40px;
+        height: 40px;
+        box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+        z-index: 60;
+    }
+    
     .rightMeta { padding-top: 0; text-align: left; }
 }
 
@@ -241,7 +299,7 @@
     }
 
     .title {
-        font-size: 1.15rem;
+        font-size: 1.5rem;
     }
 
     .toolbar {
@@ -278,7 +336,11 @@
     /* allow status column to size to its content on mobile (remove large reserved height) */
     .statusColumn { width: 100%; margin-top: 6px; flex-direction: column; align-items: flex-start; flex: 0 0 auto; height: auto; }
 
-    .statusActions { flex-direction: column; gap: 4px; width: 100%; }
+    .statusActions { flex-direction: row; gap: 8px; width: 100%; }
+    
+    .statusSelect { flex: 1; min-width: 0; }
+    
+    .statusUpdateBtn { flex: 0 0 auto; width: auto; padding: 8px 16px; }
 
     .statusLabel { margin-bottom: 4px; }
 

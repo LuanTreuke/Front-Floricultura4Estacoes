@@ -1,0 +1,107 @@
+4 REVISÃO BIBLIOGRÁFICA
+
+A eficiência na distribuição é fator determinante em um cenário de competição, conforme indicado por estudo recente sobre e‑commerce de flores, agilidade na entrega é prioridade para 56 % dos consumidores, com 64 % influenciados pelo prazo estimado. No setor de flores, perecibilidade e ocasiões especiais intensificam essa pressão. O uso de hubs logísticos, rastreamento em tempo real e automação otimizam prazos e preservam a qualidade dos produtos (Capterra; Ibraflor; Clóvis Souza, 2025).
+ No entanto, observam-se ainda floriculturas que utilizam processos manuais e sistemas básicos para o controle de vendas, o que compromete a criação de bases de dados e a integração com fornecedores. Esse uso limitado de tecnologia gera barreiras na adoção de ferramentas digitais que poderiam melhorar a gestão e a eficiência operacional. Um estudo recente de Mantilla (2025), voltado ao setor florícola em países emergentes, destaca que “a implantação de tecnologias da Indústria 4.0 encontra entraves, incluindo custos elevados e falta de expertise técnica, limitando o uso de ferramentas inteligentes no controle operacional”. Além disso, a logística da última milha é identificada como um grande desafio nas vendas via internet, impactando a etapa decisiva da entrega, que deve ser cumprida com competência (Menin, 2019). Nesse contexto, cabe analisar de que forma a adoção de um catálogo digital aliado a um sistema estruturado de entregas pode contribuir para a superação dos desafios logísticos e para a elevação da eficiência operacional e da satisfação do cliente.
+Primeiramente, é necessário analisar o papel do catálogo digital. Segundo (Liu et al., 2022), ele é uma ferramenta essencial para apresentar os produtos de forma organizada, clara e acessível, permitindo que o usuário compreenda rapidamente as opções disponíveis e tome decisões com base em informações visuais e descritivas. a estruturação de um catálogo digital melhora a navegação do usuário e facilita a localização de conteúdos relevantes, contribuindo para uma experiência mais objetiva.
+Para que essa ferramenta de gestão se alinhe à experiência do cliente, o foco recai sobre a Experiência do Usuário (UX) e a usabilidade. Segundo Sharp (2013), a usabilidade se refere à qualidade da experiência ao interagir com um sistema ou site e é fundamental para o sucesso no comércio eletrônico. Portanto, um catálogo online deve ser intuitivo e fácil de usar, permitindo que os usuários encontrem a informação desejada, algo que a falta de usabilidade em muitos sites impede, levando à perda de visitantes (Silva, 2023).
+Martins e Almeida, (2022), destacam a importância da Arquitetura da Informação, definida por Cruz e Bicudo (2010) como a competência responsável pela disposição e organização objetiva das informações. Segundo Kim e Lee (2021), o uso de um Sistema de Gerenciamento de Conteúdo (CMS) permite administrar todas as etapas, da criação à publicação de conteúdo, separando o gerenciamento da sua apresentação. Em um catálogo digital, isso se traduz na facilidade de descrever itens (catalogação), rotular conteúdo com palavras-chave (indexação ou tags), e permitir a busca e recuperação de informações (Kim; Lee, 2021). Ferramentas como barras de pesquisa e nuvens de tags podem melhorar significativamente a navegabilidade. Uma boa prática sugere lançar o catálogo quando estiver cerca de 80% pronto, fazendo ajustes baseados no feedback do cliente (Nielsen; Budiu, 2021). Ferreira, Chauvel e Silveira (2006) também enfatizam a importância dos requisitos não funcionais de usabilidade, que têm forte impacto na qualidade de sistemas de informação com interação direta com clientes.
+Em relação à gestão de entregas, ela aborda um dos gargalos operacionais do setor, especialmente considerando o desafio da última milha (Menin, 2019). A falta de controle sobre as operações logísticas, evidenciada pela baixa utilização de tecnologia para acompanhar fluxos de compra e venda, leva à desorganização e perda de informações.
+Um sistema de gerenciamento de entregas pode mitigar esses problemas logísticos ao otimizar processos e substituir métodos manuais, que frequentemente causam perda de informações e ineficiência (Menin, 2019). 
+Finalmente, a proposta de uma plataforma digital integrada está alinhada com a transformação digital e os princípios do Marketing 4.0. Kotler, Kartajaya e Setiawan (2017), assim como Lima e Queiroz (2018), observam que o avanço tecnológico influencia diretamente o comportamento do consumidor, que utiliza cada vez mais meios digitais no processo de compra. Em um mercado onde a experiência digital é importante, plataformas com boa usabilidade e interfaces intuitivas tornam-se um diferencial competitivo (Loureiro; Barbosa, 2022). Conhecer o consumidor online e suas interações com a plataforma torna-se relevante neste contexto. A otimização da experiência do usuário pode ser medida por métricas de atendimento ao cliente, como CSAT, NPS, CES, tempo de resposta e também por uma métrica de autoatendimento, como pesquisas realizadas pelos próprios usuários (Métricas de Atendimento, 2019). 
+4.1 Arquitetura de aplicações web modernas
+Além dos aspectos de negócio e usabilidade, a construção de uma solução digital depende de uma arquitetura de software bem definida. A arquitetura estabelece a estrutura do sistema, ditando como seus componentes se organizam e se comunicam para atender aos requisitos funcionais e não funcionais do projeto (SOMMERVILLE, 2019). Para aplicações web contemporâneas, dois padrões arquitetônicos se destacam por sua eficácia, escalabilidade e aderência aos princípios da Engenharia de Software: a Arquitetura em Camadas e o modelo Cliente-Servidor.
+A Arquitetura em Camadas (Layered Architecture) é um estilo arquitetural amplamente adotado em sistemas de informação, pois organiza a aplicação em camadas horizontais, cada uma responsável por uma função específica. De acordo com Fowler (2002), uma estrutura comum envolve três camadas principais: a camada de apresentação (interface com o usuário), a camada de lógica de negócio (onde são processadas as regras de negócio) e a camada de acesso a dados (responsável pela comunicação com o banco de dados). Essa separação favorece o princípio da separação de interesses (separation of concerns), promovendo modularidade, facilidade de manutenção e testabilidade (FOWLER, 2002; SOMMERVILLE, 2019).
+Complementarmente, o modelo cliente-servidor define uma arquitetura distribuída, em que o cliente solicita recursos e o servidor os fornece. Segundo Silva e Almeida (2022), essa estrutura fundamenta a maioria das aplicações web atuais. O servidor concentra a lógica de negócio e o acesso aos dados, enquanto o cliente, geralmente uma aplicação web ou mobile, gerencia a interação com o usuário. A comunicação entre essas camadas ocorre via APIs, que expõem os serviços do sistema de forma padronizada e reutilizável (Silva; Almeida, 2022).
+Entre os padrões de API mais comuns destaca-se o modelo RESTful (Representational State Transfer), definido por Richardson e Ruby (2020). Nesse modelo, os recursos do sistema são manipulados por meio dos verbos do protocolo HTTP (GET, POST, PUT, DELETE), esses verbos são comandos utilizados para definir a ação que o cliente deseja realizar sobre um recurso em uma aplicação web. No modelo REST, os principais são: GET, para obter dados; POST, para criar novos registros; PUT, para atualizar um recurso existente; e DELETE, para removê-lo. Esses métodos padronizam a comunicação entre cliente e servidor e orientam o comportamento das requisições em sistemas web. promovendo simplicidade, escalabilidade e interoperabilidade. O uso de APIs REST é uma prática usada na criação de sistemas desacoplados, permitindo que diferentes clientes (como uma aplicação web) consumam os mesmos serviços back-end (Richardson; Ruby, 2020; Foreach Partners, 2025).
+A integração desses dois modelos, arquitetura em camadas e cliente-servidor, representa uma prática recomendada no desenvolvimento de soluções web modernas. Ela possibilita a criação de sistemas escaláveis, organizados e sustentáveis, fundamentais para projetos que demandam evolução contínua e manutenção ao longo do tempo, como o proposto neste trabalho  (SOMMERVILLE, 2019).
+Para que o sistema esteja disponível continuamente ao usuário final, é necessário utilizar um serviço de hospedagem, que consiste na alocação dos arquivos e dados da aplicação em servidores conectados à internet, permitindo o acesso remoto e ininterrupto ao website (IBM, 2023). Conforme afirma Leonardi (2023), a hospedagem web viabiliza a publicação de aplicações online, garantindo desempenho, segurança e tempo de atividade compatíveis com a experiência esperada pelo usuário.
+A arquitetura de aplicações web modernas normalmente adota a separação entre as responsabilidades do front-end e do back-end como uma prática consolidada, pois isso favorece a modularidade e facilita a manutenção e evolução dos sistemas (SOMMERVILLE, 2019). O front-end é responsável pela interface gráfica e pela experiência de interação do usuário, enquanto o back-end gerencia a lógica de negócio e o acesso aos dados da aplicação (FIELDING, 2000).
+Entre os frameworks modernos utilizados para construção de interfaces web, destaca-se o Next.js, ele é baseado no React.js e se destaca por oferecer renderização no lado do servidor (Server-Side Rendering – SSR), geração de páginas estáticas (Static Site Generation – SSG), divisão automática de código e roteamento orientado a arquivos, o que melhora o desempenho e a indexação da aplicação em motores de busca (NEXT.JS, 2025). O React, por sua vez, é uma biblioteca declarativa mantida pela Meta (antigo Facebook), cuja estrutura baseada em componentes reutilizáveis permite o desenvolvimento de interfaces complexas de forma eficiente e organizada (REACT, 2025).
+A estilização de interfaces em projetos modernos pode ser realizada com Tailwind CSS, um framework CSS utilitário adotado por sua produtividade e consistência visual (TAILWIND CSS, 2025). Ele utiliza classes utilitárias diretamente na marcação HTML, o que reduz a necessidade de escrever CSS personalizado e aumenta a consistência visual do projeto (TAILWIND CSS, 2025).
+No contexto de aplicações back-end escaláveis, o NestJS destaca-se como opção, baseada em TypeScript, com suporte à modularidade, injeção de dependências e organização em camadas (NESTJS, 2025). O NestJS se fundamenta em princípios de programação orientada a objetos e funcional, e organiza o código em módulos, controladores e serviços, promovendo coesão e baixo acoplamento (NESTJS, 2025). Segundo a documentação oficial, o NestJS emprega o padrão de injeção de dependência, o que favorece a reutilização de código e a escalabilidade da aplicação (NESTJS, 2025).
+A camada de persistência de dados em aplicações modernas pode ser gerenciada por ferramentas como o TypeORM, um ORM que permite o mapeamento entre objetos e tabelas relacionais, facilitando a manipulação e a consistência dos dados (TYPEORM, 2024). Ele permite o uso de classes como entidades, realizando o mapeamento automático para as tabelas do banco de dados e facilitando a manipulação dos registros sem a necessidade de comandos SQL diretamente no código (TYPEORM, 2024).
+Para garantir a disponibilidade contínua do sistema em ambiente de produção, muitas ferramentas utilizam o PM2, um gerenciador de processos para aplicações Node.js. De acordo com a documentação da Keymetrics (2025), o PM2 mantém a aplicação em execução mesmo após falhas inesperadas e oferece suporte ao modo cluster, que permite utilizar múltiplos núcleos da CPU, otimizando o desempenho e a estabilidade do sistema.
+4.2 Trabalhos relacionados
+Este trabalho propõe o desenvolvimento de uma solução digital para floriculturas de pequeno porte, com foco na criação de um catálogo virtual e sistema de gerenciamento de entregas. Nesse contexto, é importante destacar plataformas, ferramentas e trabalhos acadêmicos que abordam temas semelhantes, seja no âmbito da informatização de floriculturas, da organização logística em pequenos negócios, ou da experiência do usuário em vitrines digitais. A seguir, apresentam-se estudos e sistemas que influenciam e justificam a proposta deste projeto.
+4.2.1 Fontes literárias
+A literatura aponta que pequenos negócios, como floriculturas, ainda utilizam métodos informais de atendimento e registro de vendas, o que compromete a eficiência e a escalabilidade das operações (Menin, 2019). A ausência de um catálogo digital e de um sistema logístico estruturado compromete a experiência do cliente, a confiabilidade das entregas e a imagem da marca.
+O estudo de Mantilla (2025) evidencia que melhorias nos processos logísticos podem reduzir significativamente o tempo de entrega (lead time), resultando em ganhos operacionais e maior satisfação do cliente. Já Santos e Lima (2022), ressaltam que a usabilidade em sistemas digitais voltados ao comércio eletrônico é essencial para o sucesso da interação com o consumidor. Sharp (2013) também aponta que sistemas com baixa usabilidade afastam usuários e geram experiências negativas. 
+4.2.2 Ferramentas similares
+Com base em pesquisa em trabalhos acadêmicos e ferramentas profissionais, identificaram-se algumas utilizadas por floriculturas e comércios semelhantes que combinam catálogo digital e funcionalidades logísticas:
+
+Destefani (Supeleto, 2022): Trabalho acadêmico em que foi desenvolvido um aplicativo mobile para uma loja de móveis e eletrodomésticos no Espírito Santo, com foco na digitalização de vendas. A solução inclui catálogo de produtos, cadastro de clientes, filtros, favoritos e integração com WhatsApp para finalização dos pedidos. Utiliza Android Studio com Java e Firebase Realtime Database. A interface foi projetada no Figma, priorizando usabilidade. Apesar de funcional, o sistema não possui controle interno de entregas nem versão web, sendo voltado exclusivamente a dispositivos Android. A figura 1 apresenta o catálogo da ferramenta Destefani:
+FIGURA 1 – TELA INICIAL (DESTEFANI)
+
+FONTE: Supeleto (2022, p. 31).
+
+
+SICON (Fernandes, 2012): Sistema web desenvolvido para a empresa Elus & Elysama, especializada em semi jóias, com o objetivo de substituir catálogos físicos e desorganizados por uma plataforma digital de acesso remoto. O sistema permite que os clientes acessem o catálogo online, realizem pedidos e registrem devoluções de produtos. Também oferece funcionalidades de cadastro de usuários, categorias, produtos e geração de relatórios. O projeto foi implementado com foco em web (PHP, MySQL, HTML, CSS, jQuery), com modelagem UML e banco de dados relacional. Apesar de abrangente, a solução não possui acompanhamento em tempo real de entregas, interface agradável aos clientes, nem integração com canais externos de comunicação (como WhatsApp). A figura 2 apresenta o catálogo da ferramenta Sicon:
+
+
+FIGURA 2 – TELA DE VISUALIZAÇÃO DE CATÁLOGO (SICON)
+
+FONTE: Fernandes (2012, p. 79). 
+
+Na figura 3 é apresentado o diagrama de casos de uso da ferramenta SICON (Fernandes, 2012), a fim de apresentar suas funcionalidades. Se comparado ao diagrama de casos de uso da solução proposta neste trabalho, é perceptível a diferença entre as soluções
+FIGURA 3 – DIAGRAMA DE CASOS DE USO (SICON)
+
+FONTE: Fernandes (2012, p. 79).
+
+Nuvemshop: Diferentemente dos projetos acadêmicos anteriores, a Nuvemshop é uma plataforma comercial de e-commerce consolidada no mercado latino-americano, que serve como um exemplo de solução generalista para o varejo. A ferramenta permite que lojistas de diversos segmentos criem uma loja virtual completa, com funcionalidades robustas para cadastro de produtos, customização de layout, processamento de pagamentos e, de forma relevante para este trabalho, um sistema de gestão de fretes integrado a transportadoras e Correios. As figuras 4 e 5 apresentam telas importantes da NuvemShop.
+
+
+FIGURA 4 – TELA DE VISUALIZAÇÃO DE VENDAS (NUVEMSHOP)
+
+FONTE: NuvemShop (2025).
+
+
+FIGURA 5 – TELA DE VISUALIZAÇÃO DE LAYOUTS (NUVEMSHOP)
+
+FONTE: NuvemShop (2025).
+
+Para sintetizar a análise dos trabalhos relacionados, o quadro 1 compara as principais características de cada solução com a proposta neste trabalho:
+QUADRO 1 –  QUADRO COMPARATIVO DE FERRAMENTAS SIMILARES
+Característica
+Solução Proposta 
+Nuvemshop
+Destefani
+SICON
+Tipo de Solução
+Sistema Web Customizado
+Plataforma SaaS (Software como Serviço)
+Aplicativo Mobile
+Sistema Web
+Foco Principal
+Nicho específico (Floricultura)
+E-commerce Generalista
+Nicho específico (Loja de Móveis)
+Vendas por Catálogo (Jóias)
+Plataforma
+Web (Desktop e Mobile)
+Web (Desktop e Mobile)
+Android
+Web
+Catálogo Digital
+Sim, com gestão simplificada e foco em visualização
+Sim, com gestão robusta e integrada
+Sim, com foco em visualização
+Sim, para acesso remoto de clientes
+Gestão de Entregas
+Painel para gestão manual e local
+Integração com transportadoras/Correios
+Não possui
+Não possui
+Modelo de Custo
+Custo de Hospedagem (AWS)
+Assinatura Mensal + Taxas
+Gratuito (Acadêmico)
+
+
+Gratuito (Acadêmico)
+
+
+
+FONTE: Elaborado pelo autor (2025). 
+4.2.2.1 Considerações
+Destefani e SICON validam a necessidade de digitalizar catálogos para nichos de mercado, mas frequentemente carecem de um componente robusto para a gestão logística das entregas. Por outro lado, plataformas comerciais como a Nuvemshop oferecem soluções de e-commerce completas, porém generalistas, com um modelo de custo recorrente e um foco em logística integrada a grandes transportadoras, o que não atende à realidade de um pequeno negócio que gerencia suas próprias entregas locais.
+Observa-se, portanto, uma lacuna para uma solução que combine um catálogo digital com um painel de gerenciamento de encomendas projetado especificamente para o fluxo operacional da floricultura alvo.

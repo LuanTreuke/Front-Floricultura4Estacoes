@@ -25,6 +25,8 @@
   cursor: pointer;
   font-weight: 500;
   transition: background 0.15s;
+  color: #222;
+  -webkit-tap-highlight-color: transparent;
 }
 .loginPopupBtn:hover {
   background: #f3f7f4;
@@ -75,6 +77,7 @@
   gap: 6px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.06);
   position: relative;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .cartBadge {
@@ -109,10 +112,35 @@
   align-items: center;
   gap: 6px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .loginBtn:hover {
   background: #cbead6;
+}
+
+.notificationBadge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #e53935;
+  color: #fff;
+  border-radius: 999px;
+  width: 16px;
+  height: 16px;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .notificationBadge {
+    top: 0px;
+    right: 0px;
+  }
 }
 
 .searchBar {

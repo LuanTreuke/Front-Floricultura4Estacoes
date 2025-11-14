@@ -66,7 +66,7 @@ export default function CadastroPage() {
           <Image src="/Logo-floricultura.svg" alt="Logo Floricultura" className={styles.logo} width={96} height={96} style={{ objectFit: 'contain' }} />
         </div>
         <h2>Cadastro</h2>
-        <input type="text" placeholder="Nome" value={nome} onChange={e => setNome(e.target.value)} required />
+        <input type="text" placeholder="Nome completo" value={nome} onChange={e => setNome(e.target.value)} required />
         <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
         <input type="password" placeholder="Senha" value={senha} onChange={e => setSenha(e.target.value)} required />
         <input type="password" placeholder="Confirmar senha" value={senha2} onChange={e => setSenha2(e.target.value)} required />

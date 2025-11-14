@@ -13,6 +13,7 @@ export interface CreateOrderDto {
   status?: string;
   pagamento_confirmado?: boolean;
   cobrar_no_endereco?: boolean;
+  vem_retirar?: boolean;
   observacao?: string;
   carrinho?: string;
   Endereco_id: number;

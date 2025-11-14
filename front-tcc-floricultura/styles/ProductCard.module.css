@@ -12,6 +12,7 @@
   flex: 1 1 0;
   margin: 0;
   position: relative;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .card:hover { 
@@ -23,6 +24,24 @@
   color: inherit; 
   display: block; 
   width: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.noLinkCard {
+  text-decoration: none; 
+  color: inherit; 
+  display: block; 
+  width: 100%;
+  -webkit-tap-highlight-color: transparent;
+  cursor: default;
+}
+
+.noLinkCard .card {
+  cursor: default;
+}
+
+.noLinkCard .card:hover {
+  transform: none;
 }
 
 .image { 
@@ -61,22 +80,30 @@
   top: 10px; /* sits within image area */
   right: 10px;
   z-index: 50;
-  background: rgba(255,255,255,0.95);
-  border-radius: 999px;
-  padding: 6px;
+  background: transparent;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
   pointer-events: auto; /* ensure inputs are clickable */
 }
 
 .topRight input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   cursor: pointer;
   margin: 0;
   padding: 0;
+  accent-color: #2e7d32;
+  flex-shrink: 0;
+}
+
+.topRight label {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
 }
 
 @media (max-width: 800px) {

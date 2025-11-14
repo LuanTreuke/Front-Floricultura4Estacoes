@@ -1,0 +1,16 @@
+3 OBJETIVOS 
+
+ 3.1 Geral 
+
+Projetar e implementar uma solução web que atue em duas frentes de uma floricultura: vitrine digital e um painel administrativo.
+
+ 3.2 Específicos
+
+Realizar uma revisão bibliográfica sobre sistemas de e-commerce e gestão logística para pequenas empresas.
+Levantar e documentar os requisitos funcionais e não funcionais da plataforma web.
+Modelar a arquitetura do sistema, incluindo seus casos de uso, diagramas de classe e o modelo de dados.
+Criar um protótipo de alta fidelidade da aplicação para validar os fluxos de navegação e a experiência do usuário.
+Implementar uma plataforma web, desenvolvendo as funcionalidades de gestão de catálogo e controle de entregas.
+Validar a plataforma desenvolvida por meio da verificação dos requisitos e da realização de testes de usabilidade com o usuário-alvo.
+Realizar o refinamento final do projeto e a sua implantação em um ambiente de produção na nuvem.
+

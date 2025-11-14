@@ -89,6 +89,8 @@
 .adminMain {
   flex: 1;
   padding: 40px;
+  padding-top: 0;
+  margin-top: 0;
   background: #fafbfc;
   min-width: 0;
 }

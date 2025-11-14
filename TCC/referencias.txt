@@ -1,0 +1,51 @@
+8 REFERÊNCIAS 
+
+CAPTERRA. Pesquisa em e‑commerce de flores: rapidez na entrega supera preço e atendimento, segundo consumidores. Plataforma online, 2025.
+CNA BRASIL. Mão de obra pode limitar crescimento do setor de flores e plantas ornamentais em 2025. Comunicado do Sistema CNA/Senar-SP, 23 abr. 2025. Disponível em: https://www.cnabrasil.org.br/noticias/mao-de-obra-pode-limitar-crescimento-do-setor-de-flores-e-plantas-ornamentais-em-2025. Acesso em: 24 abr. 2025.
+CRUZ, José Jovenildo da; BICUDO, Dhiego Augusto dos Santos. A arquitetura de informação aplicada no desenvolvimento de um catálogo digital em CD-ROM. In: CONGRESSO NACIONAL DE EXTENSÃO UNIVERSITÁRIA, 4.º; ENCONTRO DE ATIVIDADES CIENTÍFICAS DA UNOPAR, 13., 2010, Anais... Londrina: Unopar, 2010.
+FERNANDES, Adriano de Oliveira. SICON: sistema de controle de vendas para produtos de catálogo. 2012. 88 f. Trabalho de Conclusão de Curso (Graduação em Bacharelado em Sistemas de Informação) – Universidade Estadual de Goiás, Anápolis, 2012. Disponível em: https://repositorio.ueg.br/jspui/bitstream/riueg/2474/2/MG%20024%200063-2012.pdf. Acesso em: 15 mai. 2025.
+FERREIRA, Simone Bacellar Leal; CHAUVEL, Marie Agnes; SILVEIRA, Denis Silva da. Usability of virtual organization's sites: um estudo de usabilidade de sites de empresas virtuais. Produção, v. 16, n. 2, p. 300-313, maio/ago. 2006. Acesso em: 29 mai. 2025.
+FIELDING, Roy Thomas. Architectural Styles and the Design of Network-based Software Architectures. 2000. 172 f. Tese (Doutorado em Ciência da Computação) – University of California, Irvine, 2000. Disponível em: https://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm. Acesso em: 24 abr. 2025.
+FOREACH PARTNERS. Nest.js: A scalable and modular framework for building modern Node.js applications. 2025. Disponível em: https://foreachpartners.com/technology/nestjs. Acesso em: 13 jun. 2025.
+FOWLER, Martin. Patterns of Enterprise Application Architecture. Boston: Addison-Wesley, 2002.
+GANNEY, Paul S.; CLARIDGE, Edwin. Incremental model/prototyping model. In: CLINICAL ENGINEERING. 2. ed. [S. l.]: Elsevier, 2020. Disponível em: https://www.sciencedirect.com/topics/computer-science/incremental-model. 
+GEEKSFORGEEKS. Unified Modeling Language (UML) Class Diagrams – what is a class diagram?. GeeksforGeeks, 3 jan. 2025. Disponível em: https://www.geeksforgeeks.org/unified-modeling-language-uml-class-diagrams. Acesso em: 13 jun. 2025.
+GLINZ, Martin. On Non-Functional Requirements. In: 15TH IEEE INTERNATIONAL REQUIREMENTS ENGINEERING CONFERENCE (RE 2007). Anais... IEEE, 2007. p. 2–7. DOI: 10.1109/RE.2007.45.
+HEUSER, Carlos Alberto. Projeto de banco de dados. 6. ed. Porto Alegre: Bookman, 2009.
+IBM NS1 Connect. O que é hospedagem web (web hosting)? Think, IBM Brasil, 2023. Disponível em: https://www.ibm.com/br-pt/topics/web-hosting. Acesso em: 10 jul. 2025.
+ILIS, Vitor. Mercado de flores no Brasil atingiu R$ 10,9 bilhões em 2021. CNA Brasil, 19 set. 2022. Disponível em: https://cnabrasil.org.br/noticias/mercado-de-flores-no-brasil-atingiu-r-10-9-bilhoes-em-2021. Acesso em: 16 abr. 2025.
+
+INSTITUTO BRASILEIRO DE FLORICULTURA – IBRAFLOR. Perspectivas do mercado de flores no Brasil. 2025. Informação divulgada em artigo da Graciosa Digital, 2 jun. 2025.
+KEYMETRICS. PM2: Advanced, production process manager for Node.js. 2025. Disponível em: https://pm2.keymetrics.io/. Acesso em: 26 jun. 2025.
+KIM, J.; LEE, S. Content management systems and navigation in digital catalogs. Information Systems Journal, v. 31, n. 3, p. 479–498, 2021.
+KOTLER, Philip; KARTAJAYA, Hermawan; SETIAWAN, Iwan. Marketing 4.0: do tradicional ao digital. Rio de Janeiro: Sextante, 2017.
+LEONARDI, Marco. Responsabilidade civil dos provedores de conteúdo de internet. Jus Navigandi, 2023. p. 2.
+LIMA, Samia Mendes de; QUEIROZ, Cyntia Tavares Marques de. MARKETING 4.0 E A MODA: PLATAFORMAS DE COMÉRCIO DIGITAL NO MERCADO DE MODA BRASILEIRO. In: ENCONTRO DE INICIAÇÃO ACADÊMICA DA UNIFOR, 24., 2018, Fortaleza. Anais... Fortaleza: Unifor, 2018. Acesso em: 6 jun. 2025.
+LIU, Wei et al. Digital catalog design and its impact on user decision-making. Journal of Retailing and Consumer Services, v. 65, p. 102–118, 2022.
+LOUREIRO, Ana C. R.; BARBOSA, Simony A. A experiência do usuário e a usabilidade em interfaces digitais: fatores críticos para o engajamento online. Revista de Sistemas e Computação, v. 12, n. 3, p. 56–70, 2022.
+LUCIDCHART. Diagrama de caso de uso UML: o que é, como fazer e exemplos. Lucidchart. Disponível em: https://www.lucidchart.com/pages/pt/diagrama-de-caso-de-uso-uml. Acesso em: 13 jun. 2025.
+LUCIDCHART. What is an ER diagram?. Lucidchart. Disponível em: https://www.lucidchart.com/pages/er-diagrams. Acesso em: 13 jun. 2025.
+MARTINS, R.; ALMEIDA, P. A importância da arquitetura da informação em sistemas digitais. Revista Brasileira de Ciência da Informação, v. 18, n. 2, p. 112–124, 2022.
+MELLO, L. T. C. de; et al. Análise do lead time nos processos logísticos de uma rede varejista de flores. 16 mai. 2025.Revista Produção Online, Florianópolis, v. 16, n. 4, p. 1237–1261, 2016. Acesso em: 29 mai. 2025.
+MENIN, Rennan M. Tchuvaiff. Comercialização e logística da floricultura no Sudoeste do Paraná. 2019. 38 p. Monografia (Trabalho de Conclusão de Curso) – Universidade Tecnológica Federal do Paraná, Pato Branco, 2019. Disponível em: https://riut.utfpr.edu.br/jspui/bitstream/1/24593/1/PB_COAGR_2019_2_19.pdf. Acesso em: 6 jun. 2025.
+MÉTRICAS DE ATENDIMENTO. Quais são os principais indicadores de sucesso no atendimento ao cliente? Zendesk, 22 mar. 2019. Disponível em: https://www.zendesk.com.br/blog/indicadores-atendimento-cliente/. Acesso em: 29 mai. 2025.
+
+MUNDO CORPORATIVO. E-commerce de flores busca entregas rápidas com clientes mais exigentes. Portal UAI, Belo Horizonte, 02 abr. 2025. Disponível em: https://www.em.com.br/mundo-corporativo/2025/04/7100144-e-commerce-de-flores-busca-entregas-rapidas-com-clientes-mais-exigentes.html. Acesso em: 7 jun. 2025.
+NESTJS. A progressive Node.js framework. 2025. Disponível em: https://nestjs.com/. Acesso em: 6 jul. 2025.
+NEXT.JS. The React Framework for the Web. Vercel, 2025. Disponível em: https://nextjs.org/. Acesso em: 6 jul. 2025.
+NIELSEN, Jakob; BUDIU, Raluca. UX Strategy for Lean Startups: Faster User Research and Smarter UX Design. San Francisco: New Riders, 2021.
+NUVEMSHOP. Crie sua loja online e venda pela internet. São Paulo: Nuvemshop, 2025. Disponível em: https://www.nuvemshop.com.br/. Acesso em: 26 jun. 2025.
+PRESSMAN, Roger S. Engenharia de software: uma abordagem profissional. 8. ed. Porto Alegre: AMGH, 2016.
+REACT. A JavaScript library for building user interfaces. Meta, 2025. Disponível em: https://react.dev/. Acesso em: 6 jul. 2025.
+RIBEIRO, Danielly dos Santos. Sistema de gerenciamento de conteúdo: proposta de um catálogo bibliográfico 2.0 no WordPress. 2015. 68 p. Monografia (Graduação em Biblioteconomia) – Universidade de Brasília, Brasília, 2015. Disponível em: https://bdm.unb.br/bitstream/10483/25480/1/2015_DaniellyDosSantosRibeiro_tcc.pdf. Acesso em: 29 mai. 2025.
+RICHARDSON, L.; RUBY, S. RESTful Web APIs. 2. ed. O'Reilly Media, 2020.
+SHARP, Helen; ROGERS, Yvonne; PREECE, Jenny. Design de interação: além da interação homem-computador. 3. ed. Porto Alegre: Bookman, 2013.
+SILVA, J.; ALMEIDA, F. Arquitetura cliente-servidor e seu papel em aplicações web modernas. Revista de Sistemas e Tecnologia, v. 14, n. 1, p. 25–38, 2022.
+SILVA, Jeferson Luan da. Análise da Usabilidade em Sites de Comércio Eletrônico. 2023. 38 p. Monografia (Graduação em Tecnologia da Informação) – Universidade Federal Rural do Semi-Árido, Pau dos Ferros, 2023. 29 mai. 2025.
+SOMMERVILLE, Ian. Engenharia de software. 10. ed. São Paulo: Pearson, 2019.
+SOUZA, Clóvis. Depoimento sobre logística na Giuliana Flores. 2025. Em: E‑commerce de flores busca entregas rápidas com clientes mais exigentes. Graciosa Digital, 2 jun. 2025.
+SUPELETO, Adriano Fernando Bezerra. Destefani: aplicativo para catálogo e venda de produtos. 2022. Trabalho de Conclusão de Curso (Tecnólogo em Análise e Desenvolvimento de Sistemas) – Instituto Federal do Espírito Santo, Campus Alegre, Alegre, 2022. Disponível em: https://repositorio.ifes.edu.br/bitstream/handle/123456789/2596/TCC_Destefani_Adriano.pdf?sequence=1&isAllowed=y. Acesso em: 15 mai. 2025.
+TAILWIND CSS. A utility-first CSS framework. Tailwind Labs, 2025. Disponível em: https://tailwindcss.com/. Acesso em: 9 jul. 2025.
+TUTORIALTPOINT. Incremental Model in Software Engineering. 2019. Disponível em: https://www.tutorialtpoint.net/2019/07/incremental-model-in-software-engineering.html. Acesso em: 8 jul. 2025.
+TYPEORM. TypeORM documentation. 2024. Disponível em: https://typeorm.io/. Acesso em: 8 jul. 2025.
+UPLARN. Benefits of React JS for Front-end Development. Uplarn, 2025. Disponível em: https://www.uplarn.com/benefits-of-react-js-for-front-end-development/. Acesso em: 13 jun. 2025.

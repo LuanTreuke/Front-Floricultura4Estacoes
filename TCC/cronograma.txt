@@ -1,0 +1,94 @@
+7 CRONOGRAMA DE EXECUÇÃO
+
+O desenvolvimento da solução digital proposta será realizado em etapas, conforme o modelo incremental descrito na metodologia. A organização do cronograma tem como objetivo garantir entregas parciais e funcionais, possibilitando ajustes com base em validações constantes. O planejamento considera um período total de aproximadamente 20 semanas, com dedicação semanal do autor.
+A seguir, apresenta-se quadro 4, que contém o cronograma dividido em fases:
+QUADRO 4 –  CRONOGRAMA DE EXECUÇÃO
+Etapa
+Descrição
+Jul.
+Ago.
+Set.
+Out.
+Nov.
+Dez.
+Implementação do catálogo de produtos
+Desenvolvimento das funcionalidades de exibição, cadastro, edição e filtro de produtos.
+X
+X
+
+
+
+
+
+
+
+
+Testes do catálogo e ajustes de interface
+Realização de testes funcionais e correções baseadas no feedback obtido.
+
+
+X
+
+
+
+
+
+
+
+
+Implementação do módulo de pedidos e entregas
+Criação das funcionalidades de anotação de pedidos, controle de status e painel administrativo.
+
+
+
+
+X
+X
+
+
+
+
+Integração e testes dos módulos desenvolvidos
+Integração entre os módulos de catálogo e pedidos. Validação da consistência e funcionalidade do sistema.
+
+
+
+
+
+
+X
+
+
+
+
+Implementação da geração de relatórios e refino da aplicação
+Desenvolvimento das funcionalidades de relatórios e aplicação de melhorias identificadas.
+
+
+
+
+
+
+
+
+X
+
+
+Documentação e Preparação para Entrega
+Documentação do sistema, backup do código-fonte, revisão geral e apresentação final.
+
+
+
+
+
+
+
+
+
+
+X
+
+FONTE: Elaborado pelo autor (2025). 
+
+
+

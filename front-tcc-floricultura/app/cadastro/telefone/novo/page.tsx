@@ -1,7 +1,7 @@
 "use client";
 import React, { useMemo, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import styles from '../../../../styles/ProductOrder.module.css';
+import styles from '../../../../styles/CadastroWhatsApp.module.css';
 import Image from 'next/image';
 import { getCurrentUser, User } from '../../../../services/authService';
 import api from '../../../../services/api';
@@ -80,35 +80,90 @@ export default function CadastroTelefoneNovoPage() {
       <div className={styles.logoContainer}>
         <Image src="/Logo-floricultura.svg" alt="Floricultura" width={400} height={120} />
       </div>
-      <h1 className={styles.heading} style={{fontSize: 25}}>Cadastrar telefone via WhatsApp</h1>
+      <h1 className={styles.heading}>Cadastrar WhatsApp</h1>
 
-      <p style={{fontSize: 20}}>Para vincular seu número de telefone basta enviar a mensagem pré-definida para o número da empresa usando o botão abaixo:</p>
-      <div style={{justifyContent: 'flex-start', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ marginTop: 12, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8}}>
-          <label>Mensagem:</label>
-          <textarea className={styles.textarea} value={defaultMessage} readOnly rows={5} />
+      <div className={styles.instructionsBox}>
+        <h2 className={styles.instructionsTitle}>Siga estes 4 passos simples:</h2>
+        
+        <div className={styles.stepContainer}>
+          <div className={styles.stepRow}>
+            <div className={styles.stepNumber}>1</div>
+            <div className={styles.stepContent}>
+              <h3>Clique no botão verde abaixo</h3>
+              <p>O botão irá gerar um link especial para você</p>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.stepContainer}>
+          <div className={styles.stepRow}>
+            <div className={styles.stepNumber}>2</div>
+            <div className={styles.stepContent}>
+              <h3>Clique novamente para abrir o WhatsApp</h3>
+              <p>Após gerar o link, o botão mudará. Clique nele de novo para abrir o WhatsApp no seu celular ou computador</p>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.stepContainer}>
+          <div className={styles.stepRow}>
+            <div className={styles.stepNumber}>3</div>
+            <div className={styles.stepContent}>
+              <h3>Envie a mensagem</h3>
+              <p>No WhatsApp, uma mensagem já estará pronta. <strong>Basta clicar no botão de enviar</strong>.</p>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.stepContainer}>
+          <div className={styles.stepRow}>
+            <div className={styles.stepNumber}>4</div>
+            <div className={styles.stepContent}>
+              <h3>Retorne à esta página</h3>
+              <p>Depois de enviar a mensagem no whatsapp, retorne à esta página para concluir o cadastro.</p>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.importantBox}>
+          <p>
+            <strong>💡 Importante:</strong> Não edite a mensagem, apenas envie para o número da floricultura: <strong>+55 42 3524-2223</strong>
+          </p>
         </div>
       </div>
 
-          <div style={{ marginTop: 12, display: 'flex', gap: 8, alignItems: 'center' }}>
-            <button
-              type="button"
-              className={styles.primaryBtn}
-              onClick={async () => {
-                if (!token) await generateToken();
-                else handleOpen();
-              }}
-              disabled={generating}
-            >
-              {generating ? 'Gerando link...' : token ? 'Abrir no WhatsApp' : 'Gerar link'}
-            </button>
-            <button type="button" className={styles.secondaryBtn} onClick={() => router.push('/')}>Voltar</button>
-          </div>
-
-      <div style={{ marginTop: 12, fontSize: 20 }}>
-        <small>Clique em &quot;Gerar Link&quot; e em seguida em &quot;Abrir no WhatsApp&quot;, depois disso você será levado para o WhatsApp, em seguida, envie a mensagem para +55 42 3524-2223, e pronto! você estará cadastrado.</small>
-        {error && <div style={{ color: 'red', marginTop: 8 }}>Erro: {error}</div>}
+      <div className={styles.buttonContainer}>
+        <button
+          type="button"
+          className={styles.primaryBtn}
+          onClick={async () => {
+            if (!token) await generateToken();
+            else handleOpen();
+          }}
+          disabled={generating}
+        >
+          {generating ? '⏳ Gerando...' : token ? '✅ Abrir WhatsApp' : '🔗 Começar'}
+        </button>
+        <button 
+          type="button" 
+          className={styles.secondaryBtn} 
+          onClick={() => router.push('/')}
+        >
+          Voltar
+        </button>
       </div>
+
+      {error && (
+        <div className={styles.errorBox}>
+          ❌ Erro: {error}
+        </div>
+      )}
+
+      {token && (
+        <div className={styles.successBox}>
+          ✅ Link gerado! Agora clique no botão verde acima para abrir o WhatsApp
+        </div>
+      )}
     </div>
   );
 }

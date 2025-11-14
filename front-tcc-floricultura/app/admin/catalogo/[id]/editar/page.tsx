@@ -4,6 +4,7 @@ import { useRouter, useParams } from 'next/navigation';
 
 import { fetchProductById, Product } from '@/services/productService';
 import api from '@/services/api';
+import ImageUpload from '@/components/ImageUpload';
 
 export default function EditarProdutoPage() {
   const router = useRouter();
@@ -15,7 +16,7 @@ export default function EditarProdutoPage() {
   const [preco, setPreco] = useState('');
   const [categoria, setCategoria] = useState('');
   const [categories, setCategories] = useState<Array<{ id: number; nome: string }>>([]);
-  const [, setImagem] = useState<File | null>(null);
+  const [imagemUrl, setImagemUrl] = useState('');
   const [enabled, setEnabled] = useState(true);
 
   useEffect(() => {
@@ -28,6 +29,7 @@ export default function EditarProdutoPage() {
         // produto pode trazer relation 'categoria' ou só Categoria_id
         const catId = prod.categoria ? prod.categoria.id : prod.Categoria_id;
         setCategoria(catId ? String(catId) : '');
+        setImagemUrl(prod.imagem_url || '');
         setEnabled(prod.enabled === undefined ? true : !!prod.enabled);
       }
     });
@@ -42,10 +44,8 @@ export default function EditarProdutoPage() {
     })();
   }, [id]);
 
-  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
-    if (e.target.files && e.target.files[0]) {
-      setImagem(e.target.files[0]);
-    }
+  function handleImageUploaded(url: string) {
+    setImagemUrl(url);
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -56,6 +56,7 @@ export default function EditarProdutoPage() {
           nome,
           descricao,
           preco: Number(preco),
+          imagem_url: imagemUrl,
           Categoria_id: categoria ? Number(categoria) : undefined,
           enabled,
         };
@@ -82,8 +83,8 @@ export default function EditarProdutoPage() {
       <h1 style={{fontSize: '2rem', fontWeight: 600, marginBottom: 24}}>Editar produto</h1>
       <form onSubmit={handleSubmit} style={{background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.08)', padding: 32, display: 'flex', flexDirection: 'column', gap: 24}}>
         <div style={{display: 'flex', flexDirection: 'column', gap: 8}}>
-          <label style={{fontWeight: 500}}>Imagens do produto</label>
-          <input type="file" accept="image/*" onChange={handleImageChange} style={{marginBottom: 8}} />
+          <label style={{fontWeight: 500}}>Imagem do produto</label>
+          <ImageUpload onImageUploaded={handleImageUploaded} currentImage={imagemUrl} />
         </div>
         <div style={{display: 'flex', flexDirection: 'column', gap: 8}}>
           <label>Nome do produto</label>

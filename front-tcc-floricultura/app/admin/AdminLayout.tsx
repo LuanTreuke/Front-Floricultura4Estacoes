@@ -99,7 +99,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
         <Offcanvas.Header closeButton>
           <div style={{ flex: 1, textAlign: 'center' }}>
-            <Offcanvas.Title style={{ margin: 0 }}>Painel administrativo</Offcanvas.Title>
+            <Offcanvas.Title style={{ margin: 0 }}>Painel Administrativo</Offcanvas.Title>
           </div>
         </Offcanvas.Header>
         <Offcanvas.Body style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
