@@ -336,11 +336,26 @@
     /* allow status column to size to its content on mobile (remove large reserved height) */
     .statusColumn { width: 100%; margin-top: 6px; flex-direction: column; align-items: flex-start; flex: 0 0 auto; height: auto; }
 
-    .statusActions { flex-direction: row; gap: 8px; width: 100%; }
+    .statusActions { 
+        flex-direction: row; 
+        gap: 8px; 
+        width: 100%; 
+        align-items: stretch;
+    }
     
-    .statusSelect { flex: 1; min-width: 0; }
+    /* no mobile o select ocupa ~70% da largura disponível */
+    .statusSelect { 
+        flex: 0 0 70%;
+        max-width: 70%;
+        min-width: 0;
+    }
     
-    .statusUpdateBtn { flex: 0 0 auto; width: auto; padding: 8px 16px; }
+    /* botão fica com o restante da largura, sem espremê-lo */
+    .statusUpdateBtn { 
+        flex: 1; 
+        width: auto; 
+        padding: 8px 16px; 
+    }
 
     .statusLabel { margin-bottom: 4px; }
 
