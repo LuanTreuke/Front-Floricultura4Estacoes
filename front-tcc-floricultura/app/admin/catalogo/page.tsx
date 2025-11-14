@@ -12,7 +12,6 @@ import SortButtons from '../../../components/SortButtons';
 import api from '@/services/api';
 import { fetchProducts, Product, deleteProduct, updateProduct } from '../../../services/productService';
 import { showDeleteConfirm, showError, showConfirm, showToast, showSuccess, showWarning } from '../../../utils/sweetAlert';
-import ApiTest from '../../../components/ApiTest';
 
 export default function AdminCatalogoPage() {
   const [search, setSearch] = useState('');
@@ -153,7 +152,6 @@ export default function AdminCatalogoPage() {
 
   return (
     <div className={adminStyles.adminMain} style={{ padding: 0 }}>
-      <ApiTest />
       <div className={homeStyles.container} style={{ padding: 15, boxSizing: 'border-box' }}>
         <div style={{ marginBottom: 24 }}>
           <div style={{ display: 'flex', justifyContent: 'center' }}>

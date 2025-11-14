@@ -139,7 +139,7 @@ export default function ImageUpload({ onImageUploaded, currentImage, disabled = 
             minWidth: '140px'
           }}
         >
-          📷 Tirar Foto
+          <i className="bi bi-camera"></i> Tirar Foto
         </button>
         
         <button

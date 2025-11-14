@@ -95,7 +95,6 @@ export default function AdicionarProdutoPage() {
         </div>
         <div style={{display: 'flex', gap: 8, alignItems: 'center'}}>
           <input id="enabled" type="checkbox" checked={enabled} onChange={e => setEnabled(e.target.checked)} />
-          <label htmlFor="enabled"> Exibir produto na loja (Ativo)</label>
         </div>
         <div style={{display: 'flex', gap: 16, justifyContent: 'flex-end'}}>
           <button type="button" onClick={() => router.push('/admin/catalogo')} style={{background: '#f3f7f4', color: '#222', border: 'none', borderRadius: 8, padding: '12px 24px', fontWeight: 500, fontSize: '1rem', cursor: 'pointer'}}>Cancelar</button>
