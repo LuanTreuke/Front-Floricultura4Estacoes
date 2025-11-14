@@ -46,6 +46,21 @@ export default function EditarProdutoPage() {
 
   function handleImageUploaded(url: string) {
     setImagemUrl(url);
+
+    // Se estiver editando e a imagem foi removida (string vazia), já atualizar no backend
+    if (url === '' && id && produto?.imagem_url) {
+      (async () => {
+        try {
+          const { updateProduct } = await import('@/services/productService');
+          const res = await updateProduct(id, { imagem_url: '' });
+          if (res) {
+            setProduto(res);
+          }
+        } catch (err) {
+          console.error('Falha ao atualizar imagem do produto:', err);
+        }
+      })();
+    }
   }
 
   function handleSubmit(e: React.FormEvent) {
