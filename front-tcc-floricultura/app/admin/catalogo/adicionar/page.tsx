@@ -68,8 +68,8 @@ export default function AdicionarProdutoPage() {
               height={120} 
               style={{ objectFit: 'contain' }} 
             />
+            <h1 style={{fontSize: '2rem', fontWeight: 600, marginBottom: 24}}>Adicione um produto</h1>
           </div>
-      <h1 style={{fontSize: '2rem', fontWeight: 600, marginBottom: 24}}>Adicione um produto</h1>
       <form onSubmit={handleSubmit} style={{background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.08)', padding: 32, display: 'flex', flexDirection: 'column', gap: 24}}>
         <div style={{display: 'flex', flexDirection: 'column', gap: 8}}>
           <label style={{fontWeight: 500}}>Imagem do produto</label>
