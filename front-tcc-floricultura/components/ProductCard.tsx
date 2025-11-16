@@ -35,7 +35,7 @@ export default function ProductCard({ id, name, price, image, topRight, onClick,
           width={300} 
           height={300} 
           style={{ objectFit: 'cover' }}
-          onError={(e) => {
+          onError={() => {
             console.error(`❌ Erro ao carregar imagem do produto "${name}":`, imgSrc);
           }}
         />

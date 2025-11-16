@@ -99,8 +99,9 @@ export default function ProductPopup({ productId, onClose, inline = false }: Pro
               width={400}
               height={400}
               style={{ objectFit: 'cover' }}
-              onError={(e) => {
-                console.error(`❌ Erro ao carregar imagem no modal do produto "${product.nome}":`, buildImageURL(product.imagem_url));
+              onError={() => {
+                const imageUrl = product.imagem_url ? buildImageURL(product.imagem_url) : 'N/A';
+                console.error(`❌ Erro ao carregar imagem no modal do produto "${product.nome}":`, imageUrl);
               }}
             />
           ) : (
