@@ -6,7 +6,7 @@ import { fetchProductById, Product, updateProduct } from '@/services/productServ
 import { uploadImage } from '@/services/uploadService';
 import api from '@/services/api';
 import ImageUpload from '@/components/ImageUpload';
-import { showSuccess, showError } from '../../../../utils/sweetAlert';
+import { showSuccess, showError } from '@/utils/sweetAlert';
 
 export default function EditarProdutoPage() {
   const router = useRouter();

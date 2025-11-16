@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import { addProduct, Product } from '@/services/productService';
 import { fetchCategories, Categoria } from '@/services/categoryService';
 import { uploadImage } from '@/services/uploadService';
-import { showSuccess, showError } from '../../../../utils/sweetAlert';
-import ImageUpload from '../../../../components/ImageUpload';
+import { showSuccess, showError } from '@/utils/sweetAlert';
+import ImageUpload from '@/components/ImageUpload';
 import Image from 'next/image';
 
 export default function AdicionarProdutoPage() {
