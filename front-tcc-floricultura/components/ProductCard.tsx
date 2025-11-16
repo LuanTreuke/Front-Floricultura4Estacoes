@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import styles from '../styles/ProductCard.module.css';
 import { buildImageURL } from '@/utils/imageUtils';
+import NgrokImage from './NgrokImage';
 
 interface ProductCardProps {
   id?: number;
@@ -24,15 +25,13 @@ export default function ProductCard({ id, name, price, image, topRight, onClick,
     <div className={styles.card} style={noLink ? { cursor: 'default' } : {}}>
       {imgSrc ? (
         isNgrok ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img 
+          <NgrokImage 
             src={imgSrc} 
             alt={name} 
             className={styles.image}
-            style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-            onError={() => {
-              console.error(`❌ Erro ao carregar imagem do produto "${name}":`, imgSrc);
-            }}
+            width={300}
+            height={300}
+            style={{ objectFit: 'cover' }}
           />
         ) : (
           <Image 

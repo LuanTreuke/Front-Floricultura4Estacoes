@@ -7,6 +7,7 @@ import { fetchProductById, Product } from '../services/productService';
 import { getCurrentUser, User } from '../services/authService';
 import { addToCart } from '../services/cartService';
 import { buildImageURL } from '@/utils/imageUtils';
+import NgrokImage from './NgrokImage';
 
 type Props = {
   productId: number;
@@ -96,15 +97,13 @@ export default function ProductPopup({ productId, onClose, inline = false }: Pro
             const isNgrok = imageUrl.includes('ngrok');
             
             return isNgrok ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <NgrokImage
                 src={imageUrl}
                 alt={product.nome}
                 className={styles.image}
-                style={{ objectFit: 'cover', width: '100%', height: 'auto' }}
-                onError={() => {
-                  console.error(`❌ Erro ao carregar imagem no modal do produto "${product.nome}":`, imageUrl);
-                }}
+                width={400}
+                height={400}
+                style={{ objectFit: 'cover' }}
               />
             ) : (
               <Image

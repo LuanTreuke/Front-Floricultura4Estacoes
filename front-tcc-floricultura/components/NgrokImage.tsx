@@ -1,0 +1,139 @@
+"use client";
+
+import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
+
+interface NgrokImageProps {
+  src: string;
+  alt: string;
+  className?: string;
+  width?: number;
+  height?: number;
+  style?: React.CSSProperties;
+}
+
+/**
+ * Componente que lida com imagens do ngrok fazendo fetch com headers corretos
+ * para pular a página de aviso do ngrok
+ */
+export default function NgrokImage({ src, alt, className, width, height, style }: NgrokImageProps) {
+  const [imageSrc, setImageSrc] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    if (!src) {
+      setLoading(false);
+      return;
+    }
+
+    const isNgrok = src.includes('ngrok');
+    
+    // Se não for ngrok, usar src direto
+    if (!isNgrok) {
+      setImageSrc(src);
+      setLoading(false);
+      return;
+    }
+
+    // Para URLs do ngrok, fazer fetch com header correto
+    const fetchImage = async () => {
+      try {
+        const response = await fetch(src, {
+          headers: {
+            'ngrok-skip-browser-warning': 'true',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Falha ao carregar imagem');
+        }
+
+        const blob = await response.blob();
+        const objectUrl = URL.createObjectURL(blob);
+        setImageSrc(objectUrl);
+        setLoading(false);
+      } catch (err) {
+        console.error('Erro ao carregar imagem do ngrok:', err);
+        setError(true);
+        setLoading(false);
+      }
+    };
+
+    fetchImage();
+
+    // Cleanup: revogar URL quando componente desmontar
+    return () => {
+      if (imageSrc && imageSrc.startsWith('blob:')) {
+        URL.revokeObjectURL(imageSrc);
+      }
+    };
+  }, [src]);
+
+  if (loading) {
+    return (
+      <div 
+        className={className} 
+        style={{
+          ...style,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: '#f0f0f0',
+          color: '#999',
+          fontSize: '0.85rem'
+        }}
+      >
+        Carregando...
+      </div>
+    );
+  }
+
+  if (error || !imageSrc) {
+    return (
+      <div 
+        className={className} 
+        style={{
+          ...style,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: '#f0f0f0',
+          color: '#666',
+          fontSize: '1.5rem'
+        }}
+      >
+        🖼️
+      </div>
+    );
+  }
+
+  // Se tiver width e height, usar componente Image do Next.js
+  if (width && height) {
+    return (
+      <Image
+        src={imageSrc}
+        alt={alt}
+        className={className}
+        width={width}
+        height={height}
+        style={style}
+        unoptimized={imageSrc.startsWith('blob:')}
+        onError={() => setError(true)}
+      />
+    );
+  }
+
+  // Caso contrário, usar img nativo
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={imageSrc}
+      alt={alt}
+      className={className}
+      style={style}
+      onError={() => setError(true)}
+    />
+  );
+}
+
