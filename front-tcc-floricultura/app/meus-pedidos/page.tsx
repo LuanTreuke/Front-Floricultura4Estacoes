@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState, useCallback } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { fetchOrders, updateOrderStatus } from '../../services/orderService';
 import { getCurrentUser, User } from '../../services/authService';
