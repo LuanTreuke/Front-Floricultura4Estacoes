@@ -163,7 +163,7 @@ export default function ImageUpload({ onFileSelected, currentImage, disabled = f
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
             }}
             unoptimized={preview.startsWith('data:')}
-            onError={(e) => {
+            onError={() => {
               if (process.env.NODE_ENV === 'development') {
                 console.warn('Preview da imagem não pôde ser carregado:', preview);
               }

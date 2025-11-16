@@ -21,8 +21,6 @@ export default function CartPopup({ onClose, inline = false }: Props) {
   const [total, setTotal] = useState(0);
   // local string inputs for quantities so we don't force immediate numeric coercion
   const [qtyInputs, setQtyInputs] = useState<Record<number, string>>({});
-  const [addresses, setAddresses] = useState<Address[]>([]);
-  const [selectedAddress, setSelectedAddress] = useState<number | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {

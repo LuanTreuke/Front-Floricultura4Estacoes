@@ -22,6 +22,9 @@ export default function NgrokImage({ src, alt, className, width, height, style }
   const [error, setError] = useState(false);
 
   useEffect(() => {
+    let isMounted = true;
+    let blobUrl: string | null = null;
+
     if (!src) {
       setLoading(false);
       return;
@@ -49,12 +52,18 @@ export default function NgrokImage({ src, alt, className, width, height, style }
 
         const blob = await response.blob();
         const objectUrl = URL.createObjectURL(blob);
-        setImageSrc(objectUrl);
-        setLoading(false);
+        blobUrl = objectUrl;
+        
+        if (isMounted) {
+          setImageSrc(objectUrl);
+          setLoading(false);
+        }
       } catch (err) {
         console.error('Erro ao carregar imagem do ngrok:', err);
-        setError(true);
-        setLoading(false);
+        if (isMounted) {
+          setError(true);
+          setLoading(false);
+        }
       }
     };
 
@@ -62,8 +71,9 @@ export default function NgrokImage({ src, alt, className, width, height, style }
 
     // Cleanup: revogar URL quando componente desmontar
     return () => {
-      if (imageSrc && imageSrc.startsWith('blob:')) {
-        URL.revokeObjectURL(imageSrc);
+      isMounted = false;
+      if (blobUrl) {
+        URL.revokeObjectURL(blobUrl);
       }
     };
   }, [src]);

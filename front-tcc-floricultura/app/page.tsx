@@ -106,7 +106,7 @@ export default function HomePage() {
           );
           const normalized = Number.isFinite(computedMax) && computedMax > 0 ? Math.ceil(computedMax) : 99999;
           setMaxPrice(normalized);
-          setPrice(([min]) => [0, normalized]);
+          setPrice(() => [0, normalized]);
         } catch {}
         setLoading(false);
       })
