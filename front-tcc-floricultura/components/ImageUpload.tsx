@@ -1,23 +1,27 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { uploadImage } from '@/services/uploadService';
 import { buildImageURL } from '@/utils/imageUtils';
 
 interface ImageUploadProps {
-  onImageUploaded: (imageUrl: string) => void;
+  onFileSelected: (file: File | null) => void;
   currentImage?: string;
   disabled?: boolean;
 }
 
-export default function ImageUpload({ onImageUploaded, currentImage, disabled = false }: ImageUploadProps) {
-  const [uploading, setUploading] = useState(false);
+export default function ImageUpload({ onFileSelected, currentImage, disabled = false }: ImageUploadProps) {
   const [preview, setPreview] = useState<string>(currentImage ? buildImageURL(currentImage) : '');
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const cameraInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Atualizar preview quando currentImage mudar
+  useEffect(() => {
+    if (currentImage) {
+      setPreview(buildImageURL(currentImage));
+    }
+  }, [currentImage]);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -25,7 +29,6 @@ export default function ImageUpload({ onImageUploaded, currentImage, disabled = 
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
     if (!validTypes.includes(file.type)) {
       alert('Tipo de arquivo não suportado. Use: JPG, PNG, GIF ou WebP');
-      // Limpar o input para permitir nova seleção
       e.target.value = '';
       return;
     }
@@ -34,63 +37,33 @@ export default function ImageUpload({ onImageUploaded, currentImage, disabled = 
     const maxSize = 15 * 1024 * 1024;
     if (file.size > maxSize) {
       alert('Arquivo muito grande. Máximo 15MB permitido.');
-      // Limpar o input para permitir nova seleção
       e.target.value = '';
       return;
     }
 
-    // Criar preview local
+    // Criar preview local (base64)
     const reader = new FileReader();
     reader.onload = (e) => {
       setPreview(e.target?.result as string);
     };
     reader.readAsDataURL(file);
 
-    // Upload do arquivo
-    try {
-      setUploading(true);
-      const result = await uploadImage(file);
-      onImageUploaded(result.url);
-    } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('Erro no upload:', error);
-      }
-      alert('Erro ao fazer upload da imagem. Tente novamente.');
-      setPreview(currentImage ? buildImageURL(currentImage) : '');
-    } finally {
-      setUploading(false);
-      // Limpar ambos os inputs após o upload (sucesso ou erro)
-      // para permitir nova seleção do mesmo arquivo
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-      if (cameraInputRef.current) {
-        cameraInputRef.current.value = '';
-      }
-    }
+    // Notificar o componente pai sobre o arquivo selecionado
+    onFileSelected(file);
+
+    // Limpar o input para permitir nova seleção
+    e.target.value = '';
   };
 
   const handleRemoveImage = () => {
     setPreview('');
-    onImageUploaded('');
+    onFileSelected(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-    if (cameraInputRef.current) {
-      cameraInputRef.current.value = '';
-    }
   };
 
-  const handleCameraClick = () => {
-    // Limpar o input antes de abrir para garantir que onChange sempre dispare
-    if (cameraInputRef.current) {
-      cameraInputRef.current.value = '';
-      cameraInputRef.current.click();
-    }
-  };
-
-  const handleFileClick = () => {
-    // Limpar o input antes de abrir para garantir que onChange sempre dispare
+  const handleButtonClick = () => {
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
       fileInputRef.current.click();
@@ -99,54 +72,23 @@ export default function ImageUpload({ onImageUploaded, currentImage, disabled = 
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {/* Inputs ocultos */}
+      {/* Input oculto - aceita tanto câmera quanto arquivo */}
       <input
         ref={fileInputRef}
         type="file"
         accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
-        onChange={handleFileSelect}
-        disabled={disabled || uploading}
-        style={{ display: 'none' }}
-      />
-      <input
-        ref={cameraInputRef}
-        type="file"
-        accept="image/*"
         capture="environment"
         onChange={handleFileSelect}
-        disabled={disabled || uploading}
+        disabled={disabled}
         style={{ display: 'none' }}
       />
 
-      {/* Botões visuais */}
+      {/* Botão unificado */}
       <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', flexWrap: 'wrap' }}>
         <button
           type="button"
-          onClick={handleCameraClick}
-          disabled={disabled || uploading}
-          style={{
-            background: '#28a745',
-            color: 'white',
-            border: 'none',
-            borderRadius: 8,
-            padding: '12px 16px',
-            fontSize: '0.9rem',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            flex: '1',
-            minWidth: '140px',
-            maxHeight: '45.61px'
-          }}
-        >
-          <i className="bi bi-camera" style={{ verticalAlign: 'middle', fontSize: 22, marginRight: 0 }}></i> Tirar Foto 
-        </button>
-        
-        <button
-          type="button"
-          onClick={handleFileClick}
-          disabled={disabled || uploading}
+          onClick={handleButtonClick}
+          disabled={disabled}
           style={{
             background: '#007bff',
             color: 'white',
@@ -159,10 +101,11 @@ export default function ImageUpload({ onImageUploaded, currentImage, disabled = 
             alignItems: 'center',
             gap: 8,
             flex: '1',
-            minWidth: '140px'
+            minWidth: '200px'
           }}
         >
-          Escolher Arquivo
+          <i className="bi bi-image" style={{ fontSize: 20 }}></i>
+          Selecionar Imagem
         </button>
 
         {/* Botão remover (se há preview) */}
@@ -170,7 +113,7 @@ export default function ImageUpload({ onImageUploaded, currentImage, disabled = 
           <button
             type="button"
             onClick={handleRemoveImage}
-            disabled={disabled || uploading}
+            disabled={disabled}
             style={{
               background: '#dc3545',
               color: 'white',
@@ -184,6 +127,7 @@ export default function ImageUpload({ onImageUploaded, currentImage, disabled = 
               gap: 8
             }}
           >
+            <i className="bi bi-trash" style={{ fontSize: 18 }}></i>
             Remover
           </button>
         )}
@@ -218,27 +162,13 @@ export default function ImageUpload({ onImageUploaded, currentImage, disabled = 
               borderRadius: 8,
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
             }}
+            unoptimized={preview.startsWith('data:')}
             onError={(e) => {
               if (process.env.NODE_ENV === 'development') {
                 console.warn('Preview da imagem não pôde ser carregado:', preview);
               }
             }}
           />
-        </div>
-      )}
-
-      {/* Indicador de upload */}
-      {uploading && (
-        <div style={{
-          padding: 12,
-          background: '#e3f2fd',
-          border: '1px solid #1976d2',
-          borderRadius: 8,
-          color: '#1976d2',
-          textAlign: 'center',
-          fontSize: '0.9rem'
-        }}>
-          Fazendo upload da imagem...
         </div>
       )}
     </div>

@@ -17,6 +17,14 @@ interface ProductCardProps {
 export default function ProductCard({ id, name, price, image, topRight, onClick, noLink }: ProductCardProps) {
   const imgSrc = buildImageURL(image);
 
+  // Debug: log da imagem sendo processada
+  if (process.env.NODE_ENV === 'development' && image) {
+    console.log(`🖼️ ProductCard [${name}]:`, { 
+      imagemOriginal: image, 
+      imagemProcessada: imgSrc 
+    });
+  }
+
   const inner = (
     <div className={styles.card} style={noLink ? { cursor: 'default' } : {}}>
       {imgSrc ? (
@@ -28,9 +36,7 @@ export default function ProductCard({ id, name, price, image, topRight, onClick,
           height={300} 
           style={{ objectFit: 'cover' }}
           onError={(e) => {
-            if (process.env.NODE_ENV === 'development') {
-              console.warn('Imagem não pôde ser carregada:', imgSrc);
-            }
+            console.error(`❌ Erro ao carregar imagem do produto "${name}":`, imgSrc);
           }}
         />
       ) : (
