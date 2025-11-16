@@ -36,14 +36,12 @@ export default function NgrokImage({ src, alt, className, width, height, style }
       return;
     }
 
-    // Para URLs do ngrok, fazer fetch com header correto
+    // Para URLs do ngrok, usar proxy do Next.js para evitar CORS
     const fetchImage = async () => {
       try {
-        const response = await fetch(src, {
-          headers: {
-            'ngrok-skip-browser-warning': 'true',
-          },
-        });
+        // Usar API route como proxy
+        const proxyUrl = `/api/image-proxy?url=${encodeURIComponent(src)}`;
+        const response = await fetch(proxyUrl);
 
         if (!response.ok) {
           throw new Error('Falha ao carregar imagem');
