@@ -91,20 +91,35 @@ export default function ProductPopup({ productId, onClose, inline = false }: Pro
         <div>Produto não encontrado</div>
       ) : (
         <div className={styles.layout}>
-          {product.imagem_url ? (
-            <Image
-              src={buildImageURL(product.imagem_url)}
-              alt={product.nome}
-              className={styles.image}
-              width={400}
-              height={400}
-              style={{ objectFit: 'cover' }}
-              onError={() => {
-                const imageUrl = product.imagem_url ? buildImageURL(product.imagem_url) : 'N/A';
-                console.error(`❌ Erro ao carregar imagem no modal do produto "${product.nome}":`, imageUrl);
-              }}
-            />
-          ) : (
+          {product.imagem_url ? (() => {
+            const imageUrl = buildImageURL(product.imagem_url);
+            const isNgrok = imageUrl.includes('ngrok');
+            
+            return isNgrok ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={imageUrl}
+                alt={product.nome}
+                className={styles.image}
+                style={{ objectFit: 'cover', width: '100%', height: 'auto' }}
+                onError={() => {
+                  console.error(`❌ Erro ao carregar imagem no modal do produto "${product.nome}":`, imageUrl);
+                }}
+              />
+            ) : (
+              <Image
+                src={imageUrl}
+                alt={product.nome}
+                className={styles.image}
+                width={400}
+                height={400}
+                style={{ objectFit: 'cover' }}
+                onError={() => {
+                  console.error(`❌ Erro ao carregar imagem no modal do produto "${product.nome}":`, imageUrl);
+                }}
+              />
+            );
+          })() : (
             <div className={styles.image}>Img</div>
           )}
           <div className={styles.info}>

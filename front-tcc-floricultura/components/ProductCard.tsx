@@ -17,28 +17,36 @@ interface ProductCardProps {
 export default function ProductCard({ id, name, price, image, topRight, onClick, noLink }: ProductCardProps) {
   const imgSrc = buildImageURL(image);
 
-  // Debug: log da imagem sendo processada
-  if (process.env.NODE_ENV === 'development' && image) {
-    console.log(`🖼️ ProductCard [${name}]:`, { 
-      imagemOriginal: image, 
-      imagemProcessada: imgSrc 
-    });
-  }
+  // Detectar se está usando ngrok para usar img nativo
+  const isNgrok = imgSrc.includes('ngrok');
 
   const inner = (
     <div className={styles.card} style={noLink ? { cursor: 'default' } : {}}>
       {imgSrc ? (
-        <Image 
-          src={imgSrc} 
-          alt={name} 
-          className={styles.image} 
-          width={300} 
-          height={300} 
-          style={{ objectFit: 'cover' }}
-          onError={() => {
-            console.error(`❌ Erro ao carregar imagem do produto "${name}":`, imgSrc);
-          }}
-        />
+        isNgrok ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img 
+            src={imgSrc} 
+            alt={name} 
+            className={styles.image}
+            style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+            onError={() => {
+              console.error(`❌ Erro ao carregar imagem do produto "${name}":`, imgSrc);
+            }}
+          />
+        ) : (
+          <Image 
+            src={imgSrc} 
+            alt={name} 
+            className={styles.image} 
+            width={300} 
+            height={300} 
+            style={{ objectFit: 'cover' }}
+            onError={() => {
+              console.error(`❌ Erro ao carregar imagem do produto "${name}":`, imgSrc);
+            }}
+          />
+        )
       ) : (
         <div className={styles.image}>Img</div>
       )}
