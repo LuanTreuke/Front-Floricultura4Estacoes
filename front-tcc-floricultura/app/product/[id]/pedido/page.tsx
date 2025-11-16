@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
 import { useRouter, useParams } from 'next/navigation';
 import { fetchProductById, Product } from '../../../../services/productService';
 import { fetchAddresses, AddressDto } from '../../../../services/addressService';
@@ -10,6 +9,7 @@ import { getCurrentUser, User } from '../../../../services/authService';
 import { createOrder, CreateOrderDto } from '../../../../services/orderService';
 import styles from '../../../../styles/ProductOrder.module.css';
 import Breadcrumb from '../../../../components/Breadcrumb';
+import SmartImage from '../../../../components/SmartImage';
 import { showSuccess, showError, showValidationError, showLoginRequired } from '../../../../utils/sweetAlert';
 
 export default function ProductOrderPage() {
@@ -203,7 +203,7 @@ export default function ProductOrderPage() {
       <h1 className={styles.heading}>Fazer pedido — {product.nome}</h1>
       <div className={styles.card}>
         {product.imagem_url ? (
-          <Image src={product.imagem_url} alt={product.nome} className={styles.image} width={400} height={400} style={{ objectFit: 'cover' }} />
+          <SmartImage src={product.imagem_url} alt={product.nome} className={styles.image} width={400} height={400} style={{ objectFit: 'cover' }} />
         ) : (
           <div className={styles.image}>Img</div>
         )}

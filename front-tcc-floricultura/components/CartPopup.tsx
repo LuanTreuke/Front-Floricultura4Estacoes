@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect, useState, useRef } from 'react';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import cartStyles from '../styles/ShoppingCart.module.css';
+import SmartImage from './SmartImage';
 import { getCart, CartItem, updateQty, removeFromCart, cartTotal, subscribeCart } from '../services/cartService';
 import { fetchAddresses } from '../services/addressService';
 import { getCurrentUser } from '../services/authService';
@@ -208,7 +208,7 @@ export default function CartPopup({ onClose, inline = false }: Props) {
             {items.map((it) => (
               <div key={it.id} className={cartStyles.item}>
                 {it.imagem_url ? (
-                  <Image src={it.imagem_url} className={cartStyles.itemImage} alt={it.nome || ''} width={64} height={64} style={{ objectFit: 'cover', borderRadius: 8 }} />
+                  <SmartImage src={it.imagem_url} className={cartStyles.itemImage} alt={it.nome || ''} width={64} height={64} style={{ objectFit: 'cover', borderRadius: 8 }} />
                 ) : (
                   <div className={cartStyles.itemImage} />
                 )}

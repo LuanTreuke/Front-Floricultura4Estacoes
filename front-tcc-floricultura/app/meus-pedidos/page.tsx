@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState, useCallback } from 'react';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { fetchOrders, updateOrderStatus } from '../../services/orderService';
 import { getCurrentUser, User } from '../../services/authService';
@@ -8,6 +7,7 @@ import { fetchProductById } from '../../services/productService';
 import styles from '../../styles/OrderDetails.module.css';
 import BackButton from '../../components/BackButton';
 import Breadcrumb from '../../components/Breadcrumb';
+import SmartImage from '../../components/SmartImage';
 import { showConfirm, showError, showToast } from '../../utils/sweetAlert';
 
 export default function MeusPedidosPage() {
@@ -195,7 +195,7 @@ export default function MeusPedidosPage() {
                       {(o._images && (o._images as string[]).length > 0) ? (
                     <div style={{ position: 'relative' }}>
                       {o._images && (o._images as string[])[o._imageIndex || 0] ? (
-                        <Image src={String((o._images as string[])[o._imageIndex || 0])} alt={`Pedido ${String(o.id ?? '')}`} width={160} height={160} style={{ objectFit: 'cover', borderRadius: 8 }} />
+                        <SmartImage src={String((o._images as string[])[o._imageIndex || 0])} alt={`Pedido ${String(o.id ?? '')}`} width={160} height={160} style={{ objectFit: 'cover', borderRadius: 8 }} />
                       ) : (
                         <div style={{ width: 160, height: 160, background: '#f3f3f3', borderRadius: 8 }} />
                       )}

@@ -1,9 +1,9 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import styles from '../../../styles/OrderDetails.module.css';
 import { fetchOrderById } from '../../../services/orderService';
+import SmartImage from '../../../components/SmartImage';
 
 function formatDateTime(dateStr?: string, timeStr?: string) {
   if (!dateStr) return '—';
@@ -123,7 +123,7 @@ export default function PedidoDetalhePage() {
             {unique.map((it: AnyObj, idx: number) => (
               <li key={idx} className={styles.productItem}>
                 {((it['imagem_url'] as string | undefined) || (it['imagem'] as string | undefined) || (it['imagemUrl'] as string | undefined)) ? (
-                  <Image src={String((it['imagem_url'] as string | undefined) || (it['imagem'] as string | undefined) || (it['imagemUrl'] as string | undefined))} alt={(it['nome'] as string | undefined) ?? ''} width={80} height={80} className={styles.productImg} style={{ objectFit: 'cover' }} />
+                  <SmartImage src={String((it['imagem_url'] as string | undefined) || (it['imagem'] as string | undefined) || (it['imagemUrl'] as string | undefined))} alt={(it['nome'] as string | undefined) ?? ''} width={80} height={80} className={styles.productImg} style={{ objectFit: 'cover' }} />
                 ) : (
                   <div className={styles.productImg}>Img</div>
                 )}

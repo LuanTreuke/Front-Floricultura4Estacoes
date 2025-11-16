@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import styles from '../../styles/ProductOrder.module.css';
 import { getCart, clearCart, cartTotal, CartItem } from '../../services/cartService';
@@ -11,6 +10,7 @@ import { getCurrentUser, User } from '../../services/authService';
 import { createOrder } from '../../services/orderService';
 import BackButton from '../../components/BackButton';
 import Breadcrumb from '../../components/Breadcrumb';
+import SmartImage from '../../components/SmartImage';
 import { showSuccess, showError, showValidationError, showLoginRequired } from '../../utils/sweetAlert';
 
 export default function UnifiedOrderPage() {
@@ -348,7 +348,7 @@ export default function UnifiedOrderPage() {
         {items.map(it => (
           <div key={it.id} style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 8 }}>
             {it.imagem_url ? (
-              <Image src={it.imagem_url} alt={it.nome || ''} width={64} height={64} style={{ objectFit: 'cover', borderRadius: 8 }} />
+              <SmartImage src={it.imagem_url} alt={it.nome || ''} width={64} height={64} style={{ objectFit: 'cover', borderRadius: 8 }} />
             ) : (
               <div style={{ width: 64, height: 64, background: '#f3f3f3', borderRadius: 8 }} />
             )}
