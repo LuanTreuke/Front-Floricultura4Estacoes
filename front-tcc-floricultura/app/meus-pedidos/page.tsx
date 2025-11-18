@@ -81,12 +81,11 @@ export default function MeusPedidosPage() {
       } catch {}
 
       try {
-  const all = await fetchOrders() as Order[];
-        // filtra apenas pedidos do usuário
-        const mine = (all || []).filter(p => ((p['Usuario_id'] as number | undefined) && (p['Usuario_id'] as number) === uid) || (p['usuario'] && ((p['usuario'] as AnyObj)['id'] as number) === uid));
+        // fetchOrders() para não-Admin já retorna apenas os pedidos do usuário via /pedidos/usuario/:id
+        const all = await fetchOrders() as Order[];
 
         // enriquecer com imagens/nomes preferindo dados embutidos em observacao
-  const enriched = await Promise.all(mine.map(async (p: Order) => {
+        const enriched = await Promise.all((all || []).map(async (p: Order) => {
           const cart = extractCart(p['carrinho'] ?? p['observacao']) || [];
           const imgsFromItems = (cart || []).map((it: AnyObj) => it && (it['imagem_url'] as string)).filter(Boolean);
           const namesFromItems = (cart || []).map((it: AnyObj) => it && (it['nome'] as string)).filter(Boolean);
