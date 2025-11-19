@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Floricultura4Estacoes",
-  description: "Floricultura 4 Estações - Avenida Paula freitas 1006 - União da Vitória - PR",
+  title: "Floricultura Quatro Estações",
+  description: "Floricultura Quatro Estações - Avenida Paula freitas 1006 - União da Vitória - PR",
 };
 
 export default function RootLayout({
