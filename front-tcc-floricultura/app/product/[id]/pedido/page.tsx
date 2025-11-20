@@ -101,7 +101,7 @@ export default function ProductOrderPage() {
       nome: product.nome,
       preco: product.preco,
       quantidade: orderQuantity || 1,
-      imagem_url: product.imagem_url || null,
+      imagem_url: product.imagem_url ? product.imagem_url.split(',')[0].trim() : null,
     } : null;
     const missing: string[] = [];
     if (!selectedAddress) missing.push('selectedAddress');
@@ -202,7 +202,7 @@ export default function ProductOrderPage() {
       <h1 className={styles.heading}>Fazer pedido — {product.nome}</h1>
       <div className={styles.card}>
         {product.imagem_url ? (
-          <SmartImage src={product.imagem_url} alt={product.nome} className={styles.image} width={400} height={400} style={{ objectFit: 'cover' }} />
+          <SmartImage src={product.imagem_url.split(',')[0].trim()} alt={product.nome} className={styles.image} width={400} height={400} style={{ objectFit: 'cover' }} />
         ) : (
           <div className={styles.image}>Img</div>
         )}

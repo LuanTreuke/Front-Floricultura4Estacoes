@@ -219,7 +219,8 @@ export default function ProductPopup({ productId, onClose, inline = false }: Pro
 
                 <div className={styles.actions}>
                   <button className={styles.shoppingCart} onClick={() => {
-                    addToCart({ id: product.id, nome: product.nome, preco: product.preco, imagem_url: product.imagem_url });
+                    const firstImage = product.imagem_url ? product.imagem_url.split(',')[0].trim() : '';
+                    addToCart({ id: product.id, nome: product.nome, preco: product.preco, imagem_url: firstImage });
                     setAddedMsg('Adicionado');
                     setTimeout(() => setAddedMsg(null), 1500);
                   }}>

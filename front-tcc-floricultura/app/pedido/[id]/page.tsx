@@ -120,10 +120,13 @@ export default function PedidoDetalhePage() {
         <div className={styles.productList}>
           <strong>Produtos:</strong>
           <ul>
-            {unique.map((it: AnyObj, idx: number) => (
+            {unique.map((it: AnyObj, idx: number) => {
+              const imageUrl = (it['imagem_url'] as string | undefined) || (it['imagem'] as string | undefined) || (it['imagemUrl'] as string | undefined);
+              const firstImage = imageUrl ? imageUrl.split(',')[0].trim() : '';
+              return (
               <li key={idx} className={styles.productItem}>
-                {((it['imagem_url'] as string | undefined) || (it['imagem'] as string | undefined) || (it['imagemUrl'] as string | undefined)) ? (
-                  <SmartImage src={String((it['imagem_url'] as string | undefined) || (it['imagem'] as string | undefined) || (it['imagemUrl'] as string | undefined))} alt={(it['nome'] as string | undefined) ?? ''} width={80} height={80} className={styles.productImg} style={{ objectFit: 'cover' }} />
+                {firstImage ? (
+                  <SmartImage src={firstImage} alt={(it['nome'] as string | undefined) ?? ''} width={80} height={80} className={styles.productImg} style={{ objectFit: 'cover' }} />
                 ) : (
                   <div className={styles.productImg}>Img</div>
                 )}
@@ -136,7 +139,8 @@ export default function PedidoDetalhePage() {
                   <div style={{ fontWeight: 600 }}>{(it['preco'] as number | undefined) ? `R$ ${Number(it['preco']).toFixed(2)}` : ''}</div>
                 </div>
               </li>
-            ))}
+              );
+            })}
           </ul>
         </div>
 

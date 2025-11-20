@@ -28,7 +28,7 @@ export default function MultiImageUpload({
     }
   }, [currentImages]);
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
 
@@ -55,23 +55,33 @@ export default function MultiImageUpload({
       return;
     }
 
-    // Criar previews locais
-    const newPreviews: string[] = [];
-    validFiles.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        newPreviews.push(e.target?.result as string);
-        if (newPreviews.length === validFiles.length) {
-          // Todas as previews foram criadas
-          const updatedFiles = [...selectedFiles, ...validFiles];
-          const updatedPreviews = [...previews, ...newPreviews];
-          setSelectedFiles(updatedFiles);
-          setPreviews(updatedPreviews);
-          onFilesSelected(updatedFiles);
-        }
-      };
-      reader.readAsDataURL(file);
-    });
+    // Criar previews locais usando Promise.all para evitar condições de corrida
+    try {
+      const newPreviews = await Promise.all(
+        validFiles.map((file) => {
+          return new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              resolve(e.target?.result as string);
+            };
+            reader.onerror = () => {
+              reject(new Error(`Erro ao ler arquivo ${file.name}`));
+            };
+            reader.readAsDataURL(file);
+          });
+        })
+      );
+
+      // Atualizar estado com todas as imagens
+      const updatedFiles = [...selectedFiles, ...validFiles];
+      const updatedPreviews = [...previews, ...newPreviews];
+      setSelectedFiles(updatedFiles);
+      setPreviews(updatedPreviews);
+      onFilesSelected(updatedFiles);
+    } catch (error) {
+      console.error('Erro ao processar imagens:', error);
+      alert('Erro ao processar uma ou mais imagens. Tente novamente.');
+    }
 
     // Limpar o input para permitir nova seleção
     e.target.value = '';

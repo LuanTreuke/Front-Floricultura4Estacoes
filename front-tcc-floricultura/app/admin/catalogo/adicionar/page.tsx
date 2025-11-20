@@ -18,6 +18,7 @@ export default function AdicionarProdutoPage() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [enabled, setEnabled] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<string>('');
   const router = useRouter();
 
   function handleFilesSelected(files: File[]) {
@@ -38,11 +39,23 @@ export default function AdicionarProdutoPage() {
       // Se há arquivos selecionados, fazer upload de cada um
       if (selectedFiles.length > 0) {
         console.log(`📤 Fazendo upload de ${selectedFiles.length} imagem(ns)...`);
-        for (const file of selectedFiles) {
-          const uploadResult = await uploadImage(file);
-          imagemUrls.push(uploadResult.url);
-          console.log('✅ Upload concluído:', uploadResult.url);
+        
+        for (let i = 0; i < selectedFiles.length; i++) {
+          const file = selectedFiles[i];
+          setUploadProgress(`Enviando imagem ${i + 1} de ${selectedFiles.length}...`);
+          console.log(`📤 Upload ${i + 1}/${selectedFiles.length}: ${file.name}`);
+          
+          try {
+            const uploadResult = await uploadImage(file);
+            imagemUrls.push(uploadResult.url);
+            console.log(`✅ Upload ${i + 1}/${selectedFiles.length} concluído:`, uploadResult.url);
+          } catch (uploadError) {
+            console.error(`❌ Erro no upload da imagem ${i + 1}:`, uploadError);
+            setUploadProgress('');
+            throw new Error(`Falha ao fazer upload da imagem ${file.name}`);
+          }
         }
+        setUploadProgress('Finalizando...');
       }
       
       // Juntar as URLs com vírgula
@@ -63,9 +76,11 @@ export default function AdicionarProdutoPage() {
       router.push('/admin/catalogo');
     } catch (error) {
       console.error('Erro ao adicionar produto:', error);
-      showError('Erro ao adicionar produto!');
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao adicionar produto!';
+      showError(errorMessage);
     } finally {
       setLoading(false);
+      setUploadProgress('');
     }
   }
 
@@ -146,7 +161,7 @@ export default function AdicionarProdutoPage() {
             disabled={loading}
             style={{background: '#cbead6', color: '#222', border: 'none', borderRadius: 8, padding: '12px 24px', fontWeight: 600, fontSize: '1rem', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1}}
           >
-            {loading ? 'Adicionando...' : 'Adicionar'}
+            {loading ? (uploadProgress || 'Adicionando...') : 'Adicionar'}
           </button>
         </div>
       </form>

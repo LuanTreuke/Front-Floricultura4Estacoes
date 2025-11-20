@@ -208,7 +208,7 @@ export default function CartPopup({ onClose, inline = false }: Props) {
             {items.map((it) => (
               <div key={it.id} className={cartStyles.item}>
                 {it.imagem_url ? (
-                  <SmartImage src={it.imagem_url} className={cartStyles.itemImage} alt={it.nome || ''} width={64} height={64} style={{ objectFit: 'cover', borderRadius: 8 }} />
+                  <SmartImage src={it.imagem_url.split(',')[0].trim()} className={cartStyles.itemImage} alt={it.nome || ''} width={64} height={64} style={{ objectFit: 'cover', borderRadius: 8 }} />
                 ) : (
                   <div className={cartStyles.itemImage} />
                 )}

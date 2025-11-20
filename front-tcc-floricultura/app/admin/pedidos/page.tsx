@@ -101,7 +101,10 @@ export default function AdminPedidosPage() {
     const cart = extractCart(p['carrinho'] ?? p['observacao']) || [];
           // primeiro, tente extrair imagens e nomes diretamente do item (quando o pedido foi feito direto no produto)
     const imgsFromItems = (cart || [])
-      .map((it: AnyObj) => (it && (it['imagem_url'] as string)))
+      .map((it: AnyObj) => {
+        const url = it && (it['imagem_url'] as string);
+        return url ? url.split(',')[0].trim() : '';
+      })
       .filter((v) => Boolean(v) && typeof v === 'string' && v.trim() !== '') as string[];
     const namesFromItems = (cart || [])
       .map((it: AnyObj) => (it && (it['nome'] as string)))
@@ -119,7 +122,10 @@ export default function AdminPedidosPage() {
             const proms = ids.map((id: number) => fetchProductById(id));
             const prods = await Promise.all(proms);
             const imgs = prods
-              .map(pr => pr?.imagem_url ?? '')
+              .map(pr => {
+                const url = pr?.imagem_url ?? '';
+                return url ? url.split(',')[0].trim() : '';
+              })
               .filter((v) => Boolean(v) && typeof v === 'string' && v.trim() !== '') as string[];
             const names = prods
               .map(pr => pr?.nome ?? '')

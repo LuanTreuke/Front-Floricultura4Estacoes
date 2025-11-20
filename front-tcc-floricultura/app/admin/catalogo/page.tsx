@@ -242,7 +242,7 @@ export default function AdminCatalogoPage() {
                   id={p.id}
                   name={p.nome}
                   price={`R$${Number(p.preco).toFixed(2)}`}
-                  image={p.imagem_url || ''}
+                  image={p.imagem_url ? p.imagem_url.split(',')[0].trim() : ''}
                   noLink={true}
                   topRight={
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>

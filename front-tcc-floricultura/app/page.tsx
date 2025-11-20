@@ -283,7 +283,7 @@ export default function HomePage() {
               id={p.id}
               name={p.nome}
               price={`R$${Number(p.preco).toFixed(2)}`}
-              image={p.imagem_url || ''}
+              image={p.imagem_url ? p.imagem_url.split(',')[0].trim() : ''}
               onClick={() => { setActiveProductId(p.id); setShowProductPopup(true); }}
             />
           ))}

@@ -34,7 +34,7 @@ export default function ProductPage() {
     <div className={styles.container}>
       <div className={styles.layout}>
         {product.imagem_url ? (
-          <Image src={product.imagem_url} alt={product.nome} className={styles.image} width={400} height={400} style={{ objectFit: 'cover' }} />
+          <Image src={product.imagem_url.split(',')[0].trim()} alt={product.nome} className={styles.image} width={400} height={400} style={{ objectFit: 'cover' }} />
         ) : (
           <div className={styles.image}>Img</div>
         )}
@@ -51,7 +51,8 @@ export default function ProductPage() {
 
               <div className={styles.actions}>
                 <button className={styles.shoppingCart} onClick={() => {
-                  addToCart({ id: product.id, nome: product.nome, preco: product.preco, imagem_url: product.imagem_url });
+                  const firstImage = product.imagem_url ? product.imagem_url.split(',')[0].trim() : '';
+                  addToCart({ id: product.id, nome: product.nome, preco: product.preco, imagem_url: firstImage });
                   setAddedMsg('Adicionado');
                   setTimeout(() => setAddedMsg(null), 1500);
                 }}>
