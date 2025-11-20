@@ -309,7 +309,8 @@ export default function HomePage() {
             <a href="https://www.instagram.com/floricultura4estacoes_/" target="_blank" rel="noopener noreferrer">Instagram</a>
           </div>
           <div className={styles.footerCol}>
-            
+            <span className={styles.footerTitle}>Informações</span>
+            <a href="/termos-de-servico">Termos de Serviço</a>
           </div>
         </div>
         <div className={styles.footerAddress}>
