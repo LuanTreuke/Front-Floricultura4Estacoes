@@ -16,7 +16,7 @@ export default function TermosDeServico() {
 
       <div className={styles.content}>
         <h1 className={styles.title}>Termos de Serviço</h1>
-        <p className={styles.updateDate}>Última atualização: Novembro de 2024</p>
+        <p className={styles.updateDate}>Última atualização: Novembro de 2025</p>
 
         <section className={styles.section}>
           <h2>1. Introdução</h2>
@@ -54,7 +54,7 @@ export default function TermosDeServico() {
         <section className={styles.section}>
           <h2>4. Entrega</h2>
           <p>
-            Realizamos entregas na região de Nossa Senhora da Salete e arredores. Os prazos de entrega são estimados 
+            Realizamos entregas na região de União da Vitória, Porto União e arredores. Os prazos de entrega são estimados 
             e podem variar de acordo com a disponibilidade, condições climáticas e demanda.
           </p>
           <p>
@@ -83,22 +83,9 @@ export default function TermosDeServico() {
           </p>
         </section>
 
-        <section className={styles.section}>
-          <h2>6. Conservação dos Produtos</h2>
-          <p>
-            Para garantir a durabilidade das flores, recomendamos:
-          </p>
-          <ul>
-            <li>Manter o arranjo em local fresco e arejado, longe da luz solar direta;</li>
-            <li>Trocar a água do vaso a cada 2 dias;</li>
-            <li>Cortar as hastes em diagonal a cada troca de água;</li>
-            <li>Remover folhas que estejam submersas na água;</li>
-            <li>Evitar proximidade com frutas maduras, que aceleram o envelhecimento das flores.</li>
-          </ul>
-        </section>
 
         <section className={styles.section}>
-          <h2>7. Privacidade e Proteção de Dados</h2>
+          <h2>6. Privacidade e Proteção de Dados</h2>
           <p>
             Respeitamos a privacidade de nossos clientes e nos comprometemos a proteger suas informações pessoais 
             de acordo com a Lei Geral de Proteção de Dados (LGPD).
@@ -110,7 +97,7 @@ export default function TermosDeServico() {
         </section>
 
         <section className={styles.section}>
-          <h2>8. Responsabilidades do Cliente</h2>
+          <h2>7. Responsabilidades do Cliente</h2>
           <p>
             O cliente é responsável por:
           </p>
@@ -118,12 +105,11 @@ export default function TermosDeServico() {
             <li>Fornecer informações verdadeiras e atualizadas durante o processo de compra;</li>
             <li>Garantir que alguém esteja presente no endereço de entrega no horário combinado;</li>
             <li>Verificar o produto no momento da entrega;</li>
-            <li>Seguir as instruções de conservação para garantir a durabilidade das flores.</li>
           </ul>
         </section>
 
         <section className={styles.section}>
-          <h2>9. Limitação de Responsabilidade</h2>
+          <h2>8. Limitação de Responsabilidade</h2>
           <p>
             A Floricultura Quatro Estações não se responsabiliza por:
           </p>
@@ -136,16 +122,15 @@ export default function TermosDeServico() {
         </section>
 
         <section className={styles.section}>
-          <h2>10. Modificações nos Termos</h2>
+          <h2>9. Modificações nos Termos</h2>
           <p>
             Reservamos o direito de modificar estes Termos de Serviço a qualquer momento. 
-            As alterações entrarão em vigor imediatamente após sua publicação no site. 
             Recomendamos que você revise periodicamente esta página.
           </p>
         </section>
 
         <section className={styles.section}>
-          <h2>11. Contato</h2>
+          <h2>10. Contato</h2>
           <p>
             Para dúvidas, sugestões ou reclamações, entre em contato conosco:
           </p>
@@ -157,7 +142,7 @@ export default function TermosDeServico() {
         </section>
 
         <section className={styles.section}>
-          <h2>12. Aceitação dos Termos</h2>
+          <h2>11. Aceitação dos Termos</h2>
           <p>
             Ao realizar um pedido ou utilizar nossos serviços, você declara ter lido, compreendido e 
             concordado com todos os termos e condições estabelecidos neste documento.
