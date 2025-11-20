@@ -100,9 +100,15 @@ export default function AdminPedidosPage() {
           // aceitar o novo campo `carrinho` (string JSON) ou cair para `observacao` para compatibilidade
     const cart = extractCart(p['carrinho'] ?? p['observacao']) || [];
           // primeiro, tente extrair imagens e nomes diretamente do item (quando o pedido foi feito direto no produto)
-    const imgsFromItems = (cart || []).map((it: AnyObj) => (it && (it['imagem_url'] as string)) ).filter((v) => Boolean(v)) as string[];
-    const namesFromItems = (cart || []).map((it: AnyObj) => (it && (it['nome'] as string)) ).filter((v) => Boolean(v)) as string[];
-    const ids = (cart || []).map((it: AnyObj) => (it && (it['id'] as number)) ).filter((id) => Boolean(id)) as number[];
+    const imgsFromItems = (cart || [])
+      .map((it: AnyObj) => (it && (it['imagem_url'] as string)))
+      .filter((v) => Boolean(v) && typeof v === 'string' && v.trim() !== '') as string[];
+    const namesFromItems = (cart || [])
+      .map((it: AnyObj) => (it && (it['nome'] as string)))
+      .filter((v) => Boolean(v) && typeof v === 'string' && v.trim() !== '') as string[];
+    const ids = (cart || [])
+      .map((it: AnyObj) => (it && (it['id'] as number)))
+      .filter((id) => Boolean(id) && typeof id === 'number') as number[];
 
           // se encontramos imagens já presentes na observacao, use-as
           if (imgsFromItems.length > 0) return { ...p, _images: imgsFromItems, _imageIndex: 0, _productNames: namesFromItems };
@@ -112,8 +118,12 @@ export default function AdminPedidosPage() {
           try {
             const proms = ids.map((id: number) => fetchProductById(id));
             const prods = await Promise.all(proms);
-            const imgs = prods.map(pr => pr?.imagem_url ?? '').filter((v) => Boolean(v)) as string[];
-            const names = prods.map(pr => pr?.nome ?? '').filter((v) => Boolean(v)) as string[];
+            const imgs = prods
+              .map(pr => pr?.imagem_url ?? '')
+              .filter((v) => Boolean(v) && typeof v === 'string' && v.trim() !== '') as string[];
+            const names = prods
+              .map(pr => pr?.nome ?? '')
+              .filter((v) => Boolean(v) && typeof v === 'string' && v.trim() !== '') as string[];
             return { ...p, _images: imgs, _imageIndex: 0, _productNames: names };
           } catch {
             return { ...p, _images: [], _imageIndex: 0, _productNames: [] };

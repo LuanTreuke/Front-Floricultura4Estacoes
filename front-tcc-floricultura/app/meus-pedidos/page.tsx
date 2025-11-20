@@ -87,17 +87,27 @@ export default function MeusPedidosPage() {
         // enriquecer com imagens/nomes preferindo dados embutidos em observacao
         const enriched = await Promise.all((all || []).map(async (p: Order) => {
           const cart = extractCart(p['carrinho'] ?? p['observacao']) || [];
-          const imgsFromItems = (cart || []).map((it: AnyObj) => it && (it['imagem_url'] as string)).filter(Boolean);
-          const namesFromItems = (cart || []).map((it: AnyObj) => it && (it['nome'] as string)).filter(Boolean);
-          const ids = (cart || []).map((it: AnyObj) => it && (it['id'] as number)).filter(Boolean);
+          const imgsFromItems = (cart || [])
+            .map((it: AnyObj) => it && (it['imagem_url'] as string))
+            .filter((v) => Boolean(v) && typeof v === 'string' && v.trim() !== '') as string[];
+          const namesFromItems = (cart || [])
+            .map((it: AnyObj) => it && (it['nome'] as string))
+            .filter((v) => Boolean(v) && typeof v === 'string' && v.trim() !== '') as string[];
+          const ids = (cart || [])
+            .map((it: AnyObj) => it && (it['id'] as number))
+            .filter((id) => Boolean(id) && typeof id === 'number') as number[];
 
           if (imgsFromItems.length > 0) return { ...p, _images: imgsFromItems, _imageIndex: 0, _productNames: namesFromItems, _cart: cart };
           if (ids.length === 0) return { ...p, _images: [], _imageIndex: 0, _productNames: [], _cart: cart };
           try {
             const proms = ids.map((id: number) => fetchProductById(id));
             const prods = await Promise.all(proms);
-            const imgs = prods.map(pr => pr?.imagem_url ?? '').filter(Boolean) as string[];
-            const names = prods.map(pr => pr?.nome ?? '').filter(Boolean) as string[];
+            const imgs = prods
+              .map(pr => pr?.imagem_url ?? '')
+              .filter((v) => Boolean(v) && typeof v === 'string' && v.trim() !== '') as string[];
+            const names = prods
+              .map(pr => pr?.nome ?? '')
+              .filter((v) => Boolean(v) && typeof v === 'string' && v.trim() !== '') as string[];
             return { ...p, _images: imgs, _imageIndex: 0, _productNames: names, _cart: cart } as Order;
           } catch {
             return { ...p, _images: [], _imageIndex: 0, _productNames: [], _cart: cart } as Order;
@@ -146,7 +156,9 @@ export default function MeusPedidosPage() {
       const len = Array.isArray(imgs) ? (imgs as unknown[]).length : 0;
       if (len <= 1) return o;
       const idx = typeof o._imageIndex === 'number' ? o._imageIndex as number : 0;
-      return { ...o, _imageIndex: (idx - 1 + len) % len };
+      // não faz loop: se está no primeiro, permanece no primeiro
+      const newIdx = idx > 0 ? idx - 1 : 0;
+      return { ...o, _imageIndex: newIdx };
     }));
   }
 
@@ -157,7 +169,9 @@ export default function MeusPedidosPage() {
       const len = Array.isArray(imgs) ? (imgs as unknown[]).length : 0;
       if (len <= 1) return o;
       const idx = typeof o._imageIndex === 'number' ? o._imageIndex as number : 0;
-      return { ...o, _imageIndex: (idx + 1) % len };
+      // não faz loop: se está no último, permanece no último
+      const newIdx = idx < len - 1 ? idx + 1 : len - 1;
+      return { ...o, _imageIndex: newIdx };
     }));
   }
 
@@ -201,8 +215,56 @@ export default function MeusPedidosPage() {
                       )}
                       {(o._images as string[]).length > 1 && (
                         <>
-                          <button onClick={() => (typeof o.id === 'number' ? prevImage(o.id as number) : undefined)} style={{ position: 'absolute', left: 4, top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.4)', color: '#fff', border: 'none', borderRadius: 4, padding: '6px 8px', cursor: 'pointer' }}>{'<'}</button>
-                          <button onClick={() => (typeof o.id === 'number' ? nextImage(o.id as number) : undefined)} style={{ position: 'absolute', right: 4, top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.4)', color: '#fff', border: 'none', borderRadius: 4, padding: '6px 8px', cursor: 'pointer' }}>{'>'}</button>
+                          {/* Seta esquerda: só mostra se não estiver na primeira imagem */}
+                          {(o._imageIndex || 0) > 0 && (
+                            <button
+                              onClick={() => (typeof o.id === 'number' ? prevImage(o.id as number) : undefined)}
+                              style={{
+                                position: 'absolute',
+                                left: 4,
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                background: 'rgba(0,0,0,0.6)',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: 4,
+                                padding: '6px 8px',
+                                cursor: 'pointer',
+                                fontSize: '16px',
+                                fontWeight: 'bold',
+                                transition: 'background 0.2s'
+                              }}
+                              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.8)'}
+                              onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.6)'}
+                            >
+                              {'<'}
+                            </button>
+                          )}
+                          {/* Seta direita: só mostra se não estiver na última imagem */}
+                          {(o._imageIndex || 0) < (o._images as string[]).length - 1 && (
+                            <button
+                              onClick={() => (typeof o.id === 'number' ? nextImage(o.id as number) : undefined)}
+                              style={{
+                                position: 'absolute',
+                                right: 4,
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                background: 'rgba(0,0,0,0.6)',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: 4,
+                                padding: '6px 8px',
+                                cursor: 'pointer',
+                                fontSize: '16px',
+                                fontWeight: 'bold',
+                                transition: 'background 0.2s'
+                              }}
+                              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.8)'}
+                              onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.6)'}
+                            >
+                              {'>'}
+                            </button>
+                          )}
                         </>
                       )}
                     </div>

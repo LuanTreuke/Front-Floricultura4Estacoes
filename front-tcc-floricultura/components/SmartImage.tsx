@@ -19,7 +19,8 @@ interface SmartImageProps {
  * baseado na URL fornecida
  */
 export default function SmartImage({ src, alt, className, width, height, style }: SmartImageProps) {
-  if (!src) {
+  // Validação mais robusta: verifica se src é uma string válida e não vazia
+  if (!src || typeof src !== 'string' || src.trim() === '') {
     return (
       <div 
         className={className} 
@@ -41,6 +42,28 @@ export default function SmartImage({ src, alt, className, width, height, style }
   }
 
   const imgSrc = buildImageURL(src);
+  
+  // Verifica se buildImageURL retornou uma URL válida
+  if (!imgSrc || imgSrc.trim() === '') {
+    return (
+      <div 
+        className={className} 
+        style={{
+          ...style,
+          width,
+          height,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: '#f0f0f0',
+          color: '#666',
+          fontSize: '1.5rem'
+        }}
+      >
+        🖼️
+      </div>
+    );
+  }
   const isNgrok = imgSrc.includes('ngrok');
 
   if (isNgrok) {
