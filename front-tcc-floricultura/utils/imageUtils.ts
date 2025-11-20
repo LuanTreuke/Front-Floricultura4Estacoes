@@ -55,17 +55,6 @@ export const buildImageURL = (imagePath: string): string => {
     
     return normalized;
   })();
-
-  // Debug apenas em desenvolvimento
-  if (process.env.NODE_ENV === 'development') {
-    console.log('🖼️ buildImageURL:', { 
-      input: imagePath, 
-      output: result, 
-      backend: getBackendURL(),
-      isBase64: result.startsWith('data:'),
-      isNgrok: result.includes('ngrok')
-    });
-  }
   
   return result;
 };

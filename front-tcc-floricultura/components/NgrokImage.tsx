@@ -12,6 +12,9 @@ interface NgrokImageProps {
   style?: React.CSSProperties;
 }
 
+// Cache global de blob URLs para evitar requisições duplicadas e revogações prematuras
+const blobCache = new Map<string, string>();
+
 /**
  * Componente que lida com imagens do ngrok fazendo fetch com headers corretos
  * para pular a página de aviso do ngrok
@@ -23,7 +26,6 @@ export default function NgrokImage({ src, alt, className, width, height, style }
 
   useEffect(() => {
     let isMounted = true;
-    let blobUrl: string | null = null;
 
     if (!src) {
       setLoading(false);
@@ -36,6 +38,16 @@ export default function NgrokImage({ src, alt, className, width, height, style }
     if (!isNgrok) {
       setImageSrc(src);
       setLoading(false);
+      return;
+    }
+
+    // Verificar se já temos essa URL em cache
+    if (blobCache.has(src)) {
+      const cachedUrl = blobCache.get(src)!;
+      if (isMounted) {
+        setImageSrc(cachedUrl);
+        setLoading(false);
+      }
       return;
     }
 
@@ -52,7 +64,9 @@ export default function NgrokImage({ src, alt, className, width, height, style }
 
         const blob = await response.blob();
         const objectUrl = URL.createObjectURL(blob);
-        blobUrl = objectUrl;
+        
+        // Adicionar ao cache
+        blobCache.set(src, objectUrl);
         
         if (isMounted) {
           setImageSrc(objectUrl);
@@ -69,12 +83,10 @@ export default function NgrokImage({ src, alt, className, width, height, style }
 
     fetchImage();
 
-    // Cleanup: revogar URL quando componente desmontar
+    // Cleanup: apenas marcar componente como desmontado
+    // NÃO revogar blob URL para permitir reuso
     return () => {
       isMounted = false;
-      if (blobUrl) {
-        URL.revokeObjectURL(blobUrl);
-      }
     };
   }, [src]);
 

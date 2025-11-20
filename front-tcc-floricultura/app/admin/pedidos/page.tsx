@@ -555,18 +555,26 @@ export default function AdminPedidosPage() {
             </label>
             <div className={styles.thumb}>
               {(o._images && o._images.length > 0) ? (
-                <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                  {o._images && o._images[o._imageIndex || 0] ? (
-                    <SmartImage
-                      src={String(o._images[o._imageIndex || 0])}
-                      alt={String(o.nome_cliente ?? o.id ?? '')}
-                      width={140}
-                      height={140}
-                      style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-                    />
-                  ) : (
-                    <div style={{ width: '100%', height: '100%', background: '#f3f3f3' }} />
-                  )}
+                <div style={{ position: 'relative', width: '100%', height: '100%' }} key={`order-${o.id}-img-${o._imageIndex || 0}`}>
+                  {(() => {
+                    const currentIndex = typeof o._imageIndex === 'number' ? o._imageIndex : 0;
+                    const currentImage = o._images[currentIndex];
+                    
+                    return currentImage && typeof currentImage === 'string' && currentImage.trim() ? (
+                      <SmartImage
+                        key={`img-${o.id}-${currentIndex}`}
+                        src={currentImage}
+                        alt={String(o.nome_cliente ?? o.id ?? '')}
+                        width={140}
+                        height={140}
+                        style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                      />
+                    ) : (
+                      <div key={`no-img-${o.id}-${currentIndex}`} style={{ width: '100%', height: '100%', background: '#f3f3f3', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999', fontSize: '0.875rem' }}>
+                        Sem imagem
+                      </div>
+                    );
+                  })()}
                   {o._images.length > 1 && (
                     <>
                       {/* Seta esquerda: só mostra se não estiver na primeira imagem */}
