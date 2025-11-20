@@ -8,6 +8,7 @@ import styles from '../../../styles/AdminPedidos.module.css';
 import { showError, showToast, showConfirm } from '../../../utils/sweetAlert';
 import { formatDateToYYYYMMDD } from '../../../utils/dateUtils';
 import { buildImageURL } from '@/utils/imageUtils';
+import SmartImage from '../../../components/SmartImage';
 
 export default function AdminPedidosPage() {
   type AnyObj = Record<string, unknown>;
@@ -206,7 +207,31 @@ export default function AdminPedidosPage() {
     } catch (err) { console.error(err); showError('Erro ao atualizar status'); }
   }
 
-  // image carousel controls removed from admin view (keeps UI simpler). If needed later, re-add handlers.
+  function prevImage(orderId: number) {
+    setOrders(curr => curr.map(o => {
+      if (o.id !== orderId) return o;
+      const imgs = o._images as unknown;
+      const len = Array.isArray(imgs) ? (imgs as unknown[]).length : 0;
+      if (len <= 1) return o;
+      const idx = typeof o._imageIndex === 'number' ? o._imageIndex as number : 0;
+      // não faz loop: se está no primeiro, permanece no primeiro
+      const newIdx = idx > 0 ? idx - 1 : 0;
+      return { ...o, _imageIndex: newIdx };
+    }));
+  }
+
+  function nextImage(orderId: number) {
+    setOrders(curr => curr.map(o => {
+      if (o.id !== orderId) return o;
+      const imgs = o._images as unknown;
+      const len = Array.isArray(imgs) ? (imgs as unknown[]).length : 0;
+      if (len <= 1) return o;
+      const idx = typeof o._imageIndex === 'number' ? o._imageIndex as number : 0;
+      // não faz loop: se está no último, permanece no último
+      const newIdx = idx < len - 1 ? idx + 1 : len - 1;
+      return { ...o, _imageIndex: newIdx };
+    }));
+  }
 
   // Função helper para normalizar strings (remove acentos e converte para minúsculas)
   const normalizeString = (str: string) => {
@@ -522,8 +547,8 @@ export default function AdminPedidosPage() {
               {(o._images && o._images.length > 0) ? (
                 <div style={{ position: 'relative', width: '100%', height: '100%' }}>
                   {o._images && o._images[o._imageIndex || 0] ? (
-                    <Image
-                      src={buildImageURL(String(o._images[o._imageIndex || 0]))}
+                    <SmartImage
+                      src={String(o._images[o._imageIndex || 0])}
                       alt={String(o.nome_cliente ?? o.id ?? '')}
                       width={140}
                       height={140}
@@ -531,6 +556,60 @@ export default function AdminPedidosPage() {
                     />
                   ) : (
                     <div style={{ width: '100%', height: '100%', background: '#f3f3f3' }} />
+                  )}
+                  {o._images.length > 1 && (
+                    <>
+                      {/* Seta esquerda: só mostra se não estiver na primeira imagem */}
+                      {(o._imageIndex || 0) > 0 && (
+                        <button
+                          onClick={() => (typeof o.id === 'number' ? prevImage(o.id as number) : undefined)}
+                          style={{
+                            position: 'absolute',
+                            left: 4,
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            background: 'rgba(0,0,0,0.6)',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: 4,
+                            padding: '6px 8px',
+                            cursor: 'pointer',
+                            fontSize: '16px',
+                            fontWeight: 'bold',
+                            transition: 'background 0.2s'
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.8)'}
+                          onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.6)'}
+                        >
+                          {'<'}
+                        </button>
+                      )}
+                      {/* Seta direita: só mostra se não estiver na última imagem */}
+                      {(o._imageIndex || 0) < o._images.length - 1 && (
+                        <button
+                          onClick={() => (typeof o.id === 'number' ? nextImage(o.id as number) : undefined)}
+                          style={{
+                            position: 'absolute',
+                            right: 4,
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            background: 'rgba(0,0,0,0.6)',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: 4,
+                            padding: '6px 8px',
+                            cursor: 'pointer',
+                            fontSize: '16px',
+                            fontWeight: 'bold',
+                            transition: 'background 0.2s'
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.8)'}
+                          onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.6)'}
+                        >
+                          {'>'}
+                        </button>
+                      )}
+                    </>
                   )}
                 </div>
               ) : (
