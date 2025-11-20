@@ -5,7 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { fetchProductById, Product, updateProduct } from '@/services/productService';
 import { uploadImage } from '@/services/uploadService';
 import api from '@/services/api';
-import ImageUpload from '@/components/ImageUpload';
+import MultiImageUpload from '@/components/MultiImageUpload';
 import { showSuccess, showError } from '@/utils/sweetAlert';
 
 export default function EditarProdutoPage() {
@@ -18,8 +18,8 @@ export default function EditarProdutoPage() {
   const [preco, setPreco] = useState('');
   const [categoria, setCategoria] = useState('');
   const [categories, setCategories] = useState<Array<{ id: number; nome: string }>>([]);
-  const [imagemUrl, setImagemUrl] = useState('');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imagemUrls, setImagemUrls] = useState<string[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [enabled, setEnabled] = useState(true);
   const [loading, setLoading] = useState(false);
 
@@ -33,7 +33,9 @@ export default function EditarProdutoPage() {
         // produto pode trazer relation 'categoria' ou só Categoria_id
         const catId = prod.categoria ? prod.categoria.id : prod.Categoria_id;
         setCategoria(catId ? String(catId) : '');
-        setImagemUrl(prod.imagem_url || '');
+        // Separar URLs se houver múltiplas (separadas por vírgula)
+        const urls = prod.imagem_url ? prod.imagem_url.split(',').map(url => url.trim()).filter(url => url) : [];
+        setImagemUrls(urls);
         setEnabled(prod.enabled === undefined ? true : !!prod.enabled);
       }
     });
@@ -48,14 +50,9 @@ export default function EditarProdutoPage() {
     })();
   }, [id]);
 
-  function handleFileSelected(file: File | null) {
-    console.log('📸 Arquivo selecionado:', file?.name);
-    setSelectedFile(file);
-    
-    // Se removeu a imagem, limpar também a URL atual
-    if (file === null) {
-      setImagemUrl('');
-    }
+  function handleFilesSelected(files: File[]) {
+    console.log('📸 Arquivos selecionados:', files.length);
+    setSelectedFiles(files);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -66,14 +63,18 @@ export default function EditarProdutoPage() {
     try {
       setLoading(true);
       
-      let finalImageUrl = imagemUrl;
+      let finalImageUrl = imagemUrls.join(',');
       
-      // Se há um novo arquivo selecionado, fazer upload primeiro
-      if (selectedFile) {
-        console.log('📤 Fazendo upload da nova imagem...');
-        const uploadResult = await uploadImage(selectedFile);
-        finalImageUrl = uploadResult.url;
-        console.log('✅ Upload concluído:', finalImageUrl);
+      // Se há novos arquivos selecionados, fazer upload de todos
+      if (selectedFiles.length > 0) {
+        console.log(`📤 Fazendo upload de ${selectedFiles.length} nova(s) imagem(ns)...`);
+        const uploadedUrls: string[] = [];
+        for (const file of selectedFiles) {
+          const uploadResult = await uploadImage(file);
+          uploadedUrls.push(uploadResult.url);
+          console.log('✅ Upload concluído:', uploadResult.url);
+        }
+        finalImageUrl = uploadedUrls.join(',');
       }
 
       const payload: Partial<Product> = {
@@ -109,8 +110,8 @@ export default function EditarProdutoPage() {
       <h1 style={{fontSize: '2rem', fontWeight: 600, marginBottom: 24}}>Editar produto</h1>
       <form onSubmit={handleSubmit} style={{background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.08)', padding: 32, display: 'flex', flexDirection: 'column', gap: 24}}>
         <div style={{display: 'flex', flexDirection: 'column', gap: 8}}>
-          <label style={{fontWeight: 500}}>Imagem do produto</label>
-          <ImageUpload onFileSelected={handleFileSelected} currentImage={imagemUrl} />
+          <label style={{fontWeight: 500}}>Imagens do produto</label>
+          <MultiImageUpload onFilesSelected={handleFilesSelected} currentImages={imagemUrls} maxImages={5} />
         </div>
         <div style={{display: 'flex', flexDirection: 'column', gap: 8}}>
           <label>Nome do produto</label>

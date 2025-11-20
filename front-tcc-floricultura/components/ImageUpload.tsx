@@ -77,7 +77,6 @@ export default function ImageUpload({ onFileSelected, currentImage, disabled = f
         ref={fileInputRef}
         type="file"
         accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
-        capture="environment"
         onChange={handleFileSelect}
         disabled={disabled}
         style={{ display: 'none' }}
@@ -90,7 +89,7 @@ export default function ImageUpload({ onFileSelected, currentImage, disabled = f
           onClick={handleButtonClick}
           disabled={disabled}
           style={{
-            background: '#007bff',
+            background: '#28a745',
             color: 'white',
             border: 'none',
             borderRadius: 8,

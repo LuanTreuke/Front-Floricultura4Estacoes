@@ -1,84 +1,126 @@
-9 DISCUSSÃO
+8 DISCUSSÃO
 
 Este capítulo apresenta uma análise crítica dos resultados obtidos, discutindo os aspectos que funcionaram adequadamente, as limitações identificadas, os desafios enfrentados e as lições aprendidas durante o desenvolvimento e implantação da solução. A discussão fundamenta-se nos dados coletados durante o período de validação e nas observações realizadas ao longo do projeto.
 
-9.1 Análise Geral da Solução
+8.1 Análise Geral da Solução
 
 A solução desenvolvida demonstrou-se eficaz em resolver os problemas operacionais identificados na fase inicial do projeto. A substituição do processo manual baseado em anotações em papel e mensagens de WhatsApp por um sistema digital estruturado resultou em ganhos mensuráveis de eficiência, organização e confiabilidade.
 
 Segundo Pressman (2016), o sucesso de um projeto de software não deve ser medido apenas pela implementação correta de funcionalidades, mas também pelo valor agregado ao negócio e pela satisfação dos usuários. Sob essa perspectiva, o projeto alcançou seus objetivos principais, conforme evidenciado pelos resultados da validação e pelos feedbacks positivos da usuária-alvo.
 
-9.2 Aspectos que Funcionaram Adequadamente
+8.2 Aspectos que Funcionaram Adequadamente
 
-9.2.1 Arquitetura e Escolha Tecnológica
+8.2.1 Arquitetura e Escolha Tecnológica
 
 A decisão de adotar uma arquitetura em camadas com separação clara entre front-end e back-end mostrou-se acertada. A utilização de Next.js e NestJS proporcionou uma base sólida para o desenvolvimento, com ferramentas e padrões bem estabelecidos que facilitaram a implementação de funcionalidades complexas. Como afirma Sommerville (2019), a escolha de tecnologias maduras e bem documentadas reduz significativamente os riscos de um projeto de software.
 
 A renderização no lado do servidor (SSR) do Next.js contribuiu para o excelente desempenho de carregamento observado nos testes, com média de 3.2 segundos na vitrine digital. A estrutura modular do NestJS facilitou a manutenção e a adição de novas funcionalidades durante o desenvolvimento incremental.
 
-9.2.2 Modelo Incremental de Desenvolvimento
+8.2.2 Modelo Incremental de Desenvolvimento
 
 A adoção do modelo incremental, conforme descrito por Ganney e Claridge (2020), permitiu entregas contínuas e validações em cada etapa do projeto. Esta abordagem foi particularmente vantajosa por possibilitar ajustes baseados em feedback antes da implementação de módulos subsequentes.
 
 O desenvolvimento em incrementos também facilitou o gerenciamento de riscos. Problemas técnicos, como a questão do timezone em datas, foram identificados e resolvidos em uma etapa específica, sem impactar significativamente o cronograma geral do projeto. Esta experiência corrobora a afirmação de Pressman (2016) de que modelos iterativos são especialmente adequados para projetos onde os requisitos podem ser refinados ao longo do tempo.
 
-9.2.3 Usabilidade e Experiência do Usuário
+8.2.3 Usabilidade e Experiência do Usuário
 
 A aplicação rigorosa das heurísticas de Nielsen (1995) durante o design e implementação da interface resultou em um sistema intuitivo e fácil de usar. A pontuação SUS de 87.5 pontos, classificada como "excelente", valida a eficácia dessa abordagem centrada no usuário.
 
 A decisão de criar um protótipo de alta fidelidade no Figma antes da implementação foi crucial para o sucesso da interface. Segundo Sharp (2013), a prototipagem permite identificar problemas de usabilidade antecipadamente, quando correções ainda têm baixo custo. Este investimento inicial em design pagou-se na fase de testes, onde a usuária conseguiu executar todas as tarefas sem treinamento prévio.
 
-9.2.4 Gestão de Entregas
+8.2.4 Gestão de Entregas
 
 O módulo de gerenciamento de entregas atendeu plenamente às necessidades da floricultura, oferecendo organização e rastreabilidade inexistentes no processo manual anterior. A ausência de erros de transcrição durante o período de testes demonstra a eficácia do sistema em garantir a integridade das informações dos pedidos.
 
 A funcionalidade de filtros por data e status mostrou-se particularmente útil durante o Dia Internacional da Mulher, quando o volume de pedidos triplicou. A capacidade de visualizar rapidamente todas as entregas de um dia específico facilitou o planejamento logístico e a alocação de recursos, validando a importância desta funcionalidade identificada nos requisitos.
 
-9.2.5 Catálogo Digital
+8.2.5 Catálogo Digital
 
 A vitrine digital cumpriu seu papel de apresentar os produtos de forma profissional e atrativa. O sistema de categorização e filtros facilitou a navegação dos clientes, enquanto a facilidade de atualização do catálogo pelo administrador garantiu que as informações estivessem sempre corretas e atualizadas.
 
 A implementação do sistema de múltiplas imagens por produto, com otimização automática de tamanho, resultou em uma apresentação visual de qualidade sem comprometer o desempenho de carregamento. Esta abordagem está alinhada com as recomendações de Liu et al. (2022) sobre a importância da qualidade visual em catálogos digitais.
 
-9.3 Limitações e Aspectos que Não Funcionaram Conforme o Esperado
+8.3 Limitações e Aspectos que Não Funcionaram Conforme o Esperado
 
-9.3.1 Integração com WhatsApp
+8.3.1 Integração com WhatsApp
 
-Embora o sistema tenha sido desenvolvido com integração básica ao WhatsApp (botão que abre uma conversa), a automação completa do processo de pedidos via WhatsApp não foi implementada. A solução atual ainda requer que o cliente inicie contato manual, limitando o potencial de automatização do atendimento.
+A integração com WhatsApp implementada no sistema apresenta limitações significativas que impactam a experiência do usuário e a capacidade de automatização. O sistema utiliza a biblioteca whatsapp-web.js (versão 1.34.2), que simula o WhatsApp Web através de um navegador headless (Puppeteer), ao invés da API oficial do WhatsApp Business.
 
-Esta limitação decorre de restrições técnicas e de políticas de uso da API oficial do WhatsApp Business, que exige processo de aprovação e tem custos associados incompatíveis com o orçamento do projeto. Estudos sobre e-commerce, como o de Kotler, Kartajaya e Setiawan (2017), destacam a importância de canais de comunicação integrados para a experiência do cliente, indicando que esta é uma área prioritária para evolução futura.
+Esta abordagem, embora funcional para o escopo do projeto, apresenta várias restrições:
 
-9.3.2 Relatórios Limitados
+a) Dependência de Conexão Constante: O servidor precisa manter uma sessão ativa do WhatsApp Web constantemente conectada. Qualquer interrupção na conexão requer novo escaneamento de QR Code para reautenticação, o que pode causar indisponibilidade do serviço.
+
+b) Requisito de Telefone Ativo: O número de WhatsApp usado no servidor deve estar sempre disponível e não pode ser utilizado simultaneamente em outro dispositivo, limitando a flexibilidade operacional.
+
+c) Falta de Automação Completa: Embora o sistema consiga enviar mensagens de verificação de telefone e notificações básicas, não há automação para criação de pedidos via conversas do WhatsApp. O cliente precisa acessar o site manualmente para finalizar compras.
+
+d) Limitação de Cadastro: Um problema crítico identificado é que usuários sem WhatsApp não conseguem completar o cadastro na plataforma, pois a verificação de telefone é obrigatória e depende exclusivamente desta ferramenta. Esta restrição exclui potenciais clientes que não utilizam o aplicativo, representando uma barreira de entrada significativa.
+
+A API oficial do WhatsApp Business seria a solução ideal, oferecendo maior estabilidade, automação e escalabilidade. Porém, ela requer processo de aprovação pela Meta, possui custos de conversação (charged per message) e exige infraestrutura mais robusta, fatores incompatíveis com o orçamento e escopo deste projeto acadêmico.
+
+Estudos sobre e-commerce, como o de Kotler, Kartajaya e Setiawan (2017), destacam a importância de canais de comunicação integrados para a experiência do cliente, indicando que esta é uma área prioritária para evolução futura. A migração para a API oficial seria fundamental para transformar o sistema em uma solução comercial.
+
+8.3.2 Relatórios Limitados
 
 O módulo de relatórios implementado, embora funcional, oferece apenas análises básicas (produtos mais vendidos, faturamento por período). Relatórios mais sofisticados, como análise de sazonalidade, previsão de demanda ou segmentação de clientes, ficaram fora do escopo devido a restrições de tempo e complexidade.
 
 Para pequenos negócios como a floricultura em questão, os relatórios básicos implementados são suficientes para as decisões operacionais do dia a dia. No entanto, conforme o negócio cresce, a necessidade de análises mais aprofundadas torna-se evidente. Segundo Pressman (2016), é comum que sistemas de software evoluam ao longo do tempo para atender demandas crescentes de negócio.
 
-9.3.3 Otimização para Dispositivos Móveis
+8.3.3 Otimização para Dispositivos Móveis
 
 Embora o sistema seja responsivo e funcione adequadamente em smartphones e tablets, algumas telas administrativas complexas (como o cadastro de pedidos com múltiplos campos) apresentam desafios de usabilidade em telas pequenas. A rolagem extensiva necessária para preencher todos os campos pode causar fadiga em uso prolongado.
 
 Esta observação está alinhada com as recomendações de Sharp (2013) sobre design mobile-first, que sugere projetar interfaces priorizando dispositivos móveis desde o início. No presente projeto, a abordagem foi desktop-first, o que explica estas limitações. Para projetos futuros, uma abordagem mobile-first seria mais adequada, dado o crescente uso de smartphones para gestão de negócios.
 
-9.3.4 Teste de Carga e Escalabilidade
+8.3.4 Teste de Carga e Escalabilidade
 
 Embora a arquitetura tenha sido projetada para ser escalável, não foram realizados testes de carga formais para determinar os limites de capacidade do sistema. O período de validação, com pico de 18 pedidos em um dia, não foi suficiente para estressar o sistema e identificar possíveis gargalos de performance.
 
 De acordo com Sommerville (2019), testes de carga são essenciais para sistemas que precisam suportar grande volume de usuários simultâneos. Para a floricultura atual, com baixo volume de acessos, esta limitação não representa risco imediato. Porém, caso o negócio cresça significativamente ou o sistema seja adaptado para outras empresas, estes testes tornam-se necessários.
 
-9.4 Comparação com Trabalhos Relacionados
+8.3.5 Segurança e Autenticação
+
+O sistema implementa autenticação básica com bcrypt para hash de senhas, o que atende aos requisitos de segurança fundamentais. No entanto, algumas funcionalidades de segurança avançadas não foram implementadas:
+
+a) Ausência de Autenticação Multifator (MFA): Não há segunda camada de autenticação além de email e senha, o que poderia aumentar significativamente a segurança das contas administrativas.
+
+b) Tokens JWT Simples: Embora o sistema utilize tokens para manter sessões, não há implementação de refresh tokens ou rotação automática de tokens, práticas recomendadas para sistemas em produção.
+
+c) Política de Senhas Limitada: Não há exigência de complexidade mínima de senha (caracteres especiais, números, etc.) ou verificação contra senhas comuns.
+
+d) Logs de Auditoria Incompletos: Embora o sistema registre logs de operações, não há um sistema robusto de auditoria que rastreie todas as ações administrativas críticas.
+
+Para um sistema de gestão de pedidos de pequeno porte, as medidas de segurança implementadas são adequadas. Contudo, em uma expansão comercial ou para uso por múltiplas empresas (modelo SaaS), seria fundamental implementar camadas adicionais de segurança.
+
+8.3.6 Ausência de Testes Automatizados
+
+Uma limitação significativa do projeto é a ausência de testes automatizados (unitários, integração e end-to-end). Embora a estrutura Jest esteja configurada no projeto NestJS, não foram implementados suites de testes durante o desenvolvimento.
+
+Segundo Pressman (2016), testes automatizados são essenciais para garantir a qualidade e facilitar a manutenção de software. A ausência destes testes implica em:
+
+a) Maior Risco de Regressão: Modificações futuras no código podem quebrar funcionalidades existentes sem detecção imediata.
+
+b) Dificuldade de Refatoração: A falta de cobertura de testes torna arriscado refatorar ou otimizar código existente.
+
+c) Documentação Incompleta: Testes bem escritos servem como documentação viva do comportamento esperado do sistema.
+
+d) Validação Manual Repetitiva: Cada mudança requer validação manual extensiva, consumindo tempo e sendo propensa a erros humanos.
+
+A decisão de não implementar testes automatizados decorreu principalmente de restrições de tempo e do foco na entrega das funcionalidades principais. Para projetos futuros ou evolução deste sistema, a implementação de testes automatizados deveria ser priorizada desde o início.
+
+8.4 Comparação com Trabalhos Relacionados
 
 Comparando a solução desenvolvida com os trabalhos relacionados analisados no capítulo de revisão bibliográfica, observam-se os seguintes aspectos:
 
-9.4.1 Vantagens em Relação ao Destefani
+8.4.1 Vantagens em Relação ao Destefani
 
 O sistema web desenvolvido oferece maior flexibilidade que o aplicativo mobile Destefani (SUPELETO, 2022), funcionando em qualquer dispositivo com navegador, sem necessidade de instalação. Adicionalmente, o módulo de gestão de entregas implementado neste trabalho é mais robusto, oferecendo controle de status e filtros que não existem na solução Destefani.
 
-9.4.2 Vantagens em Relação ao SICON
+8.4.2 Vantagens em Relação ao SICON
 
 Comparado ao SICON (FERNANDES, 2012), a solução desenvolvida apresenta interface mais moderna e responsiva, alinhada com as tendências atuais de design web. A experiência do usuário foi um foco maior neste projeto, resultando em uma interface mais intuitiva e visualmente agradável.
 
-9.4.3 Diferenças em Relação à Nuvemshop
+8.4.3 Diferenças em Relação à Nuvemshop
 
 A Nuvemshop é uma plataforma comercial robusta e completa, com funcionalidades que vão muito além do escopo deste projeto, como processamento de pagamentos online e integração com marketplaces (NUVEMSHOP, 2025). No entanto, a solução customizada desenvolvida apresenta duas vantagens significativas:
 
@@ -88,7 +130,7 @@ b) Customização: O sistema foi desenvolvido especificamente para o fluxo de tr
 
 Esta análise reforça a lacuna identificada inicialmente: soluções generalistas como a Nuvemshop são excelentes para e-commerce tradicional, mas não atendem perfeitamente negócios com necessidades específicas de gestão logística local.
 
-9.5 Impacto no Negócio
+8.5 Impacto no Negócio
 
 Os resultados qualitativos observados durante o período de validação indicam impacto positivo na operação da floricultura:
 
@@ -100,27 +142,27 @@ c) Eficiência operacional: A redução do tempo médio de registro de pedidos d
 
 d) Disponibilidade 24/7: A vitrine digital permite que clientes consultem produtos a qualquer hora, mesmo fora do horário comercial, potencialmente aumentando as vendas.
 
-9.6 Lições Aprendidas
+8.6 Lições Aprendidas
 
 O desenvolvimento deste projeto proporcionou aprendizados valiosos que podem beneficiar projetos futuros:
 
-9.6.1 Importância do Levantamento de Requisitos
+8.6.1 Importância do Levantamento de Requisitos
 
 O tempo investido na observação prática da rotina da floricultura e no diálogo com a usuária-alvo foi fundamental para o sucesso do projeto. Requisitos bem compreendidos e documentados facilitam todas as fases subsequentes. Como afirma Pressman (2016), mudanças de requisitos após o início do desenvolvimento são exponencialmente mais custosas que ajustes na fase de análise.
 
-9.6.2 Valor da Prototipagem
+8.6.2 Valor da Prototipagem
 
 A criação do protótipo de alta fidelidade no Figma permitiu validar o design da interface antes de escrever uma linha de código. Ajustes visuais e de fluxo de navegação são muito mais rápidos e baratos em um protótipo do que em código implementado. Esta prática deveria ser padrão em projetos de desenvolvimento web.
 
-9.6.3 Documentação de Problemas Técnicos
+8.6.3 Documentação de Problemas Técnicos
 
 A documentação detalhada dos problemas técnicos encontrados (como a questão do timezone) e suas soluções criou uma base de conhecimento valiosa. Em múltiplas ocasiões durante o desenvolvimento, foi possível consultar documentações anteriores para resolver problemas similares rapidamente. Sommerville (2019) ressalta a importância da documentação técnica para a manutenibilidade de sistemas.
 
-9.6.4 Testes com Usuários Reais
+8.6.4 Testes com Usuários Reais
 
 Os testes de usabilidade com a usuária-alvo revelaram insights que não seriam identificados por testes técnicos. Pequenos ajustes na interface, como o aumento do tamanho de botões ou a mudança de terminologia, fizeram grande diferença na experiência percebida. Sharp (2013) enfatiza que desenvolvedores, por conhecerem intimamente o sistema, não conseguem avaliar objetivamente sua usabilidade.
 
-9.7 Contribuições do Trabalho
+8.7 Contribuições do Trabalho
 
 Este trabalho contribui para a área de sistemas de informação em diferentes aspectos:
 
@@ -130,7 +172,25 @@ b) Contribuição metodológica: Valida a eficácia do modelo incremental de des
 
 c) Contribuição para o setor: Fornece um caso de estudo detalhado sobre informatização de floriculturas de pequeno porte, um nicho pouco explorado na literatura acadêmica, mas relevante dado o tamanho do setor no Brasil.
 
-9.8 Considerações Finais
+d) Análise de trade-offs tecnológicos: O projeto documenta decisões de arquitetura e suas implicações, como a escolha entre API oficial do WhatsApp versus soluções alternativas, fornecendo referência para projetos similares.
+
+8.8 Análise de Custos e Sustentabilidade
+
+Um aspecto importante da discussão é a sustentabilidade econômica da solução desenvolvida. Os custos mensais estimados de hospedagem na AWS (R$ 50-100) são significativamente inferiores às alternativas comerciais como Nuvemshop (R$ 89-449/mês) ou VTEX (milhares de reais mensais).
+
+No entanto, esta análise de custos não considera:
+
+a) Custo de Manutenção: Tempo necessário para atualizações, correções de bugs e suporte técnico.
+
+b) Atualizações de Dependências: O sistema depende de 40+ bibliotecas JavaScript que requerem atualizações periódicas de segurança.
+
+c) Custo de Oportunidade: O tempo investido no desenvolvimento customizado versus a contratação de uma solução pronta.
+
+d) Escalabilidade de Custos: Se o negócio crescer, os custos de infraestrutura crescerão proporcionalmente.
+
+Para a floricultura atual, com operação de pequeno porte, o modelo customizado mostra-se vantajoso. Porém, para negócios com maior demanda ou menor conhecimento técnico, soluções comerciais podem oferecer melhor custo-benefício quando considerados todos os fatores.
+
+8.9 Considerações Finais
 
 A discussão dos resultados evidencia que o projeto, apesar de algumas limitações, atingiu seus objetivos principais e gerou valor tangível para o negócio. Os aspectos que funcionaram adequadamente superam as limitações identificadas, e estas últimas representam oportunidades claras de evolução futura.
 

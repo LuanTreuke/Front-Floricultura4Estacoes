@@ -21,6 +21,7 @@ export default function ProductPopup({ productId, onClose, inline = false }: Pro
   const [loading, setLoading] = useState(true);
   const [addedMsg, setAddedMsg] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const overlayRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -28,6 +29,7 @@ export default function ProductPopup({ productId, onClose, inline = false }: Pro
       try {
         const p = await fetchProductById(productId);
         setProduct(p);
+        setCurrentImageIndex(0); // Reset para primeira imagem ao trocar de produto
       } finally {
         setLoading(false);
       }
@@ -93,30 +95,110 @@ export default function ProductPopup({ productId, onClose, inline = false }: Pro
       ) : (
         <div className={styles.layout}>
           {product.imagem_url ? (() => {
-            const imageUrl = buildImageURL(product.imagem_url);
-            const isNgrok = imageUrl.includes('ngrok');
+            // Separar múltiplas URLs por vírgula
+            const imageUrls = product.imagem_url.split(',').map(url => url.trim()).filter(url => url);
+            const currentImageUrl = buildImageURL(imageUrls[currentImageIndex] || imageUrls[0]);
+            const isNgrok = currentImageUrl.includes('ngrok');
+            const hasMultipleImages = imageUrls.length > 1;
             
-            return isNgrok ? (
-              <NgrokImage
-                src={imageUrl}
-                alt={product.nome}
-                className={styles.image}
-                width={400}
-                height={400}
-                style={{ objectFit: 'cover' }}
-              />
-            ) : (
-              <Image
-                src={imageUrl}
-                alt={product.nome}
-                className={styles.image}
-                width={400}
-                height={400}
-                style={{ objectFit: 'cover' }}
-                onError={() => {
-                  console.error(`❌ Erro ao carregar imagem no modal do produto "${product.nome}":`, imageUrl);
-                }}
-              />
+            return (
+              <div style={{ position: 'relative' }}>
+                {isNgrok ? (
+                  <NgrokImage
+                    src={currentImageUrl}
+                    alt={product.nome}
+                    className={styles.image}
+                    width={400}
+                    height={400}
+                    style={{ objectFit: 'cover' }}
+                  />
+                ) : (
+                  <Image
+                    src={currentImageUrl}
+                    alt={product.nome}
+                    className={styles.image}
+                    width={400}
+                    height={400}
+                    style={{ objectFit: 'cover' }}
+                    onError={() => {
+                      console.error(`❌ Erro ao carregar imagem no modal do produto "${product.nome}":`, currentImageUrl);
+                    }}
+                  />
+                )}
+                
+                {/* Setas de navegação - apenas se houver múltiplas imagens */}
+                {hasMultipleImages && (
+                  <>
+                    <button
+                      onClick={() => setCurrentImageIndex((prev) => (prev > 0 ? prev - 1 : imageUrls.length - 1))}
+                      style={{
+                        position: 'absolute',
+                        left: 8,
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'rgba(0, 0, 0, 0.6)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: 40,
+                        height: 40,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '1.5rem',
+                        zIndex: 10
+                      }}
+                      aria-label="Imagem anterior"
+                    >
+                      ‹
+                    </button>
+                    
+                    <button
+                      onClick={() => setCurrentImageIndex((prev) => (prev < imageUrls.length - 1 ? prev + 1 : 0))}
+                      style={{
+                        position: 'absolute',
+                        right: 8,
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'rgba(0, 0, 0, 0.6)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: 40,
+                        height: 40,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '1.5rem',
+                        zIndex: 10
+                      }}
+                      aria-label="Próxima imagem"
+                    >
+                      ›
+                    </button>
+                    
+                    {/* Indicador de posição */}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        bottom: 8,
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        background: 'rgba(0, 0, 0, 0.6)',
+                        color: 'white',
+                        padding: '4px 12px',
+                        borderRadius: 12,
+                        fontSize: '0.85rem',
+                        fontWeight: 500
+                      }}
+                    >
+                      {currentImageIndex + 1} / {imageUrls.length}
+                    </div>
+                  </>
+                )}
+              </div>
             );
           })() : (
             <div className={styles.image}>Img</div>

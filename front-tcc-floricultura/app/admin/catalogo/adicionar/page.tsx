@@ -6,7 +6,7 @@ import { addProduct, Product } from '@/services/productService';
 import { fetchCategories, Categoria } from '@/services/categoryService';
 import { uploadImage } from '@/services/uploadService';
 import { showSuccess, showError } from '@/utils/sweetAlert';
-import ImageUpload from '@/components/ImageUpload';
+import MultiImageUpload from '@/components/MultiImageUpload';
 import Image from 'next/image';
 
 export default function AdicionarProdutoPage() {
@@ -15,14 +15,14 @@ export default function AdicionarProdutoPage() {
   const [preco, setPreco] = useState('');
   const [categoria, setCategoria] = useState('');
   const [categories, setCategories] = useState<Categoria[]>([]);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [enabled, setEnabled] = useState(true);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  function handleFileSelected(file: File | null) {
-    console.log('📸 Arquivo selecionado:', file?.name);
-    setSelectedFile(file);
+  function handleFilesSelected(files: File[]) {
+    console.log('📸 Arquivos selecionados:', files.length);
+    setSelectedFiles(files);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -33,15 +33,20 @@ export default function AdicionarProdutoPage() {
     try {
       setLoading(true);
       
-      let imagemUrl = '';
+      const imagemUrls: string[] = [];
       
-      // Se há um arquivo selecionado, fazer upload primeiro
-      if (selectedFile) {
-        console.log('📤 Fazendo upload da imagem...');
-        const uploadResult = await uploadImage(selectedFile);
-        imagemUrl = uploadResult.url;
-        console.log('✅ Upload concluído:', imagemUrl);
+      // Se há arquivos selecionados, fazer upload de cada um
+      if (selectedFiles.length > 0) {
+        console.log(`📤 Fazendo upload de ${selectedFiles.length} imagem(ns)...`);
+        for (const file of selectedFiles) {
+          const uploadResult = await uploadImage(file);
+          imagemUrls.push(uploadResult.url);
+          console.log('✅ Upload concluído:', uploadResult.url);
+        }
       }
+      
+      // Juntar as URLs com vírgula
+      const imagemUrl = imagemUrls.join(',');
 
       const dto = {
         nome,
@@ -93,8 +98,8 @@ export default function AdicionarProdutoPage() {
       <h1 style={{fontSize: '2rem', fontWeight: 600, marginBottom: 24, textAlign: 'center'}}>Adicione um produto</h1>
       <form onSubmit={handleSubmit} style={{background: '#fff', borderRadius: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.08)', padding: 32, display: 'flex', flexDirection: 'column', gap: 24}}>
         <div style={{display: 'flex', flexDirection: 'column', gap: 8}}>
-          <label style={{fontWeight: 500}}>Imagem do produto</label>
-          <ImageUpload onFileSelected={handleFileSelected} />
+          <label style={{fontWeight: 500}}>Imagens do produto</label>
+          <MultiImageUpload onFilesSelected={handleFilesSelected} maxImages={5} />
         </div>
         <div style={{display: 'flex', flexDirection: 'column', gap: 8}}>
           <label>Nome do produto</label>
