@@ -35,6 +35,7 @@
   color: #111; 
   font-size: 1.05rem; 
   line-height: 1.6; 
+  white-space: pre-wrap;
 }
 .actions { 
   margin-top: 28px; 
