@@ -159,9 +159,6 @@ export default function TermosDeServico() {
       <footer className={styles.footerSection}>
         <div className={styles.footerContent}>
           <div className={styles.footerCol}>
-            
-          </div>
-          <div className={styles.footerCol}>
             <span className={styles.footerTitle}>Redes Sociais</span>
             <a href="https://www.instagram.com/floricultura4estacoes_/" target="_blank" rel="noopener noreferrer">Instagram</a>
           </div>
