@@ -48,6 +48,11 @@ export function getCurrentUser(): User {
   }
 }
 
+export async function deleteAccount(userId: number) {
+  const res = await api.delete(`/usuario/${userId}`);
+  return res.data;
+}
+
 export function logout() {
   if (typeof window === 'undefined') return;
   try {

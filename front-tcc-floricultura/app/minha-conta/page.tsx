@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import styles from '../../styles/MyAccount.module.css';
 import { fetchPhones, deletePhone, PhoneDto } from '../../services/phoneService';
 import { fetchAddresses, updateAddress, deleteAddress, AddressDto } from '../../services/addressService';
-import { getCurrentUser, User } from '../../services/authService';
+import { getCurrentUser, User, deleteAccount, logout } from '../../services/authService';
 import { showConfirm, showToast } from '../../utils/sweetAlert';
 import BackButton from '../../components/BackButton';
 import Breadcrumb from '../../components/Breadcrumb';
@@ -69,6 +69,28 @@ export default function MyAccountPage() {
     await deleteAddress(id);
     setAddresses(addresses.filter(a => a.id !== id));
     showToast('Endereço removido com sucesso', 'success');
+  }
+
+  async function handleDeleteAccount() {
+    const confirmed = await showConfirm(
+      'Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita e todos os seus dados serão perdidos.',
+      'Confirmar exclusão de conta',
+      'Sim, excluir conta',
+      'Cancelar'
+    );
+    if (!confirmed) return;
+    
+    try {
+      if (usuario?.id) {
+        await deleteAccount(usuario.id);
+        showToast('Conta excluída com sucesso', 'success');
+        logout();
+        router.push('/');
+      }
+    } catch (error) {
+      console.error('Erro ao excluir conta:', error);
+      showToast('Erro ao excluir conta. Tente novamente.', 'error');
+    }
   }
 
   // handleAddAddress removed; use dedicated cadastro/endereco page which can redirect back using ?returnTo=
@@ -156,6 +178,28 @@ export default function MyAccountPage() {
           <button className={styles.addBtn} onClick={() => router.push('/cadastro/endereco?returnTo=/minha-conta')}>Adicionar endereço</button>
         </div>
       </section>
+
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '40px', marginBottom: '40px' }}>
+        <button 
+          className={styles.deleteAccountBtn} 
+          onClick={handleDeleteAccount}
+          style={{
+            backgroundColor: '#dc3545',
+            color: 'white',
+            padding: '12px 24px',
+            border: 'none',
+            borderRadius: '8px',
+            fontSize: '16px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease'
+          }}
+          onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#c82333'}
+          onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#dc3545'}
+        >
+          Excluir Conta
+        </button>
+      </div>
     </div>
   );
 }
