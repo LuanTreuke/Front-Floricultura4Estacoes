@@ -80,6 +80,7 @@ export default function LoginPage() {
         <input type="password" placeholder="Senha" value={senha} onChange={e => setSenha(e.target.value)} required />
         {error && <span className={styles.error}>{error}</span>}
         <button type="submit">Entrar</button>
+        <label htmlFor="Cadastre-se" style={{textAlign:"center"}}>Não possui uma conta?</label>
         <span className={styles.link} onClick={() => router.push('/cadastro')}>Cadastre-se</span>
       </form>
     </div>

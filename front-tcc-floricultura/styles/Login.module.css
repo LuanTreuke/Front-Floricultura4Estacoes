@@ -73,10 +73,9 @@
 }
 .link {
   color: #4b7350;
-  font-size: 0.98rem;
+  font-size: 1.1rem;
   text-align: center;
   cursor: pointer;
-  margin-top: 8px;
   text-decoration: underline;
 }
 

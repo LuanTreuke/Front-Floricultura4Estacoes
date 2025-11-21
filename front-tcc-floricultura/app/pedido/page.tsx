@@ -210,6 +210,9 @@ export default function UnifiedOrderPage() {
           {addresses.map(a => <option key={a.id} value={a.id}>{`${a.rua}, ${a.numero} - ${a.bairro}`}</option>)}
         </select>
 
+        <label>Nome</label>
+        <input className={`${styles.input} ${errors.nomeCliente ? styles.invalid : ''}`} value={nomeCliente} onChange={e => { setNomeCliente(e.target.value); setErrors(prev => ({ ...prev, nomeCliente: false })); }} />
+
         <div style={{ marginTop: 8 }}>
           <button type="button" className={styles.primaryBtn} onClick={() => {
             // Salvar dados do formulário no localStorage
@@ -231,9 +234,6 @@ export default function UnifiedOrderPage() {
           </button>
         </div>
 
-        <label>Nome</label>
-  <input className={`${styles.input} ${errors.nomeCliente ? styles.invalid : ''}`} value={nomeCliente} onChange={e => { setNomeCliente(e.target.value); setErrors(prev => ({ ...prev, nomeCliente: false })); }} />
-
         {/* Aviso de telefone ausente */}
         {hasUsuarioTelefone === false && (
           <div style={{ background: '#fffaf0', border: '1px solid #ffe4a3', padding: 10, borderRadius: 8, color: '#7a4b00' }}>
@@ -245,7 +245,7 @@ export default function UnifiedOrderPage() {
         )}
 
         <label>Quem vai receber?</label>
-  <input className={`${styles.input} ${errors.nomeDestinatario ? styles.invalid : ''}`} value={nomeDestinatario} onChange={e => { setNomeDestinatario(e.target.value); setErrors(prev => ({ ...prev, nomeDestinatario: false })); }} />
+        <input placeholder="Nome do destinatário (se diferente)" className={`${styles.input} ${errors.nomeDestinatario ? styles.invalid : ''}`} value={nomeDestinatario} onChange={e => { setNomeDestinatario(e.target.value); setErrors(prev => ({ ...prev, nomeDestinatario: false })); }} />
 
         <label 
           style={{ 
