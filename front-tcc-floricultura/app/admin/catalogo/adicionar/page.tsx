@@ -7,6 +7,7 @@ import { fetchCategories, Categoria } from '@/services/categoryService';
 import { uploadImage } from '@/services/uploadService';
 import { showSuccess, showError } from '@/utils/sweetAlert';
 import MultiImageUpload from '@/components/MultiImageUpload';
+import AddCategoryModal from '@/components/AddCategoryModal';
 import Image from 'next/image';
 
 export default function AdicionarProdutoPage() {
@@ -19,6 +20,7 @@ export default function AdicionarProdutoPage() {
   const [enabled, setEnabled] = useState(true);
   const [loading, setLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<string>('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
 
   function handleFilesSelected(files: File[]) {
@@ -84,6 +86,19 @@ export default function AdicionarProdutoPage() {
     }
   }
 
+  async function loadCategories() {
+    try {
+      const cats = await fetchCategories();
+      setCategories(cats);
+    } catch (e) {
+      console.warn('Failed to load categories', e);
+    }
+  }
+
+  function handleCategoryAdded() {
+    loadCategories();
+  }
+
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -129,7 +144,27 @@ export default function AdicionarProdutoPage() {
           <input type="number" value={preco} onChange={e => setPreco(e.target.value)} required style={{padding: 10, borderRadius: 8, border: '1px solid #cbead6'}} />
         </div>
         <div style={{display: 'flex', flexDirection: 'column', gap: 8}}>
-          <label>Categoria</label>
+          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+            <label>Categoria</label>
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(true)}
+              disabled={loading}
+              style={{
+                background: '#cbead6',
+                color: '#222',
+                border: 'none',
+                borderRadius: 8,
+                padding: '8px 16px',
+                fontWeight: 600,
+                fontSize: '0.875rem',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.6 : 1,
+              }}
+            >
+              + Nova Categoria
+            </button>
+          </div>
           <select value={categoria} onChange={e => setCategoria(e.target.value)} required style={{padding: 10, borderRadius: 8, border: '1px solid #cbead6'}}>
             <option value="">Selecione a categoria</option>
             {categories.length > 0 ? categories.map(c => (
@@ -165,6 +200,12 @@ export default function AdicionarProdutoPage() {
           </button>
         </div>
       </form>
+      
+      <AddCategoryModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onCategoryAdded={handleCategoryAdded}
+      />
     </div>
   );
 }
