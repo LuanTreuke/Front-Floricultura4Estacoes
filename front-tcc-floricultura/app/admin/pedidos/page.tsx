@@ -529,7 +529,7 @@ export default function AdminPedidosPage() {
           </div>
         ) : (
           visibleOrders.map(o => (
-          <div key={o.id} className={styles.card}>
+          <div key={o.id} className={styles.card} style={{ overflow: 'visible', minHeight: '200px', paddingTop: '80px' }}>
             {o.telefone_cliente && (
               <a
                 href={`https://wa.me/${String(o.telefone_cliente).replace(/\D/g, '')}`}
@@ -543,7 +543,7 @@ export default function AdminPedidosPage() {
                 </svg>
               </a>
             )}
-            <div style={{ position: 'absolute', top: 10, right: 10, display: 'flex', flexDirection: 'column', gap: '8px', zIndex: 10 }}>
+            <div style={{ position: 'absolute', top: 10, right: 10, display: 'flex', flexDirection: 'column', gap: '8px', zIndex: 50 }}>
               <label 
                 style={{ 
                   display: 'flex', 

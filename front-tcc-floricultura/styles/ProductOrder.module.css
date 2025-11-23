@@ -7,7 +7,7 @@
 .wrapper {
   max-width: 920px;
   margin: 0 auto;
-  padding: 42px 28px 28px 28px;
+  padding: 28px;
 }
 .heading {
   font-size: 1.4rem;
@@ -104,7 +104,7 @@
 
 @media (max-width: 480px) {
   .container {
-    padding: 16px;
+    padding: 32px 16px 16px 16px;
   }
   .heading {
     font-size: 1.25rem;
