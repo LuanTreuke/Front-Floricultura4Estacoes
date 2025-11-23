@@ -195,8 +195,7 @@ export default function ProductOrderPage() {
       <Breadcrumb 
         items={[
           { label: 'Página inicial', href: '/' },
-          { label: product.nome, href: `/product/${id}` },
-          { label: 'Fazer Pedido' }
+          { label: 'Finalizar pedido' }
         ]}
       />
       <h1 className={styles.heading}>Fazer pedido — {product.nome}</h1>

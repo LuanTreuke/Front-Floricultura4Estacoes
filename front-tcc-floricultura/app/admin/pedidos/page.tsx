@@ -499,7 +499,36 @@ export default function AdminPedidosPage() {
       </div>
 
       <div className={styles.grid}>
-        {visibleOrders.map(o => (
+        {visibleOrders.length === 0 ? (
+          <div style={{
+            gridColumn: '1 / -1',
+            textAlign: 'center',
+            padding: '60px 20px',
+            color: '#666'
+          }}>
+            <div style={{
+              fontSize: '48px',
+              marginBottom: '16px',
+              opacity: 0.3
+            }}>
+              📦
+            </div>
+            <h3 style={{
+              fontSize: '20px',
+              marginBottom: '8px',
+              color: '#333'
+            }}>
+              Nenhum pedido encontrado
+            </h3>
+            <p style={{
+              fontSize: '15px',
+              color: '#666'
+            }}>
+              Não há pedidos {dateFilter || endDateFilter ? 'na data selecionada' : statusFilter ? 'com este status' : searchTerm ? 'que correspondam à pesquisa' : 'no momento'}
+            </p>
+          </div>
+        ) : (
+          visibleOrders.map(o => (
           <div key={o.id} className={styles.card}>
             {o.telefone_cliente && (
               <a
@@ -784,7 +813,7 @@ export default function AdminPedidosPage() {
                 </div>
             </div>
           </div>
-        ))}
+        )))}
       </div>
     </div>
   );
