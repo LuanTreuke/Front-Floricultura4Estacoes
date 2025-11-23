@@ -159,3 +159,22 @@ export const showLoginRequired = async (): Promise<boolean> => {
 
   return result.isConfirmed;
 };
+
+// Confirmação de cancelamento de pedido
+export const showCancelConfirm = async (
+  title = 'Deseja cancelar este pedido?',
+  message = 'Esta ação não poderá ser desfeita.'
+): Promise<boolean> => {
+  const result = await Swal.fire({
+    icon: 'warning',
+    title,
+    text: message,
+    showCancelButton: true,
+    confirmButtonColor: colors.error,
+    cancelButtonColor: '#757575',
+    confirmButtonText: 'Sim, cancelar pedido',
+    cancelButtonText: 'Não cancelar',
+  });
+
+  return result.isConfirmed;
+};

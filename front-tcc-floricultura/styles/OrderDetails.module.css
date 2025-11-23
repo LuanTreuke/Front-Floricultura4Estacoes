@@ -46,13 +46,18 @@
   margin-top: 16px;
 }
 .secondaryBtn {
-  background: #f3f7f4;
-  color: #222;
+  background: #e53935;
+  color: #fff;
   border: none;
   border-radius: 8px;
   padding: 10px 14px;
   font-weight: 500;
   cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.secondaryBtn:hover {
+  background: #c62828;
 }
 
 .left {

@@ -9,7 +9,7 @@ import styles from '../../styles/OrderDetails.module.css';
 import BackButton from '../../components/BackButton';
 import Breadcrumb from '../../components/Breadcrumb';
 import SmartImage from '../../components/SmartImage';
-import { showConfirm, showError, showToast } from '../../utils/sweetAlert';
+import { showCancelConfirm, showError, showToast } from '../../utils/sweetAlert';
 
 export default function MeusPedidosPage() {
   const router = useRouter();
@@ -137,11 +137,9 @@ export default function MeusPedidosPage() {
 
 
   async function handleCancel(id: number) {
-    const confirmed = await showConfirm(
+    const confirmed = await showCancelConfirm(
       'Deseja cancelar este pedido?',
-      'Confirmar cancelamento',
-      'Sim, cancelar pedido',
-      'Não cancelar'
+      'Esta ação não poderá ser desfeita.'
     );
     if (!confirmed) return;
     try {
