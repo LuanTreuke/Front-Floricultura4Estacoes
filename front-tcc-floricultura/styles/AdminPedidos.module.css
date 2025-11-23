@@ -76,8 +76,6 @@
 .grid {
     display: grid;
     gap: 14px;
-    justify-items: start;
-    justify-content: start;
 }
 
 .card {
