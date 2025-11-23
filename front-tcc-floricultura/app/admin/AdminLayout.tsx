@@ -109,6 +109,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 href="/admin/pedidos"
                 className={`${styles.adminNavBtn} ${isActive('/admin/pedidos') ? styles.adminNavBtnActive : ''}`}
                 aria-current={isActive('/admin/pedidos') ? 'page' : undefined}
+                onClick={() => setShow(false)}
               >
                 <i className="bi bi-truck" aria-hidden></i> {' '}Gerenciar pedidos
               </Link>
@@ -118,6 +119,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 href="/admin/catalogo"
                 className={`${styles.adminNavBtn} ${isActive('/admin/catalogo') ? styles.adminNavBtnActive : ''}`}
                 aria-current={isActive('/admin/catalogo') ? 'page' : undefined}
+                onClick={() => setShow(false)}
               >
                 <i className="bi bi-flower3" aria-hidden></i> {' '}Gerenciar catálogo
               </Link>
@@ -127,6 +129,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 href="/admin/categorias"
                 className={`${styles.adminNavBtn} ${isActive('/admin/categorias') ? styles.adminNavBtnActive : ''}`}
                 aria-current={isActive('/admin/categorias') ? 'page' : undefined}
+                onClick={() => setShow(false)}
               >
                 <i className="bi bi-tag" aria-hidden></i> {' '}Gerenciar categorias
               </Link>
@@ -136,6 +139,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 href="/admin/relatorios"
                 className={`${styles.adminNavBtn} ${isActive('/admin/relatorios') ? styles.adminNavBtnActive : ''}`}
                 aria-current={isActive('/admin/relatorios') ? 'page' : undefined}
+                onClick={() => setShow(false)}
               >
                 <i className="bi bi-file-bar-graph" aria-hidden></i> {' '}Gerar relatórios
               </Link>
