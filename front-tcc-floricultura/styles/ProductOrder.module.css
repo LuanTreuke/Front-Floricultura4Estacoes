@@ -109,6 +109,9 @@
   .primaryBtn, .secondaryBtn, .addBtn {
     padding: 10px 14px;
   }
+  .textarea {
+    width: 100%;
+  }
 }
 
 .deliveryLabel {
