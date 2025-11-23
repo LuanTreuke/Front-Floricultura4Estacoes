@@ -3,7 +3,29 @@
   margin: 0 auto;
   padding: 28px;
   color: #0b0b0b;
+  max-height: calc(85vh - 56px);
+  overflow-y: auto;
+  overflow-x: hidden;
 }
+
+.container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+.container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
 .layout {
   display: flex;
   gap: 40px;
@@ -121,5 +143,14 @@
   }
   .price { 
     text-align: center; 
+  }
+  .actions {
+    display: flex;
+    justify-content: center;
+  }
+  .orderBtn,
+  .shoppingCart {
+    width: 100%;
+    max-width: 400px;
   }
 }

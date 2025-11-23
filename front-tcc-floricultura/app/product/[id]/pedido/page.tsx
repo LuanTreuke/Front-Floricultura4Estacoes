@@ -53,13 +53,20 @@ export default function ProductOrderPage() {
       const usuario = getCurrentUser() as User;
       const all = await fetchAddresses();
       if (usuario && usuario.id) {
-        setAddresses((all || []).filter((a) => a.Usuario_id === usuario.id));
+        const my = (all || []).filter((a) => a.Usuario_id === usuario.id);
+        setAddresses(my);
         // prefills com os dados do usuário logado quando disponíveis
         const saved = localStorage.getItem(`pedido_direto_form_${id}`);
         if (saved) {
           const data = JSON.parse(saved);
           if (data.nomeCliente) setNomeCliente(data.nomeCliente);
         } else if (usuario.nome) setNomeCliente(usuario.nome);
+        
+        // Se houver apenas 1 endereço, seleciona automaticamente
+        if (my.length === 1 && !selectedAddress) {
+          setSelectedAddress(my[0].id || null);
+        }
+        
         try {
           const phones = await fetchPhones();
           setHasUsuarioTelefone(Array.isArray(phones) && phones.length > 0 ? true : !!(usuario as any)?.telefone);
@@ -204,19 +211,20 @@ export default function ProductOrderPage() {
     }
   }
 
-  if (loading) return <div className={styles.container}>Carregando...</div>;
-  if (!product) return <div className={styles.container}>Produto não encontrado</div>;
+  if (loading) return <div className={styles.container}><div className={styles.wrapper}>Carregando...</div></div>;
+  if (!product) return <div className={styles.container}><div className={styles.wrapper}>Produto não encontrado</div></div>;
 
   return (
     <div className={styles.container}>
-      <Breadcrumb 
-        items={[
-          { label: 'Página inicial', href: '/' },
-          { label: 'Finalizar pedido' }
-        ]}
-      />
-      <h1 className={styles.heading}>Fazer pedido — {product.nome}</h1>
-      <div className={styles.card}>
+      <div className={styles.wrapper}>
+        <Breadcrumb 
+          items={[
+            { label: 'Página inicial', href: '/' },
+            { label: 'Finalizar pedido' }
+          ]}
+        />
+        <h1 className={styles.heading}>Fazer pedido — {product.nome}</h1>
+        <div className={styles.card}>
         {product.imagem_url ? (
           <SmartImage src={product.imagem_url.split(',')[0].trim()} alt={product.nome} className={styles.image} width={400} height={400} style={{ objectFit: 'cover' }} />
         ) : (
@@ -394,6 +402,7 @@ export default function ProductOrderPage() {
 
           </form>
         </div>
+      </div>
       </div>
     </div>
   );

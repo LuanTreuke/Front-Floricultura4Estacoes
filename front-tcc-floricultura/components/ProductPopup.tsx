@@ -8,7 +8,7 @@ import { getCurrentUser, User } from '../services/authService';
 import { addToCart } from '../services/cartService';
 import { buildImageURL } from '@/utils/imageUtils';
 import NgrokImage from './NgrokImage';
-import { showToast } from '../utils/sweetAlert';
+import AddToCartModal from './AddToCartModal';
 
 type Props = {
   productId: number;
@@ -20,10 +20,10 @@ export default function ProductPopup({ productId, onClose, inline = false }: Pro
   const router = useRouter();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
-  const [addedMsg, setAddedMsg] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const overlayRef = useRef<HTMLDivElement | null>(null);
+  const [showAddToCartModal, setShowAddToCartModal] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -222,12 +222,10 @@ export default function ProductPopup({ productId, onClose, inline = false }: Pro
                   <button className={styles.shoppingCart} onClick={() => {
                     const firstImage = product.imagem_url ? product.imagem_url.split(',')[0].trim() : '';
                     addToCart({ id: product.id, nome: product.nome, preco: product.preco, imagem_url: firstImage });
-                    showToast('Produto adicionado ao carrinho!', 'success');
-                    setAddedMsg('Adicionado');
-                    setTimeout(() => setAddedMsg(null), 1500);
+                    setShowAddToCartModal(true);
                   }}>
                     <span className={'material-icons'}>shopping_cart</span>
-                    {addedMsg || 'Adicionar ao carrinho'}
+                    Adicionar ao carrinho
                   </button>
                 </div>
               </>
@@ -246,47 +244,61 @@ export default function ProductPopup({ productId, onClose, inline = false }: Pro
   if (inline) return content;
 
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 30000 }}>
-      <div
-        ref={overlayRef}
-        style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 30000 }}
-        onClick={() => { if (onClose) onClose(); }}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          left: '50%',
-          top: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: 'min(900px, 95vw)',
-          maxHeight: '85vh',
-          overflowY: 'auto',
-          background: 'white',
-          borderRadius: 12,
-          boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-          zIndex: 30001,
-        }}
-      >
-        <button
-          aria-label="Fechar"
+    <>
+      <div style={{ position: 'fixed', inset: 0, zIndex: 30000 }}>
+        <div
+          ref={overlayRef}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 30000 }}
           onClick={() => { if (onClose) onClose(); }}
+        />
+        <div
           style={{
-            position: 'sticky',
-            top: 0,
-            marginLeft: 'auto',
-            display: 'block',
-            background: 'transparent',
-            border: 'none',
-            padding: 12,
-            cursor: 'pointer',
-            zIndex: 1,
+            position: 'absolute',
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 'min(900px, 95vw)',
+            maxHeight: '85vh',
+            overflow: 'hidden',
+            background: 'white',
+            borderRadius: 12,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+            zIndex: 30001,
           }}
         >
-          <span className="material-icons" style={{ fontSize: 22 }}>close</span>
-        </button>
-        {content}
+          <button
+            aria-label="Fechar"
+            onClick={() => { if (onClose) onClose(); }}
+            style={{
+              position: 'sticky',
+              top: 0,
+              marginLeft: 'auto',
+              display: 'block',
+              background: 'transparent',
+              border: 'none',
+              padding: 12,
+              cursor: 'pointer',
+              zIndex: 1,
+            }}
+          >
+            <span className="material-icons" style={{ fontSize: 22 }}>close</span>
+          </button>
+          {content}
+        </div>
       </div>
-    </div>
+      
+      {showAddToCartModal && product && (
+        <AddToCartModal
+          productName={product.nome}
+          onClose={() => setShowAddToCartModal(false)}
+          onGoToCart={() => {
+            setShowAddToCartModal(false);
+            if (onClose) onClose();
+            router.push('/carrinho');
+          }}
+        />
+      )}
+    </>
   );
 }
 

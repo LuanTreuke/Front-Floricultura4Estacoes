@@ -42,8 +42,9 @@ function CadastroEnderecoContent() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.heading}>Cadastrar endereço</h1>
-      <form onSubmit={handleSubmit} className={styles.form}>
+      <div className={styles.wrapper}>
+        <h1 className={styles.heading}>Cadastrar endereço</h1>
+        <form onSubmit={handleSubmit} className={styles.form}>
         <label>Rua</label>
         <input className={styles.input} value={rua} onChange={e => setRua(e.target.value)} required />
         <label>Número</label>
@@ -62,13 +63,14 @@ function CadastroEnderecoContent() {
         </div>
         {message && <div style={{ marginTop: 8 }}>{message}</div>}
       </form>
+      </div>
     </div>
   );
 }
 
 export default function CadastroEnderecoPage() {
   return (
-    <Suspense fallback={<div className={styles.container}>Carregando...</div>}>
+    <Suspense fallback={<div className={styles.container}><div className={styles.wrapper}>Carregando...</div></div>}>
       <CadastroEnderecoContent />
     </Suspense>
   );

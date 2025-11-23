@@ -543,51 +543,71 @@ export default function AdminPedidosPage() {
                 </svg>
               </a>
             )}
-            <label 
-              style={{ 
-                position: 'absolute', 
-                top: 10, 
-                right: 10, 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '8px',
-                fontSize: '13px',
-                fontWeight: 500,
-                cursor: 'pointer',
-                backgroundColor: 'rgba(255,255,255,0.95)',
-                padding: '8px 12px',
-                borderRadius: '6px',
-                boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-                zIndex: 10,
-                userSelect: 'none'
-              }}
-              onClick={(e) => {
-                e.preventDefault();
-                toggleNotify(typeof o.id === 'number' ? o.id as number : undefined);
-              }}
-            >
-              <span style={{ whiteSpace: 'nowrap' }}>Notificar cliente?</span>
-              <div
-                style={{
-                  width: '20px',
-                  height: '20px',
-                  borderRadius: '4px',
-                  border: '2px solid #2e7d32',
-                  backgroundColor: !(notifyDisabled && typeof o.id === 'number' && notifyDisabled[o.id]) ? '#2e7d32' : '#fff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                  transition: 'all 0.2s'
+            <div style={{ position: 'absolute', top: 10, right: 10, display: 'flex', flexDirection: 'column', gap: '8px', zIndex: 10 }}>
+              <label 
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '8px',
+                  fontSize: '13px',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  backgroundColor: 'rgba(255,255,255,0.95)',
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+                  userSelect: 'none'
+                }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  toggleNotify(typeof o.id === 'number' ? o.id as number : undefined);
                 }}
               >
-                {!(notifyDisabled && typeof o.id === 'number' && notifyDisabled[o.id]) && (
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                )}
+                <span style={{ whiteSpace: 'nowrap' }}>Notificar cliente?</span>
+                <div
+                  style={{
+                    width: '20px',
+                    height: '20px',
+                    borderRadius: '4px',
+                    border: '2px solid #2e7d32',
+                    backgroundColor: !(notifyDisabled && typeof o.id === 'number' && notifyDisabled[o.id]) ? '#2e7d32' : '#fff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  {!(notifyDisabled && typeof o.id === 'number' && notifyDisabled[o.id]) && (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  )}
+                </div>
+              </label>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  fontSize: '13px',
+                  fontWeight: 500,
+                  backgroundColor: 'rgba(255,255,255,0.95)',
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                <span>Status:</span>
+                <span style={{
+                  fontWeight: 600,
+                  color: o.status === 'Entregue' ? '#2e7d32' : o.status === 'Cancelado' ? '#d32f2f' : o.status === 'Em_Rota' ? '#1976d2' : '#f57c00'
+                }}>
+                  {displayStatus(o.status as string | null)}
+                </span>
               </div>
-            </label>
+            </div>
             <div className={styles.thumb}>
               {(o._images && o._images.length > 0) ? (
                 <div style={{ position: 'relative', width: '100%', height: '100%' }} key={`order-${o.id}-img-${o._imageIndex || 0}`}>

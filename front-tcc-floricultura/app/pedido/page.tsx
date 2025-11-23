@@ -67,9 +67,13 @@ export default function UnifiedOrderPage() {
         } else {
           const pref = localStorage.getItem('checkout_selected_address');
           if (pref) setSelectedAddress(Number(pref));
-          else if (my.length > 0) setSelectedAddress(my[0].id || null);
+          // Se houver apenas 1 endereço, seleciona automaticamente
+          else if (my.length === 1) setSelectedAddress(my[0].id || null);
         }
-      } catch { if (my.length > 0) setSelectedAddress(my[0].id || null); }
+      } catch { 
+        // Se houver apenas 1 endereço, seleciona automaticamente
+        if (my.length === 1) setSelectedAddress(my[0].id || null);
+      }
       // checar telefone no servidor (não depender apenas do localStorage)
       try {
         const phones = await fetchPhones();
@@ -206,15 +210,16 @@ export default function UnifiedOrderPage() {
 
   return (
     <div className={styles.container}>
-      <BackButton />
-      <Breadcrumb 
-        items={[
-          { label: 'Página inicial', href: '/' },
-          { label: 'Finalizar Pedido' }
-        ]}
-      />
-      <h1 className={styles.heading } style={{ marginTop: 24, fontSize: 30 }}>Finalizar pedido</h1>
-      <form onSubmit={handleSubmit} className={styles.form}>
+      <div className={styles.wrapper}>
+        <BackButton />
+        <Breadcrumb 
+          items={[
+            { label: 'Página inicial', href: '/' },
+            { label: 'Finalizar Pedido' }
+          ]}
+        />
+        <h1 className={styles.heading } style={{ marginTop: 24, fontSize: 30 }}>Finalizar pedido</h1>
+        <form onSubmit={handleSubmit} className={styles.form}>
         {!vemRetirar && (
           <>
             <label>Endereço</label>
@@ -387,6 +392,7 @@ export default function UnifiedOrderPage() {
             </div>
           </div>
         ))}
+      </div>
       </div>
     </div>
   );
