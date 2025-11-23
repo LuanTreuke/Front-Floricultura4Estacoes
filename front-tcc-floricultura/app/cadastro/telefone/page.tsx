@@ -8,16 +8,16 @@ import BackButton from '../../../components/BackButton';
 
 export default function CadastroPage() {
   const router = useRouter();
-  const [from, setFrom] = useState<string | null>(null);
+  const [returnTo, setReturnTo] = useState<string | null>(null);
 
   useEffect(() => {
     try {
       if (typeof window !== 'undefined') {
         const p = new URLSearchParams(window.location.search);
-        setFrom(p.get('from'));
+        setReturnTo(p.get('returnTo'));
       }
     } catch {
-      setFrom(null);
+      setReturnTo(null);
     }
   }, []);
 
@@ -106,7 +106,7 @@ export default function CadastroPage() {
         {/* If no phone: show only the Add button and helper text. */}
         {(!phones || phones.length === 0) ? (
           <>
-            <button type="button" onClick={() => router.push('/cadastro/telefone/novo' + (from ? `?returnTo=${encodeURIComponent(from)}` : ''))}>Adicionar telefone</button>
+            <button type="button" onClick={() => router.push('/cadastro/telefone/novo' + (returnTo ? `?returnTo=${encodeURIComponent(returnTo)}` : ''))}>Adicionar telefone</button>
             <div style={{ color: '#666', fontSize: 12, marginTop: 8 }}>Aguardando confirmação do número antes de concluir o cadastro.</div>
           </>
         ) : (
@@ -114,7 +114,14 @@ export default function CadastroPage() {
           <button
             type="button"
             style={{ background: '#b2e0c2' }}
-            onClick={() => router.push('/')}
+            onClick={() => {
+              // Redirecionar para returnTo se existir, caso contrário para a home
+              if (returnTo && returnTo.trim().length > 0) {
+                router.push(returnTo);
+              } else {
+                router.push('/');
+              }
+            }}
             title="Concluir cadastro"
           >
             Concluir cadastro

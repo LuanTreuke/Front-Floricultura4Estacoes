@@ -99,9 +99,21 @@ export default function UnifiedOrderPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (items.length === 0) return showValidationError('Carrinho vazio');
-    if (!selectedAddress) {
+    
+    // Se vem retirar e não tem endereço selecionado, selecionar o primeiro disponível
+    let enderecoFinal = selectedAddress;
+    if (vemRetirar && !enderecoFinal && addresses.length > 0) {
+      enderecoFinal = addresses[0].id || null;
+    }
+    
+    if (!vemRetirar && !enderecoFinal) {
       setErrors(prev => ({ ...prev, selectedAddress: true }));
       return showValidationError('Selecione um endereço');
+    }
+    
+    if (vemRetirar && !enderecoFinal) {
+      showValidationError('Você precisa ter pelo menos um endereço cadastrado para continuar.');
+      return;
     }
     const usuario = getCurrentUser() as User;
     if (!usuario || !usuario.id) {
@@ -139,7 +151,6 @@ export default function UnifiedOrderPage() {
   if (!nomeDestinatario || !nomeDestinatario.trim()) missing.push('nomeDestinatario');
   if (!dataEntrega) missing.push('dataEntrega');
   if (!horaEntrega) missing.push('horaEntrega');
-  if (!selectedAddress) missing.push('selectedAddress');
   if (hasUsuarioTelefone === false) {
     showValidationError('Para finalizar o pedido, cadastre um telefone de contato.');
     setLoading(false);
@@ -164,7 +175,7 @@ export default function UnifiedOrderPage() {
       const dto = {
         carrinho: JSON.stringify(carrinhoObj),
         observacao: observacao || undefined,
-        Endereco_id: selectedAddress,
+        Endereco_id: enderecoFinal!,
         Usuario_id: usuario.id,
         nome_cliente: nomeCliente || usuario.nome || '',
         telefone_cliente: (usuario as any)?.telefone || undefined,
@@ -204,41 +215,60 @@ export default function UnifiedOrderPage() {
       />
       <h1 className={styles.heading } style={{ marginTop: 24, fontSize: 30 }}>Finalizar pedido</h1>
       <form onSubmit={handleSubmit} className={styles.form}>
-        <label>Endereço</label>
-          <select className={`${styles.select} ${errors.selectedAddress ? styles.invalid : ''}`} value={selectedAddress || ''} onChange={e => { setSelectedAddress(Number(e.target.value)); setErrors(prev => ({ ...prev, selectedAddress: false })); try { localStorage.setItem('checkout_selected_address', String(Number(e.target.value))); } catch {} }}>
-          <option value="">Selecione</option>
-          {addresses.map(a => <option key={a.id} value={a.id}>{`${a.rua}, ${a.numero} - ${a.bairro}`}</option>)}
-        </select>
+        {!vemRetirar && (
+          <>
+            <label>Endereço</label>
+            <select className={`${styles.select} ${errors.selectedAddress ? styles.invalid : ''}`} value={selectedAddress || ''} onChange={e => { setSelectedAddress(Number(e.target.value)); setErrors(prev => ({ ...prev, selectedAddress: false })); try { localStorage.setItem('checkout_selected_address', String(Number(e.target.value))); } catch {} }}>
+              <option value="">Selecione</option>
+              {addresses.map(a => <option key={a.id} value={a.id}>{`${a.rua}, ${a.numero} - ${a.bairro}`}</option>)}
+            </select>
+
+            <div style={{ marginTop: 8 }}>
+              <button type="button" className={styles.primaryBtn} onClick={() => {
+                // Salvar dados do formulário no localStorage
+                try {
+                  const formData = {
+                    nomeCliente,
+                    nomeDestinatario,
+                    dataEntrega,
+                    horaEntrega,
+                    observacao,
+                    selectedAddress,
+                    vemRetirar,
+                  };
+                  localStorage.setItem('pedido_carrinho_form', JSON.stringify(formData));
+                } catch { /* ignore */ }
+                router.push('/cadastro/endereco?returnTo=/pedido');
+              }}>
+                + Adicionar endereço
+              </button>
+            </div>
+          </>
+        )}
 
         <label>Nome</label>
         <input className={`${styles.input} ${errors.nomeCliente ? styles.invalid : ''}`} value={nomeCliente} onChange={e => { setNomeCliente(e.target.value); setErrors(prev => ({ ...prev, nomeCliente: false })); }} />
-
-        <div style={{ marginTop: 8 }}>
-          <button type="button" className={styles.primaryBtn} onClick={() => {
-            // Salvar dados do formulário no localStorage
-            try {
-              const formData = {
-                nomeCliente,
-                nomeDestinatario,
-                dataEntrega,
-                horaEntrega,
-                observacao,
-                selectedAddress,
-                vemRetirar,
-              };
-              localStorage.setItem('pedido_carrinho_form', JSON.stringify(formData));
-            } catch { /* ignore */ }
-            router.push('/cadastro/endereco?returnTo=/pedido');
-          }}>
-            + Adicionar endereço
-          </button>
-        </div>
 
         {/* Aviso de telefone ausente */}
         {hasUsuarioTelefone === false && (
           <div style={{ background: '#fffaf0', border: '1px solid #ffe4a3', padding: 10, borderRadius: 8, color: '#7a4b00' }}>
             <div style={{ marginBottom: 6 }}>Você ainda não tem um telefone cadastrado. Cadastre para prosseguir.</div>
-            <button type="button" className={styles.secondaryBtn} onClick={() => router.push('/cadastro/telefone/novo?returnTo=/pedido')}>
+            <button type="button" className={styles.secondaryBtn} onClick={() => {
+              // Salvar dados do formulário no localStorage
+              try {
+                const formData = {
+                  nomeCliente,
+                  nomeDestinatario,
+                  dataEntrega,
+                  horaEntrega,
+                  observacao,
+                  selectedAddress,
+                  vemRetirar,
+                };
+                localStorage.setItem('pedido_carrinho_form', JSON.stringify(formData));
+              } catch { /* ignore */ }
+              router.push('/cadastro/telefone/novo?returnTo=/pedido');
+            }}>
               Adicionar telefone
             </button>
           </div>

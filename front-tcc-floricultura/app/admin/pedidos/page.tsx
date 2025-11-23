@@ -675,14 +675,16 @@ export default function AdminPedidosPage() {
                 <div><strong>Cliente:</strong> {o.nome_cliente || o.usuario?.nome}</div>
                 <div><strong>Para:</strong> {o.nome_destinatario || '—'}</div>
                 <div><strong>Telefone:</strong> {o.telefone_cliente || '—'}</div>
-                <div>
-                  <strong>Endereço:</strong>{' '}
-                  {o.endereco ? (
-                    `${o.endereco.rua}, ${o.endereco.numero}${o.endereco.complemento ? ' • ' + o.endereco.complemento : ''} — ${o.endereco.bairro}${o.endereco.cidade ? ', ' + o.endereco.cidade : ''}${o.endereco.cep ? ' • CEP: ' + o.endereco.cep : ''}`
-                  ) : (
-                    o.Endereco_id ? `ID ${o.Endereco_id}` : '—'
-                  )}
-                </div>
+                {!(o.vem_retirar === true || o.vem_retirar === 1) && (
+                  <div>
+                    <strong>Endereço:</strong>{' '}
+                    {o.endereco ? (
+                      `${o.endereco.rua}, ${o.endereco.numero}${o.endereco.complemento ? ' • ' + o.endereco.complemento : ''} — ${o.endereco.bairro}${o.endereco.cidade ? ', ' + o.endereco.cidade : ''}${o.endereco.cep ? ' • CEP: ' + o.endereco.cep : ''}`
+                    ) : (
+                      o.Endereco_id ? `ID ${o.Endereco_id}` : '—'
+                    )}
+                  </div>
+                )}
                 
                 <div className={styles.times}>
                   <div>

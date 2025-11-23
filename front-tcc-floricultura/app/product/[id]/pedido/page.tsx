@@ -103,8 +103,25 @@ export default function ProductOrderPage() {
       quantidade: orderQuantity || 1,
       imagem_url: product.imagem_url ? product.imagem_url.split(',')[0].trim() : null,
     } : null;
+    
+    // Se vem retirar e não tem endereço selecionado, selecionar o primeiro disponível
+    let enderecoFinal = selectedAddress;
+    if (vemRetirar && !enderecoFinal && addresses.length > 0) {
+      enderecoFinal = addresses[0].id || null;
+    }
+    
+    if (!vemRetirar && !enderecoFinal) {
+      setErrors(prev => ({ ...prev, selectedAddress: true }));
+      showValidationError('Selecione um endereço');
+      return;
+    }
+    
+    if (vemRetirar && !enderecoFinal) {
+      showValidationError('Você precisa ter pelo menos um endereço cadastrado para continuar.');
+      return;
+    }
+    
     const missing: string[] = [];
-    if (!selectedAddress) missing.push('selectedAddress');
     // require logged in user
     if (!usuario || !usuario.id) {
       const goToLogin = await showLoginRequired();
@@ -168,7 +185,7 @@ export default function ProductOrderPage() {
   observacao: observacao && observacao.trim().length ? observacao : undefined,
       cobrar_no_endereco: cobrarNoEndereco,
       vem_retirar: vemRetirar,
-      Endereco_id: selectedAddress,
+      Endereco_id: enderecoFinal!,
       Usuario_id: (typeof usuario?.id === 'number' && usuario.id > 0) ? usuario.id : null,
     };
     try {
@@ -215,41 +232,61 @@ export default function ProductOrderPage() {
             {hasUsuarioTelefone === false && (
               <div style={{ background: '#fffaf0', border: '1px solid #ffe4a3', padding: 10, borderRadius: 8, color: '#7a4b00' }}>
                 <div style={{ marginBottom: 6 }}>Você ainda não tem um telefone cadastrado. Cadastre para prosseguir.</div>
-                <button type="button" className={styles.secondaryBtn} onClick={() => router.push(`/cadastro/telefone/novo?returnTo=/product/${id}/pedido`)}>
+                <button type="button" className={styles.secondaryBtn} onClick={() => {
+                  // Salvar dados do formulário no localStorage
+                  try {
+                    const formData = {
+                      nomeCliente,
+                      nomeDestinatario,
+                      dataEntrega,
+                      horaEntrega,
+                      observacao,
+                      selectedAddress,
+                      orderQuantity,
+                      vemRetirar,
+                    };
+                    localStorage.setItem(`pedido_direto_form_${id}`, JSON.stringify(formData));
+                  } catch { /* ignore */ }
+                  router.push(`/cadastro/telefone/novo?returnTo=/product/${id}/pedido`);
+                }}>
                   Adicionar telefone
                 </button>
               </div>
             )}
 
-            <label>Endereço</label>
-            <select className={`${styles.select} ${errors.selectedAddress ? styles.invalid : ''}`} value={selectedAddress || ''} onChange={e => { setSelectedAddress(Number(e.target.value)); setErrors(prev => ({ ...prev, selectedAddress: false })); }}>
-              <option value="">Selecione</option>
-              {addresses.map(a => (
-                <option key={a.id} value={a.id}>{`${a.rua}, ${a.numero} - ${a.bairro}`}</option>
-              ))}
-            </select>
+            {!vemRetirar && (
+              <>
+                <label>Endereço</label>
+                <select className={`${styles.select} ${errors.selectedAddress ? styles.invalid : ''}`} value={selectedAddress || ''} onChange={e => { setSelectedAddress(Number(e.target.value)); setErrors(prev => ({ ...prev, selectedAddress: false })); }}>
+                  <option value="">Selecione</option>
+                  {addresses.map(a => (
+                    <option key={a.id} value={a.id}>{`${a.rua}, ${a.numero} - ${a.bairro}`}</option>
+                  ))}
+                </select>
 
-            <div style={{ marginTop: 8 }}>
-              <button type="button" className={styles.primaryBtn} onClick={() => {
-                // Salvar dados do formulário no localStorage
-                try {
-                  const formData = {
-                    nomeCliente,
-                    nomeDestinatario,
-                    dataEntrega,
-                    horaEntrega,
-                    observacao,
-                    selectedAddress,
-                    orderQuantity,
-                    vemRetirar,
-                  };
-                  localStorage.setItem(`pedido_direto_form_${id}`, JSON.stringify(formData));
-                } catch { /* ignore */ }
-                router.push(`/cadastro/endereco?returnTo=/product/${id}/pedido`);
-              }}>
-                + Adicionar endereço
-              </button>
-            </div>
+                <div style={{ marginTop: 8 }}>
+                  <button type="button" className={styles.primaryBtn} onClick={() => {
+                    // Salvar dados do formulário no localStorage
+                    try {
+                      const formData = {
+                        nomeCliente,
+                        nomeDestinatario,
+                        dataEntrega,
+                        horaEntrega,
+                        observacao,
+                        selectedAddress,
+                        orderQuantity,
+                        vemRetirar,
+                      };
+                      localStorage.setItem(`pedido_direto_form_${id}`, JSON.stringify(formData));
+                    } catch { /* ignore */ }
+                    router.push(`/cadastro/endereco?returnTo=/product/${id}/pedido`);
+                  }}>
+                    + Adicionar endereço
+                  </button>
+                </div>
+              </>
+            )}
 
             <label>Quem vai receber?</label>
             <input className={`${styles.input} ${errors.nomeDestinatario ? styles.invalid : ''}`} value={nomeDestinatario} onChange={e => { setNomeDestinatario(e.target.value); setErrors(prev => ({ ...prev, nomeDestinatario: false })); }} placeholder="Nome do destinatário (se diferente)" />

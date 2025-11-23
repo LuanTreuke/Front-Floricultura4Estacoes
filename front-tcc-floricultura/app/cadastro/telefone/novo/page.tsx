@@ -67,10 +67,13 @@ export default function CadastroTelefoneNovoPage() {
     try { if (typeof window !== 'undefined') localStorage.setItem('check_phone_after_whatsapp', '1'); } catch {}
     // wait 3 seconds to give the user time to switch to WhatsApp and send the message
     setTimeout(() => {
-      // If the caller explicitly requested returning to Minha Conta, respect it.
-      // Otherwise prefer sending the user to the cadastro flow page so they continue signup.
-      if (returnTo === '/minha-conta') router.push(returnTo);
-      else router.push('/cadastro/telefone');
+      // If the caller explicitly requested a returnTo URL, pass it to the confirmation page.
+      // Otherwise go to the cadastro flow page so they continue signup.
+      if (returnTo && returnTo.trim().length > 0) {
+        router.push(`/cadastro/telefone?returnTo=${encodeURIComponent(returnTo)}`);
+      } else {
+        router.push('/cadastro/telefone');
+      }
     }, 3000);
   }
 
