@@ -8,6 +8,7 @@ import { getCurrentUser, User } from '../services/authService';
 import { addToCart } from '../services/cartService';
 import { buildImageURL } from '@/utils/imageUtils';
 import NgrokImage from './NgrokImage';
+import { showToast } from '../utils/sweetAlert';
 
 type Props = {
   productId: number;
@@ -221,6 +222,7 @@ export default function ProductPopup({ productId, onClose, inline = false }: Pro
                   <button className={styles.shoppingCart} onClick={() => {
                     const firstImage = product.imagem_url ? product.imagem_url.split(',')[0].trim() : '';
                     addToCart({ id: product.id, nome: product.nome, preco: product.preco, imagem_url: firstImage });
+                    showToast('Produto adicionado ao carrinho!', 'success');
                     setAddedMsg('Adicionado');
                     setTimeout(() => setAddedMsg(null), 1500);
                   }}>

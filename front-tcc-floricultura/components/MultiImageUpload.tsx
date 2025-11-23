@@ -20,6 +20,7 @@ export default function MultiImageUpload({
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   // Atualizar previews quando currentImages mudar
   React.useEffect(() => {
@@ -102,26 +103,45 @@ export default function MultiImageUpload({
     }
   };
 
+  const handleCameraClick = () => {
+    if (cameraInputRef.current) {
+      cameraInputRef.current.value = '';
+      cameraInputRef.current.click();
+    }
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      {/* Input oculto - aceita múltiplos arquivos */}
+      {/* Input oculto para galeria - aceita múltiplos arquivos */}
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+        accept="image/*"
         multiple
         onChange={handleFileSelect}
         disabled={disabled || selectedFiles.length >= maxImages}
         style={{ display: 'none' }}
       />
+      
+      {/* Input oculto para câmera */}
+      <input
+        ref={cameraInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={handleFileSelect}
+        disabled={disabled || selectedFiles.length >= maxImages}
+        style={{ display: 'none' }}
+      />
 
-      {/* Botão para adicionar imagens */}
+      {/* Botões para adicionar imagens */}
       <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
         <button
           type="button"
           onClick={handleButtonClick}
           disabled={disabled || selectedFiles.length >= maxImages}
           style={{
+            flex: 1,
             background: '#28a745',
             color: 'white',
             border: 'none',
@@ -131,12 +151,35 @@ export default function MultiImageUpload({
             cursor: disabled || selectedFiles.length >= maxImages ? 'not-allowed' : 'pointer',
             display: 'flex',
             alignItems: 'center',
+            justifyContent: 'center',
             gap: 8,
             opacity: disabled || selectedFiles.length >= maxImages ? 0.6 : 1
           }}
         >
           <i className="bi bi-image" style={{ fontSize: 20 }}></i>
           Adicionar Imagens ({selectedFiles.length}/{maxImages})
+        </button>
+        
+        <button
+          type="button"
+          onClick={handleCameraClick}
+          disabled={disabled || selectedFiles.length >= maxImages}
+          style={{
+            background: '#4a4a4a',
+            color: 'white',
+            border: 'none',
+            borderRadius: 8,
+            padding: '12px 16px',
+            cursor: disabled || selectedFiles.length >= maxImages ? 'not-allowed' : 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: disabled || selectedFiles.length >= maxImages ? 0.6 : 1,
+            minWidth: '56px',
+            flexShrink: 0
+          }}
+        >
+          <i className="bi bi-camera" style={{ fontSize: 20 }}></i>
         </button>
       </div>
 
