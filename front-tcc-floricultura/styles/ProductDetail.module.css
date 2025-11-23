@@ -61,6 +61,8 @@
 }
 .actions { 
   margin-top: 28px; 
+  justify-content: center;
+  align-items: center;
 }
 .orderBtn {
   display: flex;
@@ -147,6 +149,7 @@
   .actions {
     display: flex;
     justify-content: center;
+    align-items: center;
   }
   .orderBtn,
   .shoppingCart {

@@ -57,13 +57,17 @@ export default function ProductOrderPage() {
         setAddresses(my);
         // prefills com os dados do usuário logado quando disponíveis
         const saved = localStorage.getItem(`pedido_direto_form_${id}`);
+        let hasAddressSaved = false;
         if (saved) {
           const data = JSON.parse(saved);
           if (data.nomeCliente) setNomeCliente(data.nomeCliente);
+          if (data.selectedAddress) {
+            hasAddressSaved = true;
+          }
         } else if (usuario.nome) setNomeCliente(usuario.nome);
         
-        // Se houver apenas 1 endereço, seleciona automaticamente
-        if (my.length === 1 && !selectedAddress) {
+        // Se houver apenas 1 endereço e não houver endereço salvo, seleciona automaticamente
+        if (my.length === 1 && !hasAddressSaved) {
           setSelectedAddress(my[0].id || null);
         }
         
