@@ -287,11 +287,11 @@ export default function UnifiedOrderPage() {
 
         <div style={{ display: 'flex', gap: 16, width: '100%', marginTop: 12 }}>
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <label>{vemRetirar ? 'Data de retirada' : 'Data de entrega'}</label>
+            <label className={styles.deliveryLabel}>{vemRetirar ? 'Data de retirada' : 'Data de entrega'}</label>
             <input type="date" className={`${styles.input} ${errors.dataEntrega ? styles.invalid : ''}`} value={dataEntrega} onChange={e => { setDataEntrega(e.target.value); setErrors(prev => ({ ...prev, dataEntrega: false })); }} placeholder="dd/mm/aaaa" />
           </div>
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <label>{vemRetirar ? 'Hora de retirada' : 'Hora de entrega'}</label>
+            <label className={styles.deliveryLabel}>{vemRetirar ? 'Hora de retirada' : 'Hora de entrega'}</label>
             <input type="time" className={`${styles.input} ${errors.horaEntrega ? styles.invalid : ''}`} value={horaEntrega} onChange={e => { setHoraEntrega(e.target.value); setErrors(prev => ({ ...prev, horaEntrega: false })); }} placeholder="--:--" />
           </div>
         </div>
