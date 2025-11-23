@@ -81,7 +81,7 @@
 .card {
     display: flex;
     gap: 16px;
-    align-items: center;
+    align-items: flex-start;
     background: #ffffff;
     padding: 14px;
     border-radius: 10px;
